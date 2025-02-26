@@ -1,5 +1,5 @@
-//===- HWToBTOR2.cpp - HW to BTOR2 translation ------------------*- C++ -*-===//
 //
+//===- HWToBTOR2.cpp - HW to BTOR2 translation ------------------*- C++ -*-===//
 // Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
 // See https://llvm.org/LICENSE.txt for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
@@ -98,6 +98,9 @@ private:
   // before they are used
   llvm::SmallMapVector<Operation *, OperandRange::iterator, 16> worklist;
 
+  // Store outputs to be emitted at the end of the module
+  SmallVector<StringRef> outputs;
+
   // Keeps track of operations that have been declared
   DenseSet<Operation *> handledOps;
 
@@ -155,6 +158,12 @@ public:
   }
 
 private:
+  StringRef getOpName(Operation *op) {
+    if (auto nameAttr = op->getAttrOfType<StringAttr>("sv.namehint"))
+      return nameAttr.getValue();
+    return "";
+  }
+
   // Checks if a sort was declared with the given width
   // If so, its lid will be returned
   // Otherwise -1 will be returned
@@ -276,10 +285,10 @@ private:
   void genBinOp(StringRef inst, Operation *binop, Value op1, Value op2,
                 size_t width) {
     // TODO: adding support for most variadic ops shouldn't be too hard
-    if (binop->getNumOperands() != 2) {
-      binop->emitError("variadic operations not are not currently supported");
-      return;
-    }
+    // if (binop->getNumOperands() != 2) {
+    //   binop->emitError("variadic operations not are not currently supported");
+    //   return;
+    // }
 
     // Set the LID for this operation
     size_t opLID = getOpLID(binop);
@@ -294,12 +303,25 @@ private:
 
     // Build and return the string
     os << opLID << " " << inst << " " << sid << " " << op1LID << " " << op2LID
-       << "\n";
+       << " " << getOpName(binop) << "\n";
+
+    // Handle variadic operand case where there may be more than to operads to a binop
+    unsigned num_operands = binop->getNumOperands();
+    unsigned current_op = 2;
+    while (current_op < num_operands) {
+      Value operand = binop->getOperand(current_op);
+      size_t operandLID = getOpLID(operand);
+      size_t new_op_lid = setOpLID(binop);
+      os << new_op_lid << " " << inst << " " << sid << " " << opLID << " " << operandLID
+         << " " << getOpName(binop)
+         << "\n";
+      opLID = new_op_lid;
+      current_op++;
+    }
   }
 
   // Generates a slice instruction given an operand, the lowbit, and the width
-  void genSlice(Operation *srcop, Value op0, size_t lowbit, int64_t width) {
-    // Assign a LID to this operation
+  void genSlice(Operation *srcop, Value op0, size_t lowbit, int64_t width) {    // Assign a LID to this operation
     size_t opLID = getOpLID(srcop);
 
     // Find the sort's associated lid in order to use it in the instruction
@@ -313,7 +335,8 @@ private:
     os << opLID << " "
        << "slice"
        << " " << sid << " " << op0LID << " " << (lowbit + width - 1) << " "
-       << lowbit << "\n";
+       << lowbit << " " << getOpName(srcop)
+       << "\n";
   }
 
   // Generates a constant declaration given a value, a width and a name
@@ -329,7 +352,7 @@ private:
     // Find the LID associated to the operand
     size_t op0LID = getOpLID(op0);
 
-    os << opLID << " " << inst << " " << sid << " " << op0LID << "\n";
+    os << opLID << " " << inst << " " << sid << " " << op0LID << " " << getOpName(srcop) << "\n";
   }
 
   // Generates a constant declaration given a value, a width and a name and
@@ -424,7 +447,7 @@ private:
     // Build and return the ite instruction
     os << opLID << " "
        << "ite"
-       << " " << sid << " " << condLID << " " << tLID << " " << fLID << "\n";
+       << " " << sid << " " << condLID << " " << tLID << " " << fLID << " " << getOpName(srcop) << "\n";
   }
 
   // Generate a logical implication given a lhs and a rhs
@@ -622,6 +645,9 @@ public:
       lid++;
 
       genInput(inlid, w, iName);
+    } else if (port.isOutput() && !isa<seq::ClockType, seq::ImmutableType>(port.type)) {
+      // Save the output for later emission
+      outputs.push_back(port.getName());
     }
   }
 
@@ -639,6 +665,21 @@ public:
     // Prepare for for const generation by extracting the const value and
     // generting the btor2 string
     genConst(op.getValue(), w, op);
+  }
+
+  // Handle outputs
+  void visitHWOutput(Operation* op) {
+    // Iterate over all the operands of op
+    unsigned num_operands = op->getNumOperands();
+    unsigned current_op = 0;
+    while (current_op < num_operands) {
+      Value operand = op->getOperand(current_op);
+      size_t operandLID = getOpLID(operand);
+      size_t new_lid = lid++;
+      StringRef name = outputs[current_op];
+      os << new_lid << " " << "output" << " " << operandLID << " " << name << "\n";
+      current_op++;
+    }
   }
 
   // Wires should have been removed in PrepareForFormal
@@ -743,6 +784,34 @@ public:
 
     // Generate the ite instruction
     genIte(op, pred, tval, fval, w);
+  }
+
+  // Replicate operation is emitted as a sign extension
+  void visitComb(comb::ReplicateOp op) {
+    Value op0 = op.getOperand();
+    size_t multiple = op.getMultiple();
+    int64_t current_width = hw::getBitWidth(op0.getType());
+    
+    // TODO: sext only works when a single bit is being replicated to 'n' bit. Otherwise,
+    // we may need to do a more expensive concat operations to generate the result.
+    // AFAICT, replicate is only emitted for sign-extension, but this assert should act as a guard
+    // to prevent future bugs.
+    assert(current_width == 1 && "Only single bit replication is supported");
+
+    // The new width is the current width times the multiple
+    int64_t w = current_width * multiple;
+    genSort("bitvec", w);
+
+    size_t curLID = getOpLID((Operation* ) op);
+    size_t op0LID = getOpLID(op0);
+    size_t wLID = getSortLID(w);
+
+    // NOTE: BTOR takes as the third argument, the integer, the amount to extend by. 
+    // Not the final width after extension, therefore, we need to subtract the current width.
+
+    os << curLID << " "
+       << "sext"
+       << " " << wLID << " " << op0LID << " " << w - current_width << " " << getOpName((Operation*) op) << "\n";
   }
 
   void visitComb(Operation *op) { visitInvalidComb(op); }
@@ -941,9 +1010,10 @@ public:
               sv::VerbatimExprOp, sv::VerbatimExprSEOp, sv::IfOp, sv::IfDefOp,
               sv::IfDefProceduralOp, sv::AlwaysOp, sv::AlwaysCombOp,
               seq::InitialOp, sv::AlwaysFFOp, seq::FromClockOp, seq::InitialOp,
-              seq::YieldOp, hw::OutputOp, hw::HWModuleOp>(
+              seq::YieldOp, hw::HWModuleOp>(
             [&](auto expr) { ignore(op); })
-
+        // HW Output
+        .Case<hw::OutputOp>([&](auto expr) { visitHWOutput(op); })
         // Make sure that the design only contains one clock
         .Case<seq::FromClockOp>([&](auto expr) {
           if (++nclocks > 1UL) {
