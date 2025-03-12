@@ -239,10 +239,16 @@ private:
 
     // Retrieve the lid associated with the sort (sid)
     size_t sid = sortToLIDMap.at(width);
+    SmallString<32> bitString;
+    size_t required_width = width / 4;
+    if (required_width > 32) {
+      bitString.resize(required_width + 1);
+    }
 
+    value.toString(bitString, 16, /*isSigned=*/false);
     os << opLID << " "
-       << "constd"
-       << " " << sid << " " << value << "\n";
+       << "consth"
+       << " " << sid << " " << bitString << "\n";
   }
 
   // Generates a zero constant expression
