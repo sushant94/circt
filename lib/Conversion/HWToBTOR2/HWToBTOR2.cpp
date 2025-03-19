@@ -239,16 +239,16 @@ private:
 
     // Retrieve the lid associated with the sort (sid)
     size_t sid = sortToLIDMap.at(width);
-    SmallString<32> bitString;
-    size_t required_width = width / 4;
-    if (required_width > 32) {
-      bitString.resize(required_width + 1);
-    }
+    SmallString<1024> bitString;
+    // size_t required_width = width / 4;
+    // if (required_width > 32) {
+    //   bitString.resize(required_width);
+    // }
 
     value.toString(bitString, 16, /*isSigned=*/false);
     os << opLID << " "
        << "consth"
-       << " " << sid << " " << bitString << "\n";
+       << " " << sid << " " << bitString.str() << "\n";
   }
 
   // Generates a zero constant expression
@@ -673,6 +673,16 @@ public:
     genConst(op.getValue(), w, op);
   }
 
+  void visitBitcastOp(Operation* op) {
+    // Get the first operand
+    Value op0 = op->getOperand(0);
+
+    size_t lid = getOpLID(op0);
+
+    // Set the current lid to the same lid
+    opLIDMap[op] = lid;
+  }
+
   // Handle outputs
   void visitHWOutput(Operation* op) {
     // Iterate over all the operands of op
@@ -802,7 +812,7 @@ public:
     // we may need to do a more expensive concat operations to generate the result.
     // AFAICT, replicate is only emitted for sign-extension, but this assert should act as a guard
     // to prevent future bugs.
-    assert(current_width == 1 && "Only single bit replication is supported");
+    // assert(current_width == 1 && "Only single bit replication is supported");
 
     // The new width is the current width times the multiple
     int64_t w = current_width * multiple;
@@ -812,12 +822,27 @@ public:
     size_t op0LID = getOpLID(op0);
     size_t wLID = getSortLID(w);
 
-    // NOTE: BTOR takes as the third argument, the integer, the amount to extend by. 
-    // Not the final width after extension, therefore, we need to subtract the current width.
-
-    os << curLID << " "
-       << "sext"
-       << " " << wLID << " " << op0LID << " " << w - current_width << " " << getOpName((Operation*) op) << "\n";
+    if (current_width == 1) {
+      // NOTE: BTOR takes as the third argument, the integer, the amount to extend by. 
+      // Not the final width after extension, therefore, we need to subtract the current width.
+      os << curLID << " "
+        << "sext"
+        << " " << wLID << " " << op0LID << " " << w - current_width << " " << getOpName((Operation*) op) << "\n";
+    } else {
+      size_t prevLID = op0LID;
+      for (size_t i = 0; i < multiple; i++) {
+        w = current_width * (i + 1);
+        wLID = getSortLID(w);
+        
+        os << curLID << " "
+          << "concat"
+          << " " << wLID << " " << prevLID << " " << op0LID << " ; Check me!\n";
+        
+        prevLID = curLID;
+        curLID = lid++;
+      }
+      lid--;
+    }
   }
 
   void visitComb(Operation *op) { visitInvalidComb(op); }
@@ -1020,6 +1045,7 @@ public:
             [&](auto expr) { ignore(op); })
         // HW Output
         .Case<hw::OutputOp>([&](auto expr) { visitHWOutput(op); })
+        .Case<hw::BitcastOp>([&](auto expr) { visitBitcastOp(op); })
         // Make sure that the design only contains one clock
         .Case<seq::FromClockOp>([&](auto expr) {
           if (++nclocks > 1UL) {
