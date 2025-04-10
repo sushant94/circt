@@ -16,3 +16,28 @@
 ## To-do
 
 - [ ] Try using the release with debug version
+
+## Where things are
+
+- The place to make it not flatten: `lib/Firtool/Firtool/cpp:441`
+  - When you do this, try and output MLIR versions (try and get the one after each pass)
+- The place to handle modules: `lib/Conversion/HWToBTOR2/HWToBTOR2.cpp:runOnOperation` (end of file)
+  - You want something that walks over modules, and then for each individual
+
+```
+Log executions of toplevel module passes
+
+intDebugInfo, disallowExpressionInliningInPorts, disallowMuxInlining, emitWireInPort, emitBindComments, omitVersionComment, caseInsensitiveKeywords
+  --output-final-mlir=<filename>                             - Optional file name to output the final MLIR into, in addition to the output requested by -o
+  --output-hw-mlir=<filename>                                - Optional file name to output the HW IR into, in addition to the output requested by -o
+```
+
+
+### How things connect to each other
+
+- Look at another circt pass (maybe HW to SMT for example, or just an easier one)
+- For how they go over modules
+
+### General thoughts for how to edit this
+
+- 
