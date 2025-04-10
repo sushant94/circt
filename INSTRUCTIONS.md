@@ -40,4 +40,4 @@ intDebugInfo, disallowExpressionInliningInPorts, disallowMuxInlining, emitWireIn
 
 ### General thoughts for how to edit this
 
-- 
+look into firtool, circt-translate, circt-opt
