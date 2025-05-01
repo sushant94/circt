@@ -13,6 +13,8 @@
 #include "circt/Dialect/Comb/CombDialect.h"
 #include "circt/Dialect/Comb/CombOps.h"
 #include "circt/Dialect/Comb/CombVisitors.h"
+#include "circt/Dialect/FIRRTL/FIRRTLInstanceGraph.h"
+#include "circt/Dialect/HW/HWInstanceGraph.h"
 #include "circt/Dialect/HW/HWAttributes.h"
 #include "circt/Dialect/HW/HWModuleGraph.h"
 #include "circt/Dialect/HW/HWOps.h"
@@ -29,10 +31,15 @@
 #include "circt/Dialect/Verif/VerifDialect.h"
 #include "circt/Dialect/Verif/VerifOps.h"
 #include "circt/Dialect/Verif/VerifVisitors.h"
+#include "circt/Support/InstanceGraph.h"
+#include "circt/Support/InstanceGraphInterface.h"
 #include "mlir/Pass/Pass.h"
 #include "llvm/ADT/MapVector.h"
+#include "llvm/ADT/StringRef.h"
 #include "llvm/ADT/TypeSwitch.h"
 #include "llvm/Support/raw_ostream.h"
+#include "llvm/ADT/PostOrderIterator.h"
+#include <string_view>
 
 namespace circt {
 #define GEN_PASS_DEF_CONVERTHWTOBTOR2
@@ -103,6 +110,10 @@ private:
 
   // Keeps track of operations that have been declared
   DenseSet<Operation *> handledOps;
+
+  // Keeps track of all modules and their dependencies
+  DenseMap<StringRef, Operation*> moduleMap;
+  DenseMap<Operation*, SmallVector<hw::InstanceOp>> moduleDeps;
 
   // Constants used during the conversion
   static constexpr size_t noLID = -1UL;
@@ -1068,81 +1079,254 @@ void ConvertHWToBTOR2Pass::runOnOperation() {
   // Btor2 does not have the concept of modules or module
   // hierarchies, so we assume that no nested modules exist at this point.
   // This greatly simplifies translation.
-  getOperation().walk([&](hw::HWModuleOp module) {
-    // Start by extracting the inputs and generating appropriate instructions
-    for (auto &port : module.getPortList()) {
-      visit(port);
-    }
 
-    // Previsit all registers in the module in order to avoid dependency cycles
-    module.walk([&](Operation *op) {
-      TypeSwitch<Operation *, void>(op)
-          .Case<seq::FirRegOp, seq::CompRegOp>([&](auto reg) {
-            visit(reg);
-            handledOps.insert(op);
-          })
-          .Default([&](auto expr) {});
+  // Firstly, collect all modules and their dependencies
+  getOperation().walk([&](hw::HWModuleOp module){
+    moduleMap[module.getName()] = module;
+
+    module.walk([&](hw::InstanceOp inst){
+      moduleDeps[module].push_back(inst);
     });
+  });
 
-    // Visit all of the operations in our module
-    module.walk([&](Operation *op) {
-      // Check: instances are not (yet) supported
-      if (isa<hw::InstanceOp>(op)) {
-        op->emitOpError("not supported in BTOR2 conversion");
-        return;
+  // Print module map and dependencies
+  os << "; ==== Module Map ====\n";
+  for (auto &entry : moduleMap) {
+    os << "; Module '" << entry.first << "'\n";
+  }
+  
+  os << ";\n; ==== Module Dependencies ====\n";
+  for (auto &entry : moduleDeps) {
+    auto module = cast<hw::HWModuleOp>(entry.first);
+    os << "; Module '" << module.getName() << "' contains instances:\n";
+    for (auto inst : entry.second) {
+      os << ";   - Instance '" << inst->getName() << "' of module '" 
+         << inst.getModuleName() << "'\n";
+    }
+  }
+  os << ";\n";
+
+  auto &instanceGraph = getAnalysis<hw::InstanceGraph>();
+  DenseSet<Operation *> handled;
+
+  for (auto *startNode : instanceGraph) {
+    // Reason for doing it post order is to handle leaves first (so we're able to reference them in upper level modules)
+    for (igraph::InstanceGraphNode *node : llvm::post_order(startNode)) {
+      // Only visit each module once in your graph traversal
+      if (!handled.insert(node->getModule().getOperation()).second)
+        continue;
+
+      auto module = llvm::cast<hw::HWModuleOp>(node->getModule().getOperation());
+
+      // Print out that we're at the start of a file for file parsing purposes later
+      os << "; ==== Module '" << module.getModuleName() << "' ====\n";
+      
+      // Output includes for a module
+      auto &deps = moduleDeps[module];
+      std::set<std::string> includes;
+      for (auto inst : deps) {
+        std::string depModuleName = inst.getModuleName().str();
+        std::string depFilePath = (depModuleName + ".btor2++");
+        if (depModuleName != module.getModuleName().str()) {
+          os << "include " << depFilePath << "\n";
+        }
       }
 
-      // Don't process ops that have already been emitted
-      if (handledOps.contains(op))
-        return;
+      os << "\n";
 
-      // Fill in our worklist
-      worklist.insert({op, op->operand_begin()});
+      // Emit Module Block (start)
+      os << "module " << module.getModuleName() << " {\n";
 
-      // Process the elements in our worklist
-      while (!worklist.empty()) {
-        auto &[op, operandIt] = worklist.back();
-        if (operandIt == op->operand_end()) {
-          // All of the operands have been emitted, it is safe to emit our op
-          dispatchTypeOpVisitor(op);
+      lid = 1;
+      
+      // Start by extracting inputs and generating appropriate instructions (and pre-processing outputs)
+      for (auto &port : module.getPortList()) {
+        visit(port);
+        // os << "Port: isOutput | " << port.isOutput() << " | " << port.getName() << "\n\n";
+      }
 
-          // Record that our op has been emitted
-          handledOps.insert(op);
-          worklist.pop_back();
-          continue;
-        }
+      // Previsit all registers in the module in order to avoid dependency cycles
+      module.walk([&](Operation *op) {
+        TypeSwitch<Operation *, void>(op)
+            .Case<seq::FirRegOp, seq::CompRegOp>([&](auto reg) {
+              visit(reg);
+              handledOps.insert(op);
+            });
+      });
 
-        // Send the operands of our op to the worklist in case they are still
-        // un-emitted
-        Value operand = *(operandIt++);
-        auto *defOp = operand.getDefiningOp();
-
-        // Make sure that we don't emit the same operand twice
-        if (!defOp || handledOps.contains(defOp))
-          continue;
-
-        // This is triggered if our operand is already in the worklist and
-        // wasn't handled
-        if (!worklist.insert({defOp, defOp->operand_begin()}).second) {
-          defOp->emitError("dependency cycle");
+      module.walk([&](Operation *op) {
+        // Handle instances at the end of the pass
+        if (isa<hw::InstanceOp>(op)) {
           return;
         }
-      }
-    });
 
-    // Iterate through the registers and generate the `next` instructions
-    for (size_t i = 0; i < regOps.size(); ++i) {
-      finalizeRegVisit(regOps[i]);
+        // Don't process ops that have already been emitted
+        if (handledOps.contains(op))
+          return;
+
+        // Fill in our worklist
+        worklist.insert({op, op->operand_begin()});
+
+        // Process the elements in our worklist
+        while (!worklist.empty()) {
+          auto &[op, operandIt] = worklist.back();
+          if (operandIt == op->operand_end()) {
+            // All of the operands have been emitted, it is safe to emit our op
+            dispatchTypeOpVisitor(op);
+
+            // Record that our op has been emitted
+            handledOps.insert(op);
+            worklist.pop_back();
+            continue;
+          }
+
+          // Send the operands of our op to the worklist in case they are still
+          // un-emitted
+          Value operand = *(operandIt++);
+          auto *defOp = operand.getDefiningOp();
+
+          // Make sure that we don't emit the same operand twice; not Instance; not Register
+          if (!defOp || handledOps.contains(defOp) || isa<hw::InstanceOp>(defOp))
+            continue;
+
+          if (mlir::isa<BlockArgument>(operand))
+            continue;
+
+          // This is triggered if our operand is already in the worklist and
+          // wasn't handled
+          if (!worklist.insert({defOp, defOp->operand_begin()}).second) {
+            defOp->emitError("dependency cycle");
+            return;
+          }
+        }
+      });
+
+      for (auto module : moduleDeps[module]) {
+        // TODO
+      }
+
+      // Iterate through the registers and generate the `next` instructions (do this after handling instances?)
+      for (size_t i = 0; i < regOps.size(); ++i) {
+        finalizeRegVisit(regOps[i]);
+      }
+
+      // Emit Module Block (end)
+      os << "}\n";
+
+      // For each module, walk over all instances of the module and print the ports of the instance
+      // When walking over the instances, use module instead of moduleDeps[module]
+      // module.walk([&](hw::InstanceOp inst) {
+      //   os << "; ==== Instance '" << inst.getInstanceName() << "' of module '" << inst.getModuleName() << "' ====\n";
+      //   os << "; ==== Instance Ports ====\n";
+      //   for (auto port : inst.getPortList()) {
+      //     os << "  " << port.getName() << "\n";
+      //   }
+      //   os << "; ==== End of Instance Ports ====\n";
+      // });
+
+      // Print out that we're at the end of a file
+      os << "; ==== End of Module '" << module.getModuleName() << "' ====\n";
+
+      // Clear all LID data structures to allow for pass reuse
+      sortToLIDMap.clear();
+      constToLIDMap.clear();
+      opLIDMap.clear();
+      inputLIDs.clear();
+      regOps.clear();
+      handledOps.clear();
+      worklist.clear();
     }
-  });
-  // Clear data structures to allow for pass reuse
-  sortToLIDMap.clear();
-  constToLIDMap.clear();
-  opLIDMap.clear();
-  inputLIDs.clear();
-  regOps.clear();
-  handledOps.clear();
-  worklist.clear();
+  }
+
+
+  // getOperation().walk<mlir::WalkOrder::PreOrder>([&](hw::HWModuleOp module) {
+  //   os << "Visiting " << module.getName() << "\n";
+  //   os << "Module dependencies: " << moduleDeps[module].size() << "\n";
+  //   os << "\n";
+
+    // Start by extracting inputs and generating appropriate instructions
+    // for (auto &port : module.getPortList()) {
+    //   visit(port);
+    //   os << "Port: isOutput | " << port.isOutput() << " | " << port.getName() << "\n\n";
+    // }
+
+  //   module.walk([&](Operation *op) {
+      
+  //   });
+    // // Start by extracting the inputs and generating appropriate instructions
+    // for (auto &port : module.getPortList()) {
+    //   visit(port);
+    // }
+
+    // // Previsit all registers in the module in order to avoid dependency cycles
+    // module.walk([&](Operation *op) {
+    //   TypeSwitch<Operation *, void>(op)
+    //       .Case<seq::FirRegOp, seq::CompRegOp>([&](auto reg) {
+    //         visit(reg);
+    //         handledOps.insert(op);
+    //       })
+    //       .Default([&](auto expr) {});
+    // });
+
+    // Visit all of the operations in our module
+    // module.walk([&](Operation *op) {
+    //   // Check: instances are not (yet) supported
+    //   if (isa<hw::InstanceOp>(op)) {
+    //     op->emitOpError("not supported in BTOR2 conversion");
+    //     return;
+    //   }
+
+    //   // Don't process ops that have already been emitted
+    //   if (handledOps.contains(op))
+    //     return;
+
+    //   // Fill in our worklist
+    //   worklist.insert({op, op->operand_begin()});
+
+    //   // Process the elements in our worklist
+    //   while (!worklist.empty()) {
+    //     auto &[op, operandIt] = worklist.back();
+    //     if (operandIt == op->operand_end()) {
+    //       // All of the operands have been emitted, it is safe to emit our op
+    //       dispatchTypeOpVisitor(op);
+
+    //       // Record that our op has been emitted
+    //       handledOps.insert(op);
+    //       worklist.pop_back();
+    //       continue;
+    //     }
+
+    //     // Send the operands of our op to the worklist in case they are still
+    //     // un-emitted
+    //     Value operand = *(operandIt++);
+    //     auto *defOp = operand.getDefiningOp();
+
+    //     // Make sure that we don't emit the same operand twice
+    //     if (!defOp || handledOps.contains(defOp))
+    //       continue;
+
+    //     // This is triggered if our operand is already in the worklist and
+    //     // wasn't handled
+    //     if (!worklist.insert({defOp, defOp->operand_begin()}).second) {
+    //       defOp->emitError("dependency cycle");
+    //       return;
+    //     }
+    //   }
+    // });
+
+    // // Iterate through the registers and generate the `next` instructions
+    // for (size_t i = 0; i < regOps.size(); ++i) {
+    //   finalizeRegVisit(regOps[i]);
+    // }
+//   });
+  // // Clear data structures to allow for pass reuse
+  // sortToLIDMap.clear();
+  // constToLIDMap.clear();
+  // opLIDMap.clear();
+  // inputLIDs.clear();
+  // regOps.clear();
+  // handledOps.clear();
+  // worklist.clear();
 }
 
 // Constructor with a custom ostream
