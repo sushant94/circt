@@ -21,6 +21,7 @@
 #include "circt/Dialect/HW/HWPasses.h"
 #include "circt/Dialect/HW/HWTypes.h"
 #include "circt/Dialect/HW/HWVisitors.h"
+#include "circt/Dialect/HW/PortImplementation.h"
 #include "circt/Dialect/SV/SVAttributes.h"
 #include "circt/Dialect/SV/SVDialect.h"
 #include "circt/Dialect/SV/SVOps.h"
@@ -33,12 +34,15 @@
 #include "circt/Dialect/Verif/VerifVisitors.h"
 #include "circt/Support/InstanceGraph.h"
 #include "circt/Support/InstanceGraphInterface.h"
+#include "circt/Support/LLVM.h"
+#include "mlir/IR/Value.h"
 #include "mlir/Pass/Pass.h"
 #include "llvm/ADT/MapVector.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/ADT/TypeSwitch.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/ADT/PostOrderIterator.h"
+#include "llvm/ADT/STLExtras.h"
 #include <string_view>
 
 namespace circt {
@@ -115,6 +119,21 @@ private:
   DenseMap<StringRef, Operation*> moduleMap;
   DenseMap<Operation*, SmallVector<hw::InstanceOp>> moduleDeps;
 
+  // For each module, keep track of all input/output ports
+  DenseMap<Operation*, ModulePortInfo> modulePorts;
+
+  // For each module, also keep track of the correposnding ModulePortLookupInfo
+  DenseMap<Operation*, ModulePortLookupInfo> modulePortLookupInfo;
+
+  // For each module, keep track of the LID for each input/output port. ssize_t is the port id, size_t is the LID
+  DenseMap<Operation*, DenseMap<ssize_t, size_t>> modulePortLIDs;
+
+  // instanceLIDs
+  DenseMap<Operation*, size_t> instanceLIDs;
+
+  Operation* currentModule;
+  Operation* moduleToSearch;
+
   // Constants used during the conversion
   static constexpr size_t noLID = -1UL;
   [[maybe_unused]] static constexpr int64_t noWidth = -1L;
@@ -159,16 +178,46 @@ public:
       // Extract the block argument index and use that to get the line number
       size_t argIdx = barg.getArgNumber();
 
-      // Check that the extracted argument is in range before using it
-      if (auto it = inputLIDs.find(argIdx); it != inputLIDs.end())
+      if (moduleToSearch) {
+        os << "moduleToSearch: " << llvm::cast<hw::HWModuleOp>(moduleToSearch).getModuleName() << "\n";
+        const auto &ports = modulePorts.at(moduleToSearch);
+        for (const auto &port : ports) {
+          if (port.argNum == argIdx && port.isInput()) {
+            ssize_t portId = port.getId();
+            os << "portId: " << portId << "\n";
+            os << "argnum: " << port.argNum << "\n";
+            os << "portName: " << port.getName() << "\n";
+            auto moduleIt = modulePortLIDs.find(moduleToSearch);
+            if (moduleIt != modulePortLIDs.end()) {
+              const auto &portLIDs = moduleIt->second;
+              auto lidIt = portLIDs.find(portId);
+              if (lidIt != portLIDs.end()) {
+                return lidIt->second;
+              }
+            }
+            break;
+          }
+        }
+      } else if (auto it = inputLIDs.find(argIdx); it != inputLIDs.end()) {
+        os << "inputLIDs: " << it->second << "\n";
         return it->second;
-    }
+      }
+    } 
 
     // Return -1 if no LID was found
     return noLID;
   }
 
 private:
+  // Find a port by its id
+  const PortInfo* findPortById(const ModulePortInfo& ports, ssize_t portId) {
+    for (const auto& port : ports) {
+      if (port.getId() == portId)
+        return &port;
+    }
+    return nullptr;
+  }
+
   StringRef getOpName(Operation *op) {
     if (auto nameAttr = op->getAttrOfType<StringAttr>("sv.namehint"))
       return nameAttr.getValue();
@@ -662,6 +711,10 @@ public:
       lid++;
 
       genInput(inlid, w, iName);
+
+      // Record the port in the module ports map
+      modulePortLIDs[currentModule][port.getId()] = inlid;
+
     } else if (port.isOutput() && !isa<seq::ClockType, seq::ImmutableType>(port.type)) {
       // Save the output for later emission
       outputs.push_back(port.getName());
@@ -704,6 +757,13 @@ public:
       size_t operandLID = getOpLID(operand);
       size_t new_lid = lid++;
       StringRef name = outputs[current_op];
+      auto portLookupInfo = modulePortLookupInfo.at(currentModule);
+      auto outputPortIndex = portLookupInfo.getOutputPortIndex(name);
+      if (succeeded(outputPortIndex)) {
+        modulePortLIDs[currentModule][outputPortIndex.value()] = new_lid;
+      } else {
+        op->emitError("Output port '" + name.str() + "' not found in module ports!");
+      }
       os << new_lid << " " << "output" << " " << operandLID << " " << name << "\n";
       current_op++;
     }
@@ -1080,6 +1140,17 @@ void ConvertHWToBTOR2Pass::runOnOperation() {
   // hierarchies, so we assume that no nested modules exist at this point.
   // This greatly simplifies translation.
 
+  /*
+  TODO:
+  - For each module, store the inputs and outputs in the maps above (done)
+    - For inputs/outputs, in a separate map, map the operation/something to the LID for that module's input/output (done)
+  - If a module has dependencies, create an instance of the module using the inst instruction (done)
+  - For all referenced inputs/outputs, reference them with ref, then write set/get btor instructions to get that to work
+  - Handle outputs
+  - Write next for each register
+  - Test your changes
+  */
+
   // Firstly, collect all modules and their dependencies
   getOperation().walk([&](hw::HWModuleOp module){
     moduleMap[module.getName()] = module;
@@ -1106,6 +1177,34 @@ void ConvertHWToBTOR2Pass::runOnOperation() {
   }
   os << ";\n";
 
+  for (auto module : moduleMap) {
+    auto moduleOp = llvm::cast<hw::HWModuleOp>(module.second);
+    hw::ModulePortInfo allModulePorts = hw::ModulePortInfo(moduleOp.getPortList());
+    modulePorts.insert({moduleOp, allModulePorts});
+    modulePortLookupInfo.insert({moduleOp, ModulePortLookupInfo(module.second->getContext(), allModulePorts)});
+  }
+
+  // print modulePorts
+  os << "; ==== Module Ports ====\n";
+  for (auto &entry : modulePorts) {
+    auto hwModule = cast<hw::HWModuleOp>(entry.first);
+    ModulePortInfo modulePorts = entry.second;
+    os << "; Module '" << hwModule.getName() << "'\n";
+
+    for (auto port : modulePorts.getInputs()) {
+      os << ";   - Input Port '" << port.getName() << "' with id '" << port.getId() << "'\n";
+    }
+
+    os << "\n";
+
+    for (auto port : modulePorts.getOutputs()) {
+      os << ";   - Output Port '" << port.getName() << "' with id '" << port.getId() << "'\n";
+    }
+
+    os << "\n";
+
+  }
+
   auto &instanceGraph = getAnalysis<hw::InstanceGraph>();
   DenseSet<Operation *> handled;
 
@@ -1115,7 +1214,8 @@ void ConvertHWToBTOR2Pass::runOnOperation() {
       // Only visit each module once in your graph traversal
       if (!handled.insert(node->getModule().getOperation()).second)
         continue;
-
+      
+      auto *currentOperation = node->getModule().getOperation();
       auto module = llvm::cast<hw::HWModuleOp>(node->getModule().getOperation());
 
       // Print out that we're at the start of a file for file parsing purposes later
@@ -1138,11 +1238,12 @@ void ConvertHWToBTOR2Pass::runOnOperation() {
       os << "module " << module.getModuleName() << " {\n";
 
       lid = 1;
+      currentModule = currentOperation;
+      moduleToSearch = currentModule;
       
       // Start by extracting inputs and generating appropriate instructions (and pre-processing outputs)
       for (auto &port : module.getPortList()) {
         visit(port);
-        // os << "Port: isOutput | " << port.isOutput() << " | " << port.getName() << "\n\n";
       }
 
       // Previsit all registers in the module in order to avoid dependency cycles
@@ -1162,6 +1263,9 @@ void ConvertHWToBTOR2Pass::runOnOperation() {
 
         // Don't process ops that have already been emitted
         if (handledOps.contains(op))
+          return;
+
+        if (isa<hw::OutputOp>(op))
           return;
 
         // Fill in our worklist
@@ -1185,11 +1289,8 @@ void ConvertHWToBTOR2Pass::runOnOperation() {
           Value operand = *(operandIt++);
           auto *defOp = operand.getDefiningOp();
 
-          // Make sure that we don't emit the same operand twice; not Instance; not Register
+          // Make sure that we don't emit the same operand twice; not Instance
           if (!defOp || handledOps.contains(defOp) || isa<hw::InstanceOp>(defOp))
-            continue;
-
-          if (mlir::isa<BlockArgument>(operand))
             continue;
 
           // This is triggered if our operand is already in the worklist and
@@ -1201,17 +1302,137 @@ void ConvertHWToBTOR2Pass::runOnOperation() {
         }
       });
 
-      for (auto module : moduleDeps[module]) {
-        // TODO
+      // handle outputs that weren't handled earlier
+      for (auto &op : module.getBodyBlock()->getOperations()) {
+        if (auto outputOp = dyn_cast<hw::OutputOp>(&op)) {
+          for (auto operand : outputOp.getOperands()) {
+            // If the operand is a BlockArgument, its LID should already be assigned in inputLIDs.
+            // If the operand is a result of an op, it should have been assigned in opLIDMap.
+            // If not, you need to emit/handle it here.
+            if (mlir::isa<mlir::BlockArgument>(operand)) {
+              continue;
+            }
+            Operation *defOp = operand.getDefiningOp();
+            if (isa_and_nonnull<hw::InstanceOp>(defOp)) {
+              continue;
+            }
+            if (defOp && opLIDMap.find(defOp) == opLIDMap.end()) {
+              // Emit/handle the defining op here if it wasn't already handled.
+              dispatchTypeOpVisitor(defOp);
+              handledOps.insert(defOp);
+            }
+          }
+        }
+      }      
+
+      DenseSet<StringRef> handledInstances;
+      for (auto instance : moduleDeps[module]) {
+        // TODO: emit inst instruction
+        size_t instanceLID = lid;
+        instanceLIDs[instance] = instanceLID;
+        StringRef moduleName = instance.getModuleName();
+        StringRef instanceName = instance.getInstanceName();
+
+        Operation *moduleOp = moduleMap.at(moduleName);
+        hw::HWModuleOp hwModuleOp = llvm::cast<hw::HWModuleOp>(moduleOp);
+        auto &portInfo = modulePorts.at(moduleOp);  
+
+        os << instanceLID << " " << "inst " << moduleName << "\n";
+
+        lid++;
+
+        // TODO: emit ref instructions
+        if (!handledInstances.contains(moduleName)) {
+          for (auto port : portInfo.getInputs()) {
+            if (isa<seq::ClockType, seq::ImmutableType>(port.type))
+              continue;
+            
+            size_t refLID = lid;
+            size_t portLID = modulePortLIDs[moduleOp][port.getId()];
+            lid++;
+            os << refLID << " " << "ref " << moduleName << " " << portLID << " " << port.getName() << "\n";
+          }
+
+          for (auto port : portInfo.getOutputs()) {
+            if (isa<seq::ClockType, seq::ImmutableType>(port.type))
+              continue;
+
+            size_t refLID = lid;
+            size_t portLID = modulePortLIDs[moduleOp][port.getId()];
+            lid++;
+            os << refLID << " " << "ref " << moduleName << " " << portLID << " " << port.getName() << "\n";
+          }
+
+          handledInstances.insert(moduleName);
+        }
+
+        // TODO: emit set instructions for each input port
+        unsigned operandIdx = 0;
+        for (auto port : portInfo.getInputs()) {
+          if (isa<seq::ClockType, seq::ImmutableType>(port.type))
+            continue;
+          
+          // Get the value in the parent module connected to this input port
+          Value operand = instance.getOperand(operandIdx);
+
+          // set the module to search for the LID of the operand
+          moduleToSearch = hwModuleOp;
+
+          // for moduleToSearch, output all the portLIDs
+          auto &portLIDs = modulePortLIDs.at(moduleToSearch);
+          for (auto &portLID : portLIDs) {
+            os << "portLID: " << portLID.first << " | " << portLID.second << "\n";
+          } 
+
+          size_t localLID = getOpLID(operand);
+
+          size_t refLID = modulePortLIDs[moduleOp][port.getId()];
+
+          size_t setLID = lid++;
+          os << setLID << " set " << instanceLID << " " << refLID << " " << localLID << " " << port.getName() << "\n";
+
+          operandIdx++;
+        }
+        
+        // TOOD: emit get instructions for each output port
+        
+
+      }
+
+      // emit outputs
+      for (auto &op : module.getBodyBlock()->getOperations()) {
+        if (auto outputOp = dyn_cast<hw::OutputOp>(&op)) {
+          visitHWOutput(outputOp);
+        }
       }
 
       // Iterate through the registers and generate the `next` instructions (do this after handling instances?)
-      for (size_t i = 0; i < regOps.size(); ++i) {
-        finalizeRegVisit(regOps[i]);
-      }
+      // for (size_t i = 0; i < regOps.size(); ++i) {
+      //   finalizeRegVisit(regOps[i]);
+      // }
 
       // Emit Module Block (end)
       os << "}\n";
+
+            // print modulePortLIDs
+      os << "; ==== Module Port LIDs ====\n";
+      auto &allModulePorts = modulePorts.at(module);
+      auto &currentModulePortLIDs = modulePortLIDs.at(module);
+      for (auto &port : currentModulePortLIDs) {
+        ssize_t portId = port.first;
+        size_t portLID = port.second;
+        const PortInfo* portInfo = findPortById(allModulePorts, portId);
+        // print if input or output
+        if (portInfo->isInput())
+          os << ";   - Input Port '" << portId << "' with LID '" << portLID << "'\n";
+        else
+          os << ";   - Output Port '" << portId << "' with LID '" << portLID << "'\n";
+        if (portInfo)
+          os << ";   - Port from module ports: '" << portInfo->getName() << "'\n";
+        else
+          os << ";   - Port not found in module ports!\n";
+      }
+      os << ";\n";
 
       // For each module, walk over all instances of the module and print the ports of the instance
       // When walking over the instances, use module instead of moduleDeps[module]
@@ -1235,6 +1456,7 @@ void ConvertHWToBTOR2Pass::runOnOperation() {
       regOps.clear();
       handledOps.clear();
       worklist.clear();
+      outputs.clear();
     }
   }
 
