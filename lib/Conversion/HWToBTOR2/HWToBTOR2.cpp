@@ -131,8 +131,12 @@ private:
   // instanceLIDs
   DenseMap<Operation*, size_t> instanceLIDs;
 
+  // value LIDs
+  DenseMap<Value, size_t> valueLIDMap;
+
   Operation* currentModule;
-  Operation* moduleToSearch;
+
+  const char *indent = "  ";
 
   // Constants used during the conversion
   static constexpr size_t noLID = -1UL;
@@ -167,6 +171,11 @@ public:
   // If so, its lid will be returned
   // Otherwise -1 will be returned
   size_t getOpLID(Value value) {
+    // if this value is in the valueLIDmap (for instance results)
+    if (auto it = valueLIDMap.find(value); it != valueLIDMap.end()) {
+      return it->second;
+    }
+
     Operation *defOp = value.getDefiningOp();
 
     if (auto it = opLIDMap.find(defOp); it != opLIDMap.end())
@@ -178,16 +187,12 @@ public:
       // Extract the block argument index and use that to get the line number
       size_t argIdx = barg.getArgNumber();
 
-      if (moduleToSearch) {
-        os << "moduleToSearch: " << llvm::cast<hw::HWModuleOp>(moduleToSearch).getModuleName() << "\n";
-        const auto &ports = modulePorts.at(moduleToSearch);
+      if (currentModule) {
+        const auto &ports = modulePorts.at(currentModule);
         for (const auto &port : ports) {
           if (port.argNum == argIdx && port.isInput()) {
             ssize_t portId = port.getId();
-            os << "portId: " << portId << "\n";
-            os << "argnum: " << port.argNum << "\n";
-            os << "portName: " << port.getName() << "\n";
-            auto moduleIt = modulePortLIDs.find(moduleToSearch);
+            auto moduleIt = modulePortLIDs.find(currentModule);
             if (moduleIt != modulePortLIDs.end()) {
               const auto &portLIDs = moduleIt->second;
               auto lidIt = portLIDs.find(portId);
@@ -199,12 +204,13 @@ public:
           }
         }
       } else if (auto it = inputLIDs.find(argIdx); it != inputLIDs.end()) {
-        os << "inputLIDs: " << it->second << "\n";
+        // os << "inputLIDs: " << it->second << "\n";
         return it->second;
       }
     } 
 
     // Return -1 if no LID was found
+    os << indent << " noLID\n";
     return noLID;
   }
 
@@ -275,7 +281,7 @@ private:
     size_t sortlid = setSortLID(width);
 
     // Build and return a sort declaration
-    os << sortlid << " "
+    os << indent << sortlid << " "
        << "sort"
        << " " << type << " " << width << "\n";
   }
@@ -286,7 +292,7 @@ private:
     size_t sid = sortToLIDMap.at(width);
 
     // Generate input declaration
-    os << inlid << " "
+    os << indent << inlid << " "
        << "input"
        << " " << sid << " " << name << "\n";
   }
@@ -306,7 +312,7 @@ private:
     // }
 
     value.toString(bitString, 16, /*isSigned=*/false);
-    os << opLID << " "
+    os << indent << opLID << " "
        << "consth"
        << " " << sid << " " << bitString.str() << "\n";
   }
@@ -325,7 +331,7 @@ private:
     size_t constlid = setConstLID(0, width);
 
     // Build and return the zero btor instruction
-    os << constlid << " "
+    os << indent << constlid << " "
        << "zero"
        << " " << sid << "\n";
     return constlid;
@@ -341,7 +347,7 @@ private:
 
     // Build and emit the string (the lid here doesn't need to be associated
     // to an op as it won't be used)
-    os << lid++ << " "
+    os << indent << lid++ << " "
        << "init"
        << " " << sid << " " << regLID << " " << initValLID << "\n";
   }
@@ -368,7 +374,7 @@ private:
     size_t op2LID = getOpLID(op2);
 
     // Build and return the string
-    os << opLID << " " << inst << " " << sid << " " << op1LID << " " << op2LID
+    os << indent << opLID << " " << inst << " " << sid << " " << op1LID << " " << op2LID
        << " " << getOpName(binop) << "\n";
 
     // Handle variadic operand case where there may be more than to operads to a binop
@@ -378,7 +384,7 @@ private:
       Value operand = binop->getOperand(current_op);
       size_t operandLID = getOpLID(operand);
       size_t new_op_lid = setOpLID(binop);
-      os << new_op_lid << " " << inst << " " << sid << " " << opLID << " " << operandLID
+      os << indent << new_op_lid << " " << inst << " " << sid << " " << opLID << " " << operandLID
          << " " << getOpName(binop)
          << "\n";
       opLID = new_op_lid;
@@ -398,7 +404,7 @@ private:
     size_t op0LID = getOpLID(op0);
 
     // Build and return the slice instruction
-    os << opLID << " "
+    os << indent << opLID << " "
        << "slice"
        << " " << sid << " " << op0LID << " " << (lowbit + width - 1) << " "
        << lowbit << " " << getOpName(srcop)
@@ -418,7 +424,7 @@ private:
     // Find the LID associated to the operand
     size_t op0LID = getOpLID(op0);
 
-    os << opLID << " " << inst << " " << sid << " " << op0LID << " " << getOpName(srcop) << "\n";
+    os << indent << opLID << " " << inst << " " << sid << " " << op0LID << " " << getOpName(srcop) << "\n";
   }
 
   // Generates a constant declaration given a value, a width and a name and
@@ -435,7 +441,7 @@ private:
     // Retrieve the lid associated with the sort (sid)
     size_t sid = sortToLIDMap.at(width);
 
-    os << curLid << " " << inst << " " << sid << " " << op0LID << "\n";
+    os << indent << curLid << " " << inst << " " << sid << " " << op0LID << "\n";
     return curLid;
   }
 
@@ -465,7 +471,7 @@ private:
   void genBad(size_t assertLID) {
     // Build and return the btor2 string
     // Also update the lid as this instruction is not associated to an mlir op
-    os << lid++ << " "
+    os << indent << lid++ << " "
        << "bad"
        << " " << assertLID << "\n";
   }
@@ -511,7 +517,7 @@ private:
     size_t sid = sortToLIDMap.at(width);
 
     // Build and return the ite instruction
-    os << opLID << " "
+    os << indent << opLID << " "
        << "ite"
        << " " << sid << " " << condLID << " " << tLID << " " << fLID << " " << getOpName(srcop) << "\n";
   }
@@ -536,7 +542,7 @@ private:
     // Retrieve the lid associated with the sort (sid)
     size_t sid = sortToLIDMap.at(1);
     // Build and emit the implies operation
-    os << opLID << " "
+    os << indent << opLID << " "
        << "implies"
        << " " << sid << " " << lhsLID << " " << rhsLID << "\n";
     return opLID;
@@ -551,7 +557,7 @@ private:
     size_t sid = sortToLIDMap.at(width);
 
     // Build and return the state instruction
-    os << opLID << " "
+    os << indent << opLID << " "
        << "state"
        << " " << sid << " " << name << "\n";
   }
@@ -568,7 +574,7 @@ private:
 
     // Build and return the next instruction
     // Also update the lid as this instruction is not associated to an mlir op
-    os << lid++ << " "
+    os << indent << lid++ << " "
        << "next"
        << " " << sid << " " << regLID << " " << nextLID << "\n";
   }
@@ -764,7 +770,7 @@ public:
       } else {
         op->emitError("Output port '" + name.str() + "' not found in module ports!");
       }
-      os << new_lid << " " << "output" << " " << operandLID << " " << name << "\n";
+      os << indent << new_lid << " " << "output" << " " << operandLID << " " << name << "\n";
       current_op++;
     }
   }
@@ -896,7 +902,7 @@ public:
     if (current_width == 1) {
       // NOTE: BTOR takes as the third argument, the integer, the amount to extend by. 
       // Not the final width after extension, therefore, we need to subtract the current width.
-      os << curLID << " "
+      os << indent << curLID << " "
         << "sext"
         << " " << wLID << " " << op0LID << " " << w - current_width << " " << getOpName((Operation*) op) << "\n";
     } else {
@@ -905,7 +911,7 @@ public:
         w = current_width * (i + 1);
         wLID = getSortLID(w);
         
-        os << curLID << " "
+        os << indent << curLID << " "
           << "concat"
           << " " << wLID << " " << prevLID << " " << op0LID << " ; Check me!\n";
         
@@ -1145,9 +1151,9 @@ void ConvertHWToBTOR2Pass::runOnOperation() {
   - For each module, store the inputs and outputs in the maps above (done)
     - For inputs/outputs, in a separate map, map the operation/something to the LID for that module's input/output (done)
   - If a module has dependencies, create an instance of the module using the inst instruction (done)
-  - For all referenced inputs/outputs, reference them with ref, then write set/get btor instructions to get that to work
-  - Handle outputs
-  - Write next for each register
+  - For all referenced inputs/outputs, reference them with ref, then write set/get btor instructions to get that to work (done)
+  - Handle outputs (done)
+  - Write next for each register (done)
   - Test your changes
   */
 
@@ -1161,21 +1167,21 @@ void ConvertHWToBTOR2Pass::runOnOperation() {
   });
 
   // Print module map and dependencies
-  os << "; ==== Module Map ====\n";
-  for (auto &entry : moduleMap) {
-    os << "; Module '" << entry.first << "'\n";
-  }
+  // os << "; ==== Module Map ====\n";
+  // for (auto &entry : moduleMap) {
+  //   os << "; Module '" << entry.first << "'\n";
+  // }
   
-  os << ";\n; ==== Module Dependencies ====\n";
-  for (auto &entry : moduleDeps) {
-    auto module = cast<hw::HWModuleOp>(entry.first);
-    os << "; Module '" << module.getName() << "' contains instances:\n";
-    for (auto inst : entry.second) {
-      os << ";   - Instance '" << inst->getName() << "' of module '" 
-         << inst.getModuleName() << "'\n";
-    }
-  }
-  os << ";\n";
+  // os << ";\n; ==== Module Dependencies ====\n";
+  // for (auto &entry : moduleDeps) {
+  //   auto module = cast<hw::HWModuleOp>(entry.first);
+  //   os << "; Module '" << module.getName() << "' contains instances:\n";
+  //   for (auto inst : entry.second) {
+  //     os << ";   - Instance '" << inst->getName() << "' of module '" 
+  //        << inst.getModuleName() << "'\n";
+  //   }
+  // }
+  // os << ";\n";
 
   for (auto module : moduleMap) {
     auto moduleOp = llvm::cast<hw::HWModuleOp>(module.second);
@@ -1185,25 +1191,25 @@ void ConvertHWToBTOR2Pass::runOnOperation() {
   }
 
   // print modulePorts
-  os << "; ==== Module Ports ====\n";
-  for (auto &entry : modulePorts) {
-    auto hwModule = cast<hw::HWModuleOp>(entry.first);
-    ModulePortInfo modulePorts = entry.second;
-    os << "; Module '" << hwModule.getName() << "'\n";
+  // os << "; ==== Module Ports ====\n";
+  // for (auto &entry : modulePorts) {
+  //   auto hwModule = cast<hw::HWModuleOp>(entry.first);
+  //   ModulePortInfo modulePorts = entry.second;
+  //   os << "; Module '" << hwModule.getName() << "'\n";
 
-    for (auto port : modulePorts.getInputs()) {
-      os << ";   - Input Port '" << port.getName() << "' with id '" << port.getId() << "'\n";
-    }
+  //   for (auto port : modulePorts.getInputs()) {
+  //     os << ";   - Input Port '" << port.getName() << "' with id '" << port.getId() << "'\n";
+  //   }
 
-    os << "\n";
+  //   os << "\n";
 
-    for (auto port : modulePorts.getOutputs()) {
-      os << ";   - Output Port '" << port.getName() << "' with id '" << port.getId() << "'\n";
-    }
+  //   for (auto port : modulePorts.getOutputs()) {
+  //     os << ";   - Output Port '" << port.getName() << "' with id '" << port.getId() << "'\n";
+  //   }
 
-    os << "\n";
+  //   os << "\n";
 
-  }
+  // }
 
   auto &instanceGraph = getAnalysis<hw::InstanceGraph>();
   DenseSet<Operation *> handled;
@@ -1239,7 +1245,6 @@ void ConvertHWToBTOR2Pass::runOnOperation() {
 
       lid = 1;
       currentModule = currentOperation;
-      moduleToSearch = currentModule;
       
       // Start by extracting inputs and generating appropriate instructions (and pre-processing outputs)
       for (auto &port : module.getPortList()) {
@@ -1254,6 +1259,70 @@ void ConvertHWToBTOR2Pass::runOnOperation() {
               handledOps.insert(op);
             });
       });
+
+      DenseSet<StringRef> handledInstances;
+      DenseMap<ssize_t, size_t> portRefLIDs;
+      for (auto instance : moduleDeps[module]) {
+        // TODO: emit inst instruction
+        size_t instanceLID = lid;
+        instanceLIDs[instance] = instanceLID;
+        StringRef moduleName = instance.getModuleName();
+
+        Operation *moduleOp = moduleMap.at(moduleName);
+        auto &portInfo = modulePorts.at(moduleOp);  
+
+        os << indent << instanceLID << " " << "inst " << moduleName << "\n";
+
+        lid++;
+        
+        // TODO: emit ref instructions
+        if (!handledInstances.contains(moduleName)) {
+          for (auto port : portInfo.getInputs()) {
+            if (isa<seq::ClockType, seq::ImmutableType>(port.type))
+              continue;
+            
+            size_t refLID = lid;
+            size_t portLID = modulePortLIDs[moduleOp][port.getId()];
+            lid++;
+            os << indent << refLID << " " << "ref " << moduleName << " " << portLID << " " << port.getName() << "\n";
+            portRefLIDs[port.getId()] = refLID;
+          }
+
+          for (auto port : portInfo.getOutputs()) {
+            if (isa<seq::ClockType, seq::ImmutableType>(port.type))
+              continue;
+
+            size_t refLID = lid;
+            size_t portLID = modulePortLIDs[moduleOp][port.getId()];
+            lid++;
+            os << indent << refLID << " " << "ref " << moduleName << " " << portLID << " " << port.getName() << "\n";
+            portRefLIDs[port.getId()] = refLID;
+          }
+
+          handledInstances.insert(moduleName);
+        }
+
+        // TOOD: emit get instructions for each output port
+        unsigned outputIdx = 0;
+        for (auto port : portInfo.getOutputs()) {
+          if (isa<seq::ClockType, seq::ImmutableType>(port.type)) {
+            outputIdx++;
+            continue;
+          }
+
+          Value result = instance.getResult(outputIdx);
+
+          size_t refLID = portRefLIDs[port.getId()];
+          size_t getLID = lid++;
+
+          os << indent << getLID << " get " << instanceLID << " " << refLID << " " << port.getName() << "\n";
+
+          valueLIDMap[result] = getLID;
+
+          outputIdx++;
+        }
+        
+      }
 
       module.walk([&](Operation *op) {
         // Handle instances at the end of the pass
@@ -1323,80 +1392,36 @@ void ConvertHWToBTOR2Pass::runOnOperation() {
             }
           }
         }
-      }      
+      }
 
-      DenseSet<StringRef> handledInstances;
+      // emit set instructions
       for (auto instance : moduleDeps[module]) {
-        // TODO: emit inst instruction
-        size_t instanceLID = lid;
-        instanceLIDs[instance] = instanceLID;
-        StringRef moduleName = instance.getModuleName();
-        StringRef instanceName = instance.getInstanceName();
-
-        Operation *moduleOp = moduleMap.at(moduleName);
-        hw::HWModuleOp hwModuleOp = llvm::cast<hw::HWModuleOp>(moduleOp);
-        auto &portInfo = modulePorts.at(moduleOp);  
-
-        os << instanceLID << " " << "inst " << moduleName << "\n";
-
-        lid++;
-
-        // TODO: emit ref instructions
-        if (!handledInstances.contains(moduleName)) {
-          for (auto port : portInfo.getInputs()) {
-            if (isa<seq::ClockType, seq::ImmutableType>(port.type))
-              continue;
-            
-            size_t refLID = lid;
-            size_t portLID = modulePortLIDs[moduleOp][port.getId()];
-            lid++;
-            os << refLID << " " << "ref " << moduleName << " " << portLID << " " << port.getName() << "\n";
-          }
-
-          for (auto port : portInfo.getOutputs()) {
-            if (isa<seq::ClockType, seq::ImmutableType>(port.type))
-              continue;
-
-            size_t refLID = lid;
-            size_t portLID = modulePortLIDs[moduleOp][port.getId()];
-            lid++;
-            os << refLID << " " << "ref " << moduleName << " " << portLID << " " << port.getName() << "\n";
-          }
-
-          handledInstances.insert(moduleName);
-        }
-
         // TODO: emit set instructions for each input port
         unsigned operandIdx = 0;
+        size_t instanceLID = instanceLIDs[instance];
+        StringRef moduleName = instance.getModuleName();
+
+        Operation *moduleOp = moduleMap.at(moduleName);
+        auto &portInfo = modulePorts.at(moduleOp);
+
         for (auto port : portInfo.getInputs()) {
-          if (isa<seq::ClockType, seq::ImmutableType>(port.type))
+          if (isa<seq::ClockType, seq::ImmutableType>(port.type)) {
+            operandIdx++;
             continue;
+          }
           
           // Get the value in the parent module connected to this input port
           Value operand = instance.getOperand(operandIdx);
 
-          // set the module to search for the LID of the operand
-          moduleToSearch = hwModuleOp;
-
-          // for moduleToSearch, output all the portLIDs
-          auto &portLIDs = modulePortLIDs.at(moduleToSearch);
-          for (auto &portLID : portLIDs) {
-            os << "portLID: " << portLID.first << " | " << portLID.second << "\n";
-          } 
-
           size_t localLID = getOpLID(operand);
 
-          size_t refLID = modulePortLIDs[moduleOp][port.getId()];
+          size_t refLID = portRefLIDs[port.getId()];
 
           size_t setLID = lid++;
-          os << setLID << " set " << instanceLID << " " << refLID << " " << localLID << " " << port.getName() << "\n";
+          os << indent << setLID << " set " << instanceLID << " " << refLID << " " << localLID << " " << port.getName() << "\n";
 
           operandIdx++;
         }
-        
-        // TOOD: emit get instructions for each output port
-        
-
       }
 
       // emit outputs
@@ -1407,43 +1432,32 @@ void ConvertHWToBTOR2Pass::runOnOperation() {
       }
 
       // Iterate through the registers and generate the `next` instructions (do this after handling instances?)
-      // for (size_t i = 0; i < regOps.size(); ++i) {
-      //   finalizeRegVisit(regOps[i]);
-      // }
+      for (size_t i = 0; i < regOps.size(); ++i) {
+        finalizeRegVisit(regOps[i]);
+      }
 
       // Emit Module Block (end)
       os << "}\n";
 
-            // print modulePortLIDs
-      os << "; ==== Module Port LIDs ====\n";
-      auto &allModulePorts = modulePorts.at(module);
-      auto &currentModulePortLIDs = modulePortLIDs.at(module);
-      for (auto &port : currentModulePortLIDs) {
-        ssize_t portId = port.first;
-        size_t portLID = port.second;
-        const PortInfo* portInfo = findPortById(allModulePorts, portId);
-        // print if input or output
-        if (portInfo->isInput())
-          os << ";   - Input Port '" << portId << "' with LID '" << portLID << "'\n";
-        else
-          os << ";   - Output Port '" << portId << "' with LID '" << portLID << "'\n";
-        if (portInfo)
-          os << ";   - Port from module ports: '" << portInfo->getName() << "'\n";
-        else
-          os << ";   - Port not found in module ports!\n";
-      }
-      os << ";\n";
-
-      // For each module, walk over all instances of the module and print the ports of the instance
-      // When walking over the instances, use module instead of moduleDeps[module]
-      // module.walk([&](hw::InstanceOp inst) {
-      //   os << "; ==== Instance '" << inst.getInstanceName() << "' of module '" << inst.getModuleName() << "' ====\n";
-      //   os << "; ==== Instance Ports ====\n";
-      //   for (auto port : inst.getPortList()) {
-      //     os << "  " << port.getName() << "\n";
-      //   }
-      //   os << "; ==== End of Instance Ports ====\n";
-      // });
+      // print modulePortLIDs
+      // os << "; ==== Module Port LIDs ====\n";
+      // auto &allModulePorts = modulePorts.at(module);
+      // auto &currentModulePortLIDs = modulePortLIDs.at(module);
+      // for (auto &port : currentModulePortLIDs) {
+      //   ssize_t portId = port.first;
+      //   size_t portLID = port.second;
+      //   const PortInfo* portInfo = findPortById(allModulePorts, portId);
+      //   // print if input or output
+      //   if (portInfo->isInput())
+      //     os << ";   - Input Port '" << portId << "' with LID '" << portLID << "'\n";
+      //   else
+      //     os << ";   - Output Port '" << portId << "' with LID '" << portLID << "'\n";
+      //   if (portInfo)
+      //     os << ";   - Port from module ports: '" << portInfo->getName() << "'\n";
+      //   else
+      //     os << ";   - Port not found in module ports!\n";
+      // }
+      // os << ";\n";
 
       // Print out that we're at the end of a file
       os << "; ==== End of Module '" << module.getModuleName() << "' ====\n";
@@ -1459,96 +1473,6 @@ void ConvertHWToBTOR2Pass::runOnOperation() {
       outputs.clear();
     }
   }
-
-
-  // getOperation().walk<mlir::WalkOrder::PreOrder>([&](hw::HWModuleOp module) {
-  //   os << "Visiting " << module.getName() << "\n";
-  //   os << "Module dependencies: " << moduleDeps[module].size() << "\n";
-  //   os << "\n";
-
-    // Start by extracting inputs and generating appropriate instructions
-    // for (auto &port : module.getPortList()) {
-    //   visit(port);
-    //   os << "Port: isOutput | " << port.isOutput() << " | " << port.getName() << "\n\n";
-    // }
-
-  //   module.walk([&](Operation *op) {
-      
-  //   });
-    // // Start by extracting the inputs and generating appropriate instructions
-    // for (auto &port : module.getPortList()) {
-    //   visit(port);
-    // }
-
-    // // Previsit all registers in the module in order to avoid dependency cycles
-    // module.walk([&](Operation *op) {
-    //   TypeSwitch<Operation *, void>(op)
-    //       .Case<seq::FirRegOp, seq::CompRegOp>([&](auto reg) {
-    //         visit(reg);
-    //         handledOps.insert(op);
-    //       })
-    //       .Default([&](auto expr) {});
-    // });
-
-    // Visit all of the operations in our module
-    // module.walk([&](Operation *op) {
-    //   // Check: instances are not (yet) supported
-    //   if (isa<hw::InstanceOp>(op)) {
-    //     op->emitOpError("not supported in BTOR2 conversion");
-    //     return;
-    //   }
-
-    //   // Don't process ops that have already been emitted
-    //   if (handledOps.contains(op))
-    //     return;
-
-    //   // Fill in our worklist
-    //   worklist.insert({op, op->operand_begin()});
-
-    //   // Process the elements in our worklist
-    //   while (!worklist.empty()) {
-    //     auto &[op, operandIt] = worklist.back();
-    //     if (operandIt == op->operand_end()) {
-    //       // All of the operands have been emitted, it is safe to emit our op
-    //       dispatchTypeOpVisitor(op);
-
-    //       // Record that our op has been emitted
-    //       handledOps.insert(op);
-    //       worklist.pop_back();
-    //       continue;
-    //     }
-
-    //     // Send the operands of our op to the worklist in case they are still
-    //     // un-emitted
-    //     Value operand = *(operandIt++);
-    //     auto *defOp = operand.getDefiningOp();
-
-    //     // Make sure that we don't emit the same operand twice
-    //     if (!defOp || handledOps.contains(defOp))
-    //       continue;
-
-    //     // This is triggered if our operand is already in the worklist and
-    //     // wasn't handled
-    //     if (!worklist.insert({defOp, defOp->operand_begin()}).second) {
-    //       defOp->emitError("dependency cycle");
-    //       return;
-    //     }
-    //   }
-    // });
-
-    // // Iterate through the registers and generate the `next` instructions
-    // for (size_t i = 0; i < regOps.size(); ++i) {
-    //   finalizeRegVisit(regOps[i]);
-    // }
-//   });
-  // // Clear data structures to allow for pass reuse
-  // sortToLIDMap.clear();
-  // constToLIDMap.clear();
-  // opLIDMap.clear();
-  // inputLIDs.clear();
-  // regOps.clear();
-  // handledOps.clear();
-  // worklist.clear();
 }
 
 // Constructor with a custom ostream
