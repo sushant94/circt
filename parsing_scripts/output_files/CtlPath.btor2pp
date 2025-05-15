@@ -1,0 +1,780 @@
+
+module CtlPath {
+  1 sort bitvec 1
+  2 input 1 reset
+  3 input 1 io_dmem_resp_valid
+  4 sort bitvec 32
+  5 input 4 io_dat_dec_inst
+  6 input 1 io_dat_dec_valid
+  7 input 1 io_dat_exe_br_eq
+  8 input 1 io_dat_exe_br_lt
+  9 input 1 io_dat_exe_br_ltu
+  10 sort bitvec 4
+  11 input 10 io_dat_exe_br_type
+  12 input 1 io_dat_exe_inst_misaligned
+  13 input 1 io_dat_mem_ctrl_dmem_val
+  14 input 1 io_dat_mem_data_misaligned
+  15 input 1 io_dat_mem_store
+  16 input 1 io_dat_csr_eret
+  17 input 1 io_dat_csr_interrupt
+  18 state 1 ifkill_REG
+  19 sort bitvec 5
+  20 state 19 exe_reg_wbaddr
+  21 state 1 exe_reg_illegal
+  22 state 1 exe_reg_is_csr
+  23 state 1 exe_inst_is_load
+  24 state 1 io_ctl_fencei_REG
+  25 state 1 io_ctl_mem_exception_REG
+  26 state 1 io_ctl_mem_exception_cause_REG
+  27 state 1 io_ctl_mem_exception_cause_REG_1
+  28 sort bitvec 10
+  29 consth 28 F
+  30 consth 28 8F
+  31 consth 28 3F3
+  32 consth 28 1F3
+  33 consth 28 173
+  34 consth 28 F3
+  35 consth 28 373
+  36 consth 28 2F3
+  37 consth 28 363
+  38 consth 28 263
+  39 consth 28 3E3
+  40 consth 28 2E3
+  41 consth 28 E3
+  42 consth 28 63
+  43 consth 28 67
+  44 sort bitvec 7
+  45 consth 44 6F
+  46 sort bitvec 17
+  47 consth 46 2B3
+  48 consth 46 82B3
+  49 consth 46 233
+  50 consth 46 333
+  51 consth 46 3B3
+  52 consth 46 1B3
+  53 consth 46 133
+  54 consth 46 8033
+  55 consth 46 33
+  56 consth 46 B3
+  57 consth 46 293
+  58 consth 46 8293
+  59 consth 46 93
+  60 consth 28 193
+  61 consth 28 113
+  62 consth 28 213
+  63 consth 28 313
+  64 consth 28 393
+  65 consth 28 13
+  66 consth 44 37
+  67 consth 44 17
+  68 consth 28 A3
+  69 consth 28 23
+  70 consth 28 123
+  71 consth 28 283
+  72 consth 28 83
+  73 consth 28 203
+  74 consth 28 3
+  75 consth 28 103
+  76 consth 4 10500073
+  77 consth 4 100073
+  78 consth 4 7B200073
+  79 consth 4 30200073
+  80 consth 4 73
+  81 sort bitvec 29
+  82 consth 81 0
+  83 sort bitvec 2
+  84 consth 83 3
+  85 consth 1 1
+  86 consth 10 0
+  87 consth 10 6
+  88 consth 10 5
+  89 consth 10 4
+  90 consth 10 3
+  91 consth 10 1
+  92 consth 10 2
+  93 consth 10 8
+  94 consth 10 7
+  95 consth 83 0
+  96 consth 83 2
+  97 consth 83 1
+  98 sort bitvec 3
+  99 consth 98 3
+  100 consth 98 1
+  101 consth 98 5
+  102 consth 98 4
+  103 consth 98 2
+  104 consth 10 A
+  105 consth 10 9
+  106 consth 10 B
+  107 consth 98 6
+  108 consth 98 7
+  109 consth 98 0
+  110 consth 1 0
+  111 consth 19 0
+  112 slice 98 5 14 12 
+  113 slice 98 5 14 12 
+  114 slice 44 5 6 0 
+  115 concat 28 113 114 
+  116 eq 1 115 75 _csignals_T_1
+  117 slice 98 5 14 12 
+  118 slice 44 5 6 0 
+  119 concat 28 117 118 
+  120 eq 1 119 74 _csignals_T_3
+  121 slice 98 5 14 12 
+  122 slice 44 5 6 0 
+  123 concat 28 121 122 
+  124 eq 1 123 73 _csignals_T_5
+  125 slice 98 5 14 12 
+  126 slice 44 5 6 0 
+  127 concat 28 125 126 
+  128 eq 1 127 72 _csignals_T_7
+  129 slice 98 5 14 12 
+  130 slice 44 5 6 0 
+  131 concat 28 129 130 
+  132 eq 1 131 71 _csignals_T_9
+  133 slice 98 5 14 12 
+  134 slice 44 5 6 0 
+  135 concat 28 133 134 
+  136 eq 1 135 70 _csignals_T_11
+  137 slice 98 5 14 12 
+  138 slice 44 5 6 0 
+  139 concat 28 137 138 
+  140 eq 1 139 69 _csignals_T_13
+  141 slice 98 5 14 12 
+  142 slice 44 5 6 0 
+  143 concat 28 141 142 
+  144 eq 1 143 68 _csignals_T_632
+  145 slice 44 5 6 0 
+  146 eq 1 145 67 _csignals_T_17
+  147 eq 1 145 66 _csignals_T_19
+  148 slice 98 5 14 12 
+  149 slice 44 5 6 0 
+  150 concat 28 148 149 
+  151 eq 1 150 65 _csignals_T_21
+  152 slice 98 5 14 12 
+  153 slice 44 5 6 0 
+  154 concat 28 152 153 
+  155 eq 1 154 64 _csignals_T_23
+  156 slice 98 5 14 12 
+  157 slice 44 5 6 0 
+  158 concat 28 156 157 
+  159 eq 1 158 63 _csignals_T_25
+  160 slice 98 5 14 12 
+  161 slice 44 5 6 0 
+  162 concat 28 160 161 
+  163 eq 1 162 62 _csignals_T_27
+  164 slice 98 5 14 12 
+  165 slice 44 5 6 0 
+  166 concat 28 164 165 
+  167 eq 1 166 61 _csignals_T_29
+  168 slice 98 5 14 12 
+  169 slice 44 5 6 0 
+  170 concat 28 168 169 
+  171 eq 1 170 60 _csignals_T_31
+  172 slice 44 5 31 25 
+  173 slice 44 5 31 25 
+  174 slice 98 5 14 12 
+  175 slice 44 5 6 0 
+  176 concat 46 173 174 
+  177 concat 46 176 175 
+  178 eq 1 177 59 _csignals_T_33
+  179 slice 44 5 31 25 
+  180 slice 98 5 14 12 
+  181 slice 44 5 6 0 
+  182 concat 46 179 180 
+  183 concat 46 182 181 
+  184 eq 1 183 58 _csignals_T_35
+  185 slice 44 5 31 25 
+  186 slice 98 5 14 12 
+  187 slice 44 5 6 0 
+  188 concat 46 185 186 
+  189 concat 46 188 187 
+  190 eq 1 189 57 _csignals_T_37
+  191 slice 44 5 31 25 
+  192 slice 98 5 14 12 
+  193 slice 44 5 6 0 
+  194 concat 46 191 192 
+  195 concat 46 194 193 
+  196 eq 1 195 56 _csignals_T_39
+  197 slice 44 5 31 25 
+  198 slice 98 5 14 12 
+  199 slice 44 5 6 0 
+  200 concat 46 197 198 
+  201 concat 46 200 199 
+  202 eq 1 201 55 _csignals_T_41
+  203 slice 44 5 31 25 
+  204 slice 98 5 14 12 
+  205 slice 44 5 6 0 
+  206 concat 46 203 204 
+  207 concat 46 206 205 
+  208 eq 1 207 54 _csignals_T_43
+  209 slice 44 5 31 25 
+  210 slice 98 5 14 12 
+  211 slice 44 5 6 0 
+  212 concat 46 209 210 
+  213 concat 46 212 211 
+  214 eq 1 213 53 _csignals_T_45
+  215 slice 44 5 31 25 
+  216 slice 98 5 14 12 
+  217 slice 44 5 6 0 
+  218 concat 46 215 216 
+  219 concat 46 218 217 
+  220 eq 1 219 52 _csignals_T_47
+  221 slice 44 5 31 25 
+  222 slice 98 5 14 12 
+  223 slice 44 5 6 0 
+  224 concat 46 221 222 
+  225 concat 46 224 223 
+  226 eq 1 225 51 _csignals_T_49
+  227 slice 44 5 31 25 
+  228 slice 98 5 14 12 
+  229 slice 44 5 6 0 
+  230 concat 46 227 228 
+  231 concat 46 230 229 
+  232 eq 1 231 50 _csignals_T_51
+  233 slice 44 5 31 25 
+  234 slice 98 5 14 12 
+  235 slice 44 5 6 0 
+  236 concat 46 233 234 
+  237 concat 46 236 235 
+  238 eq 1 237 49 _csignals_T_53
+  239 slice 44 5 31 25 
+  240 slice 98 5 14 12 
+  241 slice 44 5 6 0 
+  242 concat 46 239 240 
+  243 concat 46 242 241 
+  244 eq 1 243 48 _csignals_T_55
+  245 slice 98 5 14 12 
+  246 slice 44 5 6 0 
+  247 concat 46 172 245 
+  248 concat 46 247 246 
+  249 eq 1 248 47 _csignals_T_57
+  250 eq 1 145 45 _csignals_T_59
+  251 slice 98 5 14 12 
+  252 slice 44 5 6 0 
+  253 concat 28 251 252 
+  254 eq 1 253 43 _csignals_T_61
+  255 slice 98 5 14 12 
+  256 slice 44 5 6 0 
+  257 concat 28 255 256 
+  258 eq 1 257 42 _csignals_T_63
+  259 slice 98 5 14 12 
+  260 slice 44 5 6 0 
+  261 concat 28 259 260 
+  262 eq 1 261 41 _csignals_T_65
+  263 slice 98 5 14 12 
+  264 slice 44 5 6 0 
+  265 concat 28 263 264 
+  266 eq 1 265 40 _csignals_T_67
+  267 slice 98 5 14 12 
+  268 slice 44 5 6 0 
+  269 concat 28 267 268 
+  270 eq 1 269 39 _csignals_T_69
+  271 slice 98 5 14 12 
+  272 slice 44 5 6 0 
+  273 concat 28 271 272 
+  274 eq 1 273 38 _csignals_T_71
+  275 slice 98 5 14 12 
+  276 slice 44 5 6 0 
+  277 concat 28 275 276 
+  278 eq 1 277 37 _csignals_T_73
+  279 slice 98 5 14 12 
+  280 slice 44 5 6 0 
+  281 concat 28 279 280 
+  282 eq 1 281 36 _csignals_T_75
+  283 slice 98 5 14 12 
+  284 slice 44 5 6 0 
+  285 concat 28 283 284 
+  286 eq 1 285 35 _csignals_T_77
+  287 slice 98 5 14 12 
+  288 slice 44 5 6 0 
+  289 concat 28 287 288 
+  290 eq 1 289 34 _csignals_T_79
+  291 slice 98 5 14 12 
+  292 slice 44 5 6 0 
+  293 concat 28 291 292 
+  294 eq 1 293 33 _csignals_T_81
+  295 slice 98 5 14 12 
+  296 slice 44 5 6 0 
+  297 concat 28 295 296 
+  298 eq 1 297 32 _csignals_T_83
+  299 slice 98 5 14 12 
+  300 slice 44 5 6 0 
+  301 concat 28 299 300 
+  302 eq 1 301 31 _csignals_T_499
+  303 eq 1 5 80 _csignals_T_87
+  304 eq 1 5 79 _csignals_T_89
+  305 eq 1 5 78 _csignals_T_91
+  306 eq 1 5 77 _csignals_T_93
+  307 eq 1 5 76 _csignals_T_95
+  308 slice 98 5 14 12 
+  309 slice 44 5 6 0 
+  310 concat 28 308 309 
+  311 eq 1 310 30 _csignals_T_738
+  312 slice 44 5 6 0 
+  313 concat 28 112 312 
+  314 eq 1 313 29 _csignals_T_100
+  315 or 1 116 120 csignals_0
+  316 or 1 315 124 csignals_0
+  317 or 1 316 128 csignals_0
+  318 or 1 317 132 csignals_0
+  319 or 1 318 136 csignals_0
+  320 or 1 319 140 csignals_0
+  321 or 1 320 144 csignals_0
+  322 or 1 321 146 csignals_0
+  323 or 1 322 147 csignals_0
+  324 or 1 323 151 csignals_0
+  325 or 1 324 155 csignals_0
+  326 or 1 325 159 csignals_0
+  327 or 1 326 163 csignals_0
+  328 or 1 327 167 csignals_0
+  329 or 1 328 171 csignals_0
+  330 or 1 329 178 csignals_0
+  331 or 1 330 184 csignals_0
+  332 or 1 331 190 csignals_0
+  333 or 1 332 196 csignals_0
+  334 or 1 333 202 csignals_0
+  335 or 1 334 208 csignals_0
+  336 or 1 335 214 csignals_0
+  337 or 1 336 220 csignals_0
+  338 or 1 337 226 csignals_0
+  339 or 1 338 232 csignals_0
+  340 or 1 339 238 csignals_0
+  341 or 1 340 244 csignals_0
+  342 or 1 341 249 csignals_0
+  343 or 1 342 250 csignals_0
+  344 or 1 343 254 csignals_0
+  345 or 1 344 258 csignals_0
+  346 or 1 345 262 csignals_0
+  347 or 1 346 266 csignals_0
+  348 or 1 347 270 csignals_0
+  349 or 1 348 274 csignals_0
+  350 or 1 349 278 csignals_0
+  351 or 1 350 282 csignals_0
+  352 or 1 351 286 csignals_0
+  353 or 1 352 290 csignals_0
+  354 or 1 353 294 csignals_0
+  355 or 1 354 298 csignals_0
+  356 or 1 355 302 csignals_0
+  357 or 1 356 303 csignals_0
+  358 or 1 357 304 csignals_0
+  359 or 1 358 305 csignals_0
+  360 or 1 359 306 csignals_0
+  361 or 1 360 307 csignals_0
+  362 or 1 361 311 csignals_0
+  363 or 1 362 314 csignals_0
+  364 ite 10 278 87 86 _csignals_T_162
+  365 ite 10 274 88 364 _csignals_T_163
+  366 ite 10 270 89 365 _csignals_T_164
+  367 ite 10 266 90 366 _csignals_T_165
+  368 ite 10 262 91 367 _csignals_T_166
+  369 ite 10 258 92 368 _csignals_T_167
+  370 ite 10 254 93 369 _csignals_T_168
+  371 ite 10 250 94 370 _csignals_T_169
+  372 or 1 196 202 
+  373 or 1 372 208 
+  374 or 1 373 214 
+  375 or 1 374 220 
+  376 or 1 375 226 
+  377 or 1 376 232 
+  378 or 1 377 238 
+  379 or 1 378 244 
+  380 or 1 379 249 
+  381 or 1 151 155 
+  382 or 1 381 159 
+  383 or 1 382 163 
+  384 or 1 383 167 
+  385 or 1 384 171 
+  386 or 1 385 178 
+  387 or 1 386 184 
+  388 or 1 387 190 
+  389 or 1 388 380 
+  390 or 1 136 140 
+  391 or 1 390 144 
+  392 or 1 391 146 
+  393 or 1 392 147 
+  394 or 1 393 389 
+  395 or 1 116 120 
+  396 or 1 395 124 
+  397 or 1 396 128 
+  398 or 1 397 132 
+  399 or 1 398 394 
+  400 ite 10 399 86 371 csignals_1
+  401 concat 83 302 110 _csignals_T_205
+  402 or 1 290 294 
+  403 or 1 402 298 
+  404 ite 83 403 95 401 _csignals_T_208
+  405 or 1 282 286 
+  406 ite 83 405 96 404 _csignals_T_210
+  407 or 1 258 262 
+  408 or 1 407 266 
+  409 or 1 408 270 
+  410 or 1 409 274 
+  411 or 1 410 278 
+  412 or 1 250 254 
+  413 or 1 412 411 
+  414 or 1 147 151 
+  415 or 1 414 155 
+  416 or 1 415 159 
+  417 or 1 416 163 
+  418 or 1 417 167 
+  419 or 1 418 171 
+  420 or 1 419 178 
+  421 or 1 420 184 
+  422 or 1 421 190 
+  423 or 1 422 196 
+  424 or 1 423 202 
+  425 or 1 424 208 
+  426 or 1 425 214 
+  427 or 1 426 220 
+  428 or 1 427 226 
+  429 or 1 428 232 
+  430 or 1 429 238 
+  431 or 1 430 244 
+  432 or 1 431 249 
+  433 or 1 432 413 
+  434 ite 83 433 95 406 _csignals_T_238
+  435 ite 83 146 97 434 _csignals_T_239
+  436 or 1 136 140 
+  437 or 1 436 144 
+  438 or 1 116 120 
+  439 or 1 438 124 
+  440 or 1 439 128 
+  441 or 1 440 132 
+  442 or 1 441 437 
+  443 ite 83 442 95 435 csignals_2
+  444 ite 98 411 99 109 _csignals_T_265
+  445 ite 98 254 100 444 _csignals_T_266
+  446 ite 98 250 101 445 _csignals_T_267
+  447 ite 98 380 109 446 _csignals_T_277
+  448 or 1 151 155 
+  449 or 1 448 159 
+  450 or 1 449 163 
+  451 or 1 450 167 
+  452 or 1 451 171 
+  453 or 1 452 178 
+  454 or 1 453 184 
+  455 or 1 454 190 
+  456 ite 98 455 100 447 _csignals_T_286
+  457 or 1 146 147 
+  458 ite 98 457 102 456 _csignals_T_288
+  459 ite 98 437 103 458 _csignals_T_291
+  460 or 1 116 120 
+  461 or 1 460 124 
+  462 or 1 461 128 
+  463 or 1 462 132 
+  464 ite 98 463 100 459 csignals_3
+  465 or 1 282 286 
+  466 or 1 465 403 
+  467 or 1 258 262 
+  468 or 1 467 266 
+  469 or 1 468 270 
+  470 or 1 469 274 
+  471 or 1 470 278 
+  472 or 1 471 466 
+  473 or 1 254 472 _csignals_T_315
+  474 or 1 473 302 _csignals_T_315
+  475 xor 1 250 85 
+  476 and 1 475 474 _csignals_T_316
+  477 or 1 389 476 _csignals_T_335
+  478 xor 1 457 85 
+  479 and 1 478 477 _csignals_T_337
+  480 or 1 442 479 csignals_4
+  481 or 1 472 302 _csignals_T_363
+  482 or 1 250 254 
+  483 xor 1 482 85 
+  484 and 1 483 481 _csignals_T_365
+  485 or 1 380 484 _csignals_T_375
+  486 or 1 146 147 
+  487 or 1 486 455 
+  488 xor 1 487 85 
+  489 and 1 488 485 _csignals_T_386
+  490 or 1 437 489 _csignals_T_389
+  491 or 1 298 302 
+  492 or 1 282 286 
+  493 or 1 492 290 
+  494 or 1 493 294 
+  495 or 1 494 491 
+  496 xor 1 495 85 
+  497 or 1 413 496 
+  498 ite 10 497 86 104 _csignals_T_414
+  499 ite 10 249 90 498 _csignals_T_415
+  500 ite 10 244 89 499 _csignals_T_416
+  501 ite 10 238 94 500 _csignals_T_417
+  502 ite 10 232 87 501 _csignals_T_418
+  503 ite 10 226 88 502 _csignals_T_419
+  504 ite 10 220 105 503 _csignals_T_420
+  505 ite 10 214 93 504 _csignals_T_421
+  506 ite 10 208 91 505 _csignals_T_422
+  507 ite 10 202 86 506 _csignals_T_423
+  508 ite 10 196 92 507 _csignals_T_424
+  509 ite 10 190 90 508 _csignals_T_425
+  510 ite 10 184 89 509 _csignals_T_426
+  511 ite 10 178 92 510 _csignals_T_427
+  512 ite 10 171 105 511 _csignals_T_428
+  513 ite 10 167 93 512 _csignals_T_429
+  514 ite 10 163 94 513 _csignals_T_430
+  515 ite 10 159 87 514 _csignals_T_431
+  516 ite 10 155 88 515 _csignals_T_432
+  517 ite 10 151 86 516 _csignals_T_433
+  518 ite 10 147 106 517 _csignals_T_434
+  519 or 1 116 120 
+  520 or 1 519 124 
+  521 or 1 520 128 
+  522 or 1 521 132 
+  523 or 1 522 136 
+  524 or 1 523 140 
+  525 or 1 524 144 
+  526 or 1 525 146 
+  527 ite 10 526 86 518 csignals_6
+  528 sext 83 495 1 _csignals_T_455
+  529 ite 83 411 95 528 _csignals_T_461
+  530 ite 83 482 96 529 _csignals_T_463
+  531 ite 83 394 95 530 _csignals_T_487
+  532 ite 83 463 97 531 csignals_7
+  533 or 1 466 302 _csignals_T_504
+  534 xor 1 411 85 
+  535 and 1 534 533 _csignals_T_510
+  536 or 1 146 147 _csignals_T_533
+  537 or 1 536 151 _csignals_T_533
+  538 or 1 537 155 _csignals_T_533
+  539 or 1 538 159 _csignals_T_533
+  540 or 1 539 163 _csignals_T_533
+  541 or 1 540 167 _csignals_T_533
+  542 or 1 541 171 _csignals_T_533
+  543 or 1 542 178 _csignals_T_533
+  544 or 1 543 184 _csignals_T_533
+  545 or 1 544 190 _csignals_T_533
+  546 or 1 545 196 _csignals_T_533
+  547 or 1 546 202 _csignals_T_533
+  548 or 1 547 208 _csignals_T_533
+  549 or 1 548 214 _csignals_T_533
+  550 or 1 549 220 _csignals_T_533
+  551 or 1 550 226 _csignals_T_533
+  552 or 1 551 232 _csignals_T_533
+  553 or 1 552 238 _csignals_T_533
+  554 or 1 553 244 _csignals_T_533
+  555 or 1 554 249 _csignals_T_533
+  556 or 1 555 482 _csignals_T_533
+  557 or 1 556 535 _csignals_T_533
+  558 xor 1 437 85 
+  559 and 1 558 557 _csignals_T_536
+  560 or 1 463 559 csignals_8
+  561 or 1 136 140 
+  562 or 1 116 120 csignals_9
+  563 or 1 562 124 csignals_9
+  564 or 1 563 128 csignals_9
+  565 or 1 564 132 csignals_9
+  566 or 1 565 561 csignals_9
+  567 or 1 566 144 csignals_9
+  568 or 1 561 144 _csignals_T_634
+  569 xor 1 463 85 
+  570 and 1 569 568 csignals_10
+  571 concat 98 110 144 _csignals_T_681
+  572 concat 98 571 110 _csignals_T_681
+  573 ite 98 140 100 572 _csignals_T_682
+  574 ite 98 136 99 573 _csignals_T_683
+  575 ite 98 132 107 574 _csignals_T_684
+  576 ite 98 128 103 575 _csignals_T_685
+  577 ite 98 124 101 576 _csignals_T_686
+  578 ite 98 120 100 577 _csignals_T_687
+  579 ite 98 116 99 578 csignals_11
+  580 or 1 303 304 
+  581 or 1 580 305 
+  582 or 1 581 306 
+  583 concat 98 582 95 _csignals_T_694
+  584 ite 98 491 108 583 _csignals_T_696
+  585 ite 98 294 107 584 _csignals_T_697
+  586 ite 98 290 101 585 _csignals_T_698
+  587 ite 98 286 107 586 _csignals_T_699
+  588 ite 98 282 101 587 _csignals_T_700
+  589 or 1 116 120 
+  590 or 1 589 124 
+  591 or 1 590 128 
+  592 or 1 591 132 
+  593 or 1 592 136 
+  594 or 1 593 140 
+  595 or 1 594 144 
+  596 or 1 595 146 
+  597 or 1 596 433 
+  598 ite 98 597 109 588 csignals_12
+  599 or 1 116 120 
+  600 or 1 599 124 
+  601 or 1 600 128 
+  602 or 1 601 132 
+  603 or 1 602 136 
+  604 or 1 603 140 
+  605 or 1 604 144 
+  606 or 1 605 146 
+  607 or 1 606 147 
+  608 or 1 607 151 
+  609 or 1 608 155 
+  610 or 1 609 159 
+  611 or 1 610 163 
+  612 or 1 611 167 
+  613 or 1 612 171 
+  614 or 1 613 178 
+  615 or 1 614 184 
+  616 or 1 615 190 
+  617 or 1 616 196 
+  618 or 1 617 202 
+  619 or 1 618 208 
+  620 or 1 619 214 
+  621 or 1 620 220 
+  622 or 1 621 226 
+  623 or 1 622 232 
+  624 or 1 623 238 
+  625 or 1 624 244 
+  626 or 1 625 249 
+  627 or 1 626 250 
+  628 or 1 627 254 
+  629 or 1 628 258 
+  630 or 1 629 262 
+  631 or 1 630 266 
+  632 or 1 631 270 
+  633 or 1 632 274 
+  634 or 1 633 278 
+  635 or 1 634 282 
+  636 or 1 635 286 
+  637 or 1 636 290 
+  638 or 1 637 294 
+  639 or 1 638 298 
+  640 or 1 639 302 
+  641 or 1 640 303 
+  642 or 1 641 304 
+  643 or 1 642 305 
+  644 or 1 643 306 
+  645 or 1 644 307 
+  646 xor 1 645 85 
+  647 and 1 646 311 csignals_13
+  648 eq 1 11 86 _ctrl_exe_pc_sel_T
+  649 eq 1 11 91 _ctrl_exe_pc_sel_T_1
+  650 xor 1 7 85 _ctrl_exe_pc_sel_T_2
+  651 concat 83 110 650 _ctrl_exe_pc_sel_T_3
+  652 eq 1 11 92 _ctrl_exe_pc_sel_T_4
+  653 concat 83 110 7 _ctrl_exe_pc_sel_T_5
+  654 eq 1 11 90 _ctrl_exe_pc_sel_T_6
+  655 xor 1 8 85 _ctrl_exe_pc_sel_T_7
+  656 concat 83 110 655 _ctrl_exe_pc_sel_T_8
+  657 eq 1 11 89 _ctrl_exe_pc_sel_T_9
+  658 xor 1 9 85 _ctrl_exe_pc_sel_T_10
+  659 concat 83 110 658 _ctrl_exe_pc_sel_T_11
+  660 eq 1 11 88 _ctrl_exe_pc_sel_T_12
+  661 concat 83 110 8 _ctrl_exe_pc_sel_T_13
+  662 eq 1 11 87 _ctrl_exe_pc_sel_T_14
+  663 concat 83 110 9 _ctrl_exe_pc_sel_T_15
+  664 eq 1 11 94 _ctrl_exe_pc_sel_T_16
+  665 eq 1 11 93 _ctrl_exe_pc_sel_T_17
+  666 concat 83 665 110 _ctrl_exe_pc_sel_T_18
+  667 ite 83 664 97 666 _ctrl_exe_pc_sel_T_19
+  668 ite 83 662 663 667 _ctrl_exe_pc_sel_T_20
+  669 ite 83 660 661 668 _ctrl_exe_pc_sel_T_21
+  670 ite 83 657 659 669 _ctrl_exe_pc_sel_T_22
+  671 ite 83 654 656 670 _ctrl_exe_pc_sel_T_23
+  672 ite 83 652 653 671 _ctrl_exe_pc_sel_T_24
+  673 ite 83 649 651 672 _ctrl_exe_pc_sel_T_25
+  674 ite 83 648 95 673 _ctrl_exe_pc_sel_T_26
+  675 or 1 25 14 io_ctl_mem_exception
+  676 or 1 16 675 io_ctl_pipeline_kill
+  677 or 1 676 17 io_ctl_pipeline_kill
+  678 ite 83 677 84 674 ctrl_exe_pc_sel
+  679 neq 1 678 95 deckill
+  680 or 1 679 647 ifkill
+  681 or 1 680 18 ifkill
+  682 xor 1 363 85 _dec_illegal_T
+  683 slice 19 5 19 15 rs1_addr
+  684 slice 19 5 24 20 dec_rs2_addr
+  685 slice 19 5 11 7 dec_wbaddr
+  686 xor 1 679 85 
+  687 or 1 679 463 
+  688 xor 1 687 85 
+  689 eq 1 20 683 _stall_T
+  690 neq 1 20 111 _stall_T_7
+  691 and 1 23 689 _stall_T_4
+  692 and 1 691 690 _stall_T_4
+  693 and 1 692 686 _stall_T_4
+  694 and 1 693 480 _stall_T_4
+  695 eq 1 20 684 _stall_T_5
+  696 and 1 23 695 _stall_T_9
+  697 and 1 696 690 _stall_T_9
+  698 and 1 697 688 _stall_T_9
+  699 and 1 698 490 _stall_T_9
+  700 or 1 694 699 stall
+  701 or 1 700 22 stall
+  702 xor 1 701 85 
+  703 and 1 13 3 _full_stall_T
+  704 xor 1 13 85 _full_stall_T_1
+  705 or 1 703 704 _full_stall_T_2
+  706 and 1 702 705 
+  707 ite 19 679 111 685 
+  708 neq 1 598 109 _exe_reg_is_csr_T
+  709 neq 1 598 102 _exe_reg_is_csr_T_1
+  710 xor 1 679 85 
+  711 and 1 710 708 
+  712 and 1 711 709 
+  713 xor 1 679 85 
+  714 and 1 713 682 
+  715 and 1 714 6 
+  716 and 1 701 705 
+  717 ite 19 716 111 20 
+  718 ite 19 706 707 717 
+  719 xor 1 716 85 
+  720 and 1 719 22 
+  721 ite 1 706 712 720 
+  722 xor 1 716 85 
+  723 and 1 722 21 
+  724 ite 1 706 715 723 
+  725 xor 1 570 85 _exe_inst_is_load_T
+  726 and 1 567 725 _exe_inst_is_load_T_1
+  727 ite 1 705 726 23 
+  728 xor 1 16 85 
+  729 and 1 728 724 
+  730 xor 1 705 85 full_stall
+  731 or 1 647 24 io_ctl_fencei
+  732 or 1 21 12 _io_ctl_mem_exception_T
+  733 xor 1 16 85 _io_ctl_mem_exception_T_1
+  734 and 1 732 733 _io_ctl_mem_exception_T_2
+  735 concat 98 85 15 _io_ctl_mem_exception_cause_T
+  736 concat 98 735 110 _io_ctl_mem_exception_cause_T
+  737 ite 98 27 109 736 _io_ctl_mem_exception_cause_T_1
+  738 ite 98 26 103 737 _io_ctl_mem_exception_cause_T_2
+  739 concat 4 82 738 io_ctl_mem_exception_cause
+  740 eq 1 598 107 _csr_ren_T
+  741 eq 1 598 108 _csr_ren_T_1
+  742 or 1 740 741 _csr_ren_T_2
+  743 eq 1 683 111 _csr_ren_T_3
+  744 and 1 742 743 csr_ren
+  745 ite 98 744 103 598 io_ctl_csr_cmd
+  746 concat 83 110 570 io_ctl_mem_fcn
+  747 output 701 io_ctl_dec_stall
+  748 output 730 io_ctl_full_stall
+  749 output 678 io_ctl_exe_pc_sel
+  750 output 400 io_ctl_br_type
+  751 output 681 io_ctl_if_kill
+  752 output 679 io_ctl_dec_kill
+  753 output 443 io_ctl_op1_sel
+  754 output 464 io_ctl_op2_sel
+  755 output 527 io_ctl_alu_fun
+  756 output 532 io_ctl_wb_sel
+  757 output 560 io_ctl_rf_wen
+  758 output 567 io_ctl_mem_val
+  759 output 746 io_ctl_mem_fcn
+  760 output 579 io_ctl_mem_typ
+  761 output 745 io_ctl_csr_cmd
+  762 output 731 io_ctl_fencei
+  763 output 677 io_ctl_pipeline_kill
+  764 output 675 io_ctl_mem_exception
+  765 output 739 io_ctl_mem_exception_cause
+  766 next 1 18 647
+  767 next 19 20 718
+  768 ite 1 2 110 729 
+  769 next 1 21 768
+  770 ite 1 2 110 721 
+  771 next 1 22 770
+  772 ite 1 2 110 727 
+  773 next 1 23 772
+  774 next 1 24 647
+  775 next 1 25 734
+  776 next 1 26 21
+  777 next 1 27 12
+}

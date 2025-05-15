@@ -2331,10 +2331,10 @@ module CSRFile {
 }
 ; ==== End of Module 'CSRFile' ====
 ; ==== Module 'DatPath' ====
-include Queue1_MemResp.btor2++
-include Queue1_UInt32.btor2++
-include RegisterFile.btor2++
-include CSRFile.btor2++
+include Queue1_MemResp.btor2pp
+include Queue1_UInt32.btor2pp
+include RegisterFile.btor2pp
+include CSRFile.btor2pp
 
 module DatPath {
   1 sort bitvec 1
@@ -2992,8 +2992,8 @@ module DatPath {
 }
 ; ==== End of Module 'DatPath' ====
 ; ==== Module 'Core' ====
-include CtlPath.btor2++
-include DatPath.btor2++
+include CtlPath.btor2pp
+include DatPath.btor2pp
 
 module Core {
   1 sort bitvec 1

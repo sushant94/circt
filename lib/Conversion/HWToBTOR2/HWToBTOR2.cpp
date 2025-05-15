@@ -1232,7 +1232,7 @@ void ConvertHWToBTOR2Pass::runOnOperation() {
       std::set<std::string> includes;
       for (auto inst : deps) {
         std::string depModuleName = inst.getModuleName().str();
-        std::string depFilePath = (depModuleName + ".btor2++");
+        std::string depFilePath = (depModuleName + ".btor2pp");
         if (depModuleName != module.getModuleName().str()) {
           os << "include " << depFilePath << "\n";
         }
@@ -1396,7 +1396,6 @@ void ConvertHWToBTOR2Pass::runOnOperation() {
 
       // emit set instructions
       for (auto instance : moduleDeps[module]) {
-        // TODO: emit set instructions for each input port
         unsigned operandIdx = 0;
         size_t instanceLID = instanceLIDs[instance];
         StringRef moduleName = instance.getModuleName();
