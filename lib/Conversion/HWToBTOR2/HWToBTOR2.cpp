@@ -1229,11 +1229,11 @@ void ConvertHWToBTOR2Pass::runOnOperation() {
       
       // Output includes for a module
       auto &deps = moduleDeps[module];
-      std::set<std::string> includes;
+      llvm::DenseSet<std::string> handledIncludes;
       for (auto inst : deps) {
         std::string depModuleName = inst.getModuleName().str();
         std::string depFilePath = (depModuleName + ".btor2pp");
-        if (depModuleName != module.getModuleName().str()) {
+        if (depModuleName != module.getModuleName().str() && handledIncludes.insert(depModuleName).second) {
           os << "include " << depFilePath << "\n";
         }
       }
