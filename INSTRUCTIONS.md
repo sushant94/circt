@@ -12,10 +12,7 @@
 2. Delete annotations (inside `%[[` to the corresponding closing brackets `]]`)
 3. Change the module from `TestHarness` to what you want to look at (`Core` for `Sodor1StageConfig`)
 4. Remove all the `printf` statements -- you can do this with the following command: `sed -i '$!N;/\n[[:space:]]*printf/d;P;D' <file.fir>`
-
-## To-do
-
-- [ ] Try using the release with debug version
+5. You can then run an executable with `./build/bin/firtool ../rockettile.fir --btor2 > debug.txt` (or similar)
 
 ## Where things are
 
