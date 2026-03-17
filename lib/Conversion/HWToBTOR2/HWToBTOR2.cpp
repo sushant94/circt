@@ -167,6 +167,14 @@ public:
     return oplid;
   }
 
+  // Associates the current lid to an SSA value.
+  // This is needed for values without a defining op, like block arguments.
+  size_t setValueLID(Value value) {
+    size_t valueLID = lid++;
+    valueLIDMap[value] = valueLID;
+    return valueLID;
+  }
+
   // Checks if an operation was declared
   // If so, its lid will be returned
   // Otherwise -1 will be returned
@@ -227,6 +235,23 @@ private:
   StringRef getOpName(Operation *op) {
     if (auto nameAttr = op->getAttrOfType<StringAttr>("sv.namehint"))
       return nameAttr.getValue();
+    return "";
+  }
+
+  StringRef getValueName(Value value) {
+    if (auto *defOp = value.getDefiningOp())
+      return getOpName(defOp);
+
+    if (auto barg = dyn_cast<BlockArgument>(value)) {
+      if (currentModule) {
+        const auto &ports = modulePorts.at(currentModule);
+        for (const auto &port : ports) {
+          if (port.argNum == barg.getArgNumber())
+            return port.getName();
+        }
+      }
+    }
+
     return "";
   }
 
@@ -510,16 +535,21 @@ private:
   // and a res width
   void genIte(Operation *srcop, size_t condLID, size_t tLID, size_t fLID,
               int64_t width) {
-    // Register the source operation with the current line id
-    size_t opLID = getOpLID(srcop);
+    genIte(getOpLID(srcop), getOpName(srcop), condLID, tLID, fLID, width);
+  }
 
-    // Retrieve the lid associated with the sort (sid)
+  // Generate an ite instruction (if then else) given explicit result and
+  // operand line IDs.
+  void genIte(size_t opLID, StringRef name, size_t condLID, size_t tLID,
+              size_t fLID, int64_t width) {
+    // Register the source operation with the current line id
     size_t sid = sortToLIDMap.at(width);
 
     // Build and return the ite instruction
     os << indent << opLID << " "
        << "ite"
-       << " " << sid << " " << condLID << " " << tLID << " " << fLID << " " << getOpName(srcop) << "\n";
+       << " " << sid << " " << condLID << " " << tLID << " " << fLID << " "
+       << name << "\n";
   }
 
   // Generate a logical implication given a lhs and a rhs
@@ -625,60 +655,42 @@ private:
     // instruction
     size_t nextLID = noLID;
 
-    // We need to check if the next value is a port to avoid nullptrs
-    // To do so, we start by checking if our operation is a block argument
-    if (BlockArgument barg = dyn_cast<BlockArgument>(next)) {
-      // Extract the block argument index and use that to get the line number
-      size_t argIdx = barg.getArgNumber();
-
-      // Check that the extracted argument is in range before using it
-      nextLID = inputLIDs[argIdx];
-
-    } else {
-      nextLID = getOpLID(next);
-    }
+    nextLID = getOpLID(next);
 
     // Check if the register has a reset
     if (reset) {
       size_t resetValLID = noLID;
-
-      // Check if the reset signal is a port to avoid nullptrs (as done above
-      // with next)
-      size_t resetLID = noLID;
-      if (BlockArgument barg = dyn_cast<BlockArgument>(reset)) {
-        // Extract the block argument index and use that to get the line
-        // number
-        size_t argIdx = barg.getArgNumber();
-
-        // Check that the extracted argument is in range before using it
-        resetLID = inputLIDs[argIdx];
-
-      } else {
-        resetLID = getOpLID(reset);
-      }
+      size_t resetLID = getOpLID(reset);
 
       // Check for a reset value, if none exists assume it's zero
       if (resetVal)
-        resetValLID = getOpLID(resetVal.getDefiningOp());
+        resetValLID = getOpLID(resetVal);
       else
         resetValLID = genZero(width);
-
-      // Assign a new LID to next
-      setOpLID(next.getDefiningOp());
 
       // Sanity check: at this point the next operation should have had it's
       // btor2 counterpart emitted if not then something terrible must have
       // happened.
       assert(nextLID != noLID);
+      assert(resetLID != noLID);
+      assert(resetValLID != noLID);
+
+      size_t mergedNextLID;
+      StringRef mergedNextName = getValueName(next);
+      if (auto *nextOp = next.getDefiningOp()) {
+        mergedNextLID = setOpLID(nextOp);
+      } else {
+        mergedNextLID = setValueLID(next);
+      }
 
       // Generate the ite for the register update reset condition
       // i.e. reg <= reset ? 0 : next
-      genIte(next.getDefiningOp(), resetLID, resetValLID, nextLID, width);
+      genIte(mergedNextLID, mergedNextName, resetLID, resetValLID, nextLID,
+             width);
     } else {
       // Sanity check: next should have been assigned
       if (nextLID == noLID) {
-        next.getDefiningOp()->emitError(
-            "Register input does not point to a valid op!");
+        op->emitError("Register input does not point to a valid value!");
         return;
       }
     }
@@ -1229,7 +1241,7 @@ void ConvertHWToBTOR2Pass::runOnOperation() {
       
       // Output includes for a module
       auto &deps = moduleDeps[module];
-      llvm::DenseSet<std::string> handledIncludes;
+      std::set<std::string> handledIncludes;
       for (auto inst : deps) {
         std::string depModuleName = inst.getModuleName().str();
         std::string depFilePath = (depModuleName + ".btor2pp");

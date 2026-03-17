@@ -1,0 +1,244 @@
+include RoundAnyRawFNToRecFN_ie7_is64_oe11_os53.btor2pp
+
+module INToRecFN_i64_e11_s53 {
+  1 sort bitvec 1
+  2 input 1 io_signedIn
+  3 sort bitvec 64
+  4 input 3 io_in
+  5 sort bitvec 3
+  6 input 5 io_roundingMode
+  7 inst RoundAnyRawFNToRecFN_ie7_is64_oe11_os53
+  8 ref RoundAnyRawFNToRecFN_ie7_is64_oe11_os53 2 io_in_isZero
+  9 ref RoundAnyRawFNToRecFN_ie7_is64_oe11_os53 3 io_in_sign
+  10 ref RoundAnyRawFNToRecFN_ie7_is64_oe11_os53 5 io_in_sExp
+  11 ref RoundAnyRawFNToRecFN_ie7_is64_oe11_os53 7 io_in_sig
+  12 ref RoundAnyRawFNToRecFN_ie7_is64_oe11_os53 9 io_roundingMode
+  13 ref RoundAnyRawFNToRecFN_ie7_is64_oe11_os53 87 io_out
+  14 ref RoundAnyRawFNToRecFN_ie7_is64_oe11_os53 88 io_exceptionFlags
+  15 get 7 13 io_out
+  16 get 7 14 io_exceptionFlags
+  17 consth 5 2
+  18 sort bitvec 5
+  19 consth 18 1F
+  20 consth 3 0
+  21 consth 1 1
+  22 sort bitvec 121
+  23 consth 22 0
+  24 sort bitvec 63
+  25 consth 24 0
+  26 consth 1 0
+  27 sort bitvec 6
+  28 consth 27 3F
+  29 consth 27 3D
+  30 consth 27 3C
+  31 consth 27 3B
+  32 consth 27 3A
+  33 consth 27 39
+  34 consth 27 38
+  35 consth 27 37
+  36 consth 27 36
+  37 consth 27 35
+  38 consth 27 34
+  39 consth 27 33
+  40 consth 27 32
+  41 consth 27 31
+  42 consth 27 30
+  43 consth 27 2F
+  44 consth 27 2E
+  45 consth 27 2D
+  46 consth 27 2C
+  47 consth 27 2B
+  48 consth 27 2A
+  49 consth 27 29
+  50 consth 27 28
+  51 consth 27 27
+  52 consth 27 26
+  53 consth 27 25
+  54 consth 27 24
+  55 consth 27 23
+  56 consth 27 22
+  57 consth 27 21
+  58 consth 27 20
+  59 consth 27 1F
+  60 consth 27 1E
+  61 consth 27 1D
+  62 consth 27 1C
+  63 consth 27 1B
+  64 consth 27 1A
+  65 consth 27 19
+  66 consth 27 18
+  67 consth 27 17
+  68 consth 27 16
+  69 consth 27 15
+  70 consth 27 14
+  71 consth 27 13
+  72 consth 27 12
+  73 consth 27 11
+  74 consth 27 10
+  75 consth 27 F
+  76 consth 27 E
+  77 consth 27 D
+  78 consth 27 C
+  79 consth 27 B
+  80 consth 27 A
+  81 consth 27 9
+  82 consth 27 8
+  83 consth 27 7
+  84 consth 27 6
+  85 consth 27 5
+  86 consth 27 4
+  87 consth 27 3
+  88 consth 27 2
+  89 consth 27 1
+  90 consth 27 0
+  91 slice 1 4 63 63 _intAsRawFloat_sign_T
+  92 and 1 2 91 intAsRawFloat_sign
+  93 sub 3 20 4 _intAsRawFloat_absIn_T_1
+  94 ite 3 92 93 4 intAsRawFloat_absIn
+  95 slice 1 94 1 1 _intAsRawFloat_adjustedNormDist_T_1
+  96 slice 1 94 2 2 _intAsRawFloat_adjustedNormDist_T_2
+  97 slice 1 94 3 3 _intAsRawFloat_adjustedNormDist_T_3
+  98 slice 1 94 4 4 _intAsRawFloat_adjustedNormDist_T_4
+  99 slice 1 94 5 5 _intAsRawFloat_adjustedNormDist_T_5
+  100 slice 1 94 6 6 _intAsRawFloat_adjustedNormDist_T_6
+  101 slice 1 94 7 7 _intAsRawFloat_adjustedNormDist_T_7
+  102 slice 1 94 8 8 _intAsRawFloat_adjustedNormDist_T_8
+  103 slice 1 94 9 9 _intAsRawFloat_adjustedNormDist_T_9
+  104 slice 1 94 10 10 _intAsRawFloat_adjustedNormDist_T_10
+  105 slice 1 94 11 11 _intAsRawFloat_adjustedNormDist_T_11
+  106 slice 1 94 12 12 _intAsRawFloat_adjustedNormDist_T_12
+  107 slice 1 94 13 13 _intAsRawFloat_adjustedNormDist_T_13
+  108 slice 1 94 14 14 _intAsRawFloat_adjustedNormDist_T_14
+  109 slice 1 94 15 15 _intAsRawFloat_adjustedNormDist_T_15
+  110 slice 1 94 16 16 _intAsRawFloat_adjustedNormDist_T_16
+  111 slice 1 94 17 17 _intAsRawFloat_adjustedNormDist_T_17
+  112 slice 1 94 18 18 _intAsRawFloat_adjustedNormDist_T_18
+  113 slice 1 94 19 19 _intAsRawFloat_adjustedNormDist_T_19
+  114 slice 1 94 20 20 _intAsRawFloat_adjustedNormDist_T_20
+  115 slice 1 94 21 21 _intAsRawFloat_adjustedNormDist_T_21
+  116 slice 1 94 22 22 _intAsRawFloat_adjustedNormDist_T_22
+  117 slice 1 94 23 23 _intAsRawFloat_adjustedNormDist_T_23
+  118 slice 1 94 24 24 _intAsRawFloat_adjustedNormDist_T_24
+  119 slice 1 94 25 25 _intAsRawFloat_adjustedNormDist_T_25
+  120 slice 1 94 26 26 _intAsRawFloat_adjustedNormDist_T_26
+  121 slice 1 94 27 27 _intAsRawFloat_adjustedNormDist_T_27
+  122 slice 1 94 28 28 _intAsRawFloat_adjustedNormDist_T_28
+  123 slice 1 94 29 29 _intAsRawFloat_adjustedNormDist_T_29
+  124 slice 1 94 30 30 _intAsRawFloat_adjustedNormDist_T_30
+  125 slice 1 94 31 31 _intAsRawFloat_adjustedNormDist_T_31
+  126 slice 1 94 32 32 _intAsRawFloat_adjustedNormDist_T_32
+  127 slice 1 94 33 33 _intAsRawFloat_adjustedNormDist_T_33
+  128 slice 1 94 34 34 _intAsRawFloat_adjustedNormDist_T_34
+  129 slice 1 94 35 35 _intAsRawFloat_adjustedNormDist_T_35
+  130 slice 1 94 36 36 _intAsRawFloat_adjustedNormDist_T_36
+  131 slice 1 94 37 37 _intAsRawFloat_adjustedNormDist_T_37
+  132 slice 1 94 38 38 _intAsRawFloat_adjustedNormDist_T_38
+  133 slice 1 94 39 39 _intAsRawFloat_adjustedNormDist_T_39
+  134 slice 1 94 40 40 _intAsRawFloat_adjustedNormDist_T_40
+  135 slice 1 94 41 41 _intAsRawFloat_adjustedNormDist_T_41
+  136 slice 1 94 42 42 _intAsRawFloat_adjustedNormDist_T_42
+  137 slice 1 94 43 43 _intAsRawFloat_adjustedNormDist_T_43
+  138 slice 1 94 44 44 _intAsRawFloat_adjustedNormDist_T_44
+  139 slice 1 94 45 45 _intAsRawFloat_adjustedNormDist_T_45
+  140 slice 1 94 46 46 _intAsRawFloat_adjustedNormDist_T_46
+  141 slice 1 94 47 47 _intAsRawFloat_adjustedNormDist_T_47
+  142 slice 1 94 48 48 _intAsRawFloat_adjustedNormDist_T_48
+  143 slice 1 94 49 49 _intAsRawFloat_adjustedNormDist_T_49
+  144 slice 1 94 50 50 _intAsRawFloat_adjustedNormDist_T_50
+  145 slice 1 94 51 51 _intAsRawFloat_adjustedNormDist_T_51
+  146 slice 1 94 52 52 _intAsRawFloat_adjustedNormDist_T_52
+  147 slice 1 94 53 53 _intAsRawFloat_adjustedNormDist_T_53
+  148 slice 1 94 54 54 _intAsRawFloat_adjustedNormDist_T_54
+  149 slice 1 94 55 55 _intAsRawFloat_adjustedNormDist_T_55
+  150 slice 1 94 56 56 _intAsRawFloat_adjustedNormDist_T_56
+  151 slice 1 94 57 57 _intAsRawFloat_adjustedNormDist_T_57
+  152 slice 1 94 58 58 _intAsRawFloat_adjustedNormDist_T_58
+  153 slice 1 94 59 59 _intAsRawFloat_adjustedNormDist_T_59
+  154 slice 1 94 60 60 _intAsRawFloat_adjustedNormDist_T_60
+  155 slice 1 94 61 61 _intAsRawFloat_adjustedNormDist_T_61
+  156 slice 1 94 62 62 _intAsRawFloat_adjustedNormDist_T_62
+  157 slice 1 94 63 63 _intAsRawFloat_adjustedNormDist_T_63
+  158 xor 1 95 21 
+  159 concat 27 19 158 _intAsRawFloat_adjustedNormDist_T_64
+  160 ite 27 96 29 159 _intAsRawFloat_adjustedNormDist_T_65
+  161 ite 27 97 30 160 _intAsRawFloat_adjustedNormDist_T_66
+  162 ite 27 98 31 161 _intAsRawFloat_adjustedNormDist_T_67
+  163 ite 27 99 32 162 _intAsRawFloat_adjustedNormDist_T_68
+  164 ite 27 100 33 163 _intAsRawFloat_adjustedNormDist_T_69
+  165 ite 27 101 34 164 _intAsRawFloat_adjustedNormDist_T_70
+  166 ite 27 102 35 165 _intAsRawFloat_adjustedNormDist_T_71
+  167 ite 27 103 36 166 _intAsRawFloat_adjustedNormDist_T_72
+  168 ite 27 104 37 167 _intAsRawFloat_adjustedNormDist_T_73
+  169 ite 27 105 38 168 _intAsRawFloat_adjustedNormDist_T_74
+  170 ite 27 106 39 169 _intAsRawFloat_adjustedNormDist_T_75
+  171 ite 27 107 40 170 _intAsRawFloat_adjustedNormDist_T_76
+  172 ite 27 108 41 171 _intAsRawFloat_adjustedNormDist_T_77
+  173 ite 27 109 42 172 _intAsRawFloat_adjustedNormDist_T_78
+  174 ite 27 110 43 173 _intAsRawFloat_adjustedNormDist_T_79
+  175 ite 27 111 44 174 _intAsRawFloat_adjustedNormDist_T_80
+  176 ite 27 112 45 175 _intAsRawFloat_adjustedNormDist_T_81
+  177 ite 27 113 46 176 _intAsRawFloat_adjustedNormDist_T_82
+  178 ite 27 114 47 177 _intAsRawFloat_adjustedNormDist_T_83
+  179 ite 27 115 48 178 _intAsRawFloat_adjustedNormDist_T_84
+  180 ite 27 116 49 179 _intAsRawFloat_adjustedNormDist_T_85
+  181 ite 27 117 50 180 _intAsRawFloat_adjustedNormDist_T_86
+  182 ite 27 118 51 181 _intAsRawFloat_adjustedNormDist_T_87
+  183 ite 27 119 52 182 _intAsRawFloat_adjustedNormDist_T_88
+  184 ite 27 120 53 183 _intAsRawFloat_adjustedNormDist_T_89
+  185 ite 27 121 54 184 _intAsRawFloat_adjustedNormDist_T_90
+  186 ite 27 122 55 185 _intAsRawFloat_adjustedNormDist_T_91
+  187 ite 27 123 56 186 _intAsRawFloat_adjustedNormDist_T_92
+  188 ite 27 124 57 187 _intAsRawFloat_adjustedNormDist_T_93
+  189 ite 27 125 58 188 _intAsRawFloat_adjustedNormDist_T_94
+  190 ite 27 126 59 189 _intAsRawFloat_adjustedNormDist_T_95
+  191 ite 27 127 60 190 _intAsRawFloat_adjustedNormDist_T_96
+  192 ite 27 128 61 191 _intAsRawFloat_adjustedNormDist_T_97
+  193 ite 27 129 62 192 _intAsRawFloat_adjustedNormDist_T_98
+  194 ite 27 130 63 193 _intAsRawFloat_adjustedNormDist_T_99
+  195 ite 27 131 64 194 _intAsRawFloat_adjustedNormDist_T_100
+  196 ite 27 132 65 195 _intAsRawFloat_adjustedNormDist_T_101
+  197 ite 27 133 66 196 _intAsRawFloat_adjustedNormDist_T_102
+  198 ite 27 134 67 197 _intAsRawFloat_adjustedNormDist_T_103
+  199 ite 27 135 68 198 _intAsRawFloat_adjustedNormDist_T_104
+  200 ite 27 136 69 199 _intAsRawFloat_adjustedNormDist_T_105
+  201 ite 27 137 70 200 _intAsRawFloat_adjustedNormDist_T_106
+  202 ite 27 138 71 201 _intAsRawFloat_adjustedNormDist_T_107
+  203 ite 27 139 72 202 _intAsRawFloat_adjustedNormDist_T_108
+  204 ite 27 140 73 203 _intAsRawFloat_adjustedNormDist_T_109
+  205 ite 27 141 74 204 _intAsRawFloat_adjustedNormDist_T_110
+  206 ite 27 142 75 205 _intAsRawFloat_adjustedNormDist_T_111
+  207 ite 27 143 76 206 _intAsRawFloat_adjustedNormDist_T_112
+  208 ite 27 144 77 207 _intAsRawFloat_adjustedNormDist_T_113
+  209 ite 27 145 78 208 _intAsRawFloat_adjustedNormDist_T_114
+  210 ite 27 146 79 209 _intAsRawFloat_adjustedNormDist_T_115
+  211 ite 27 147 80 210 _intAsRawFloat_adjustedNormDist_T_116
+  212 ite 27 148 81 211 _intAsRawFloat_adjustedNormDist_T_117
+  213 ite 27 149 82 212 _intAsRawFloat_adjustedNormDist_T_118
+  214 ite 27 150 83 213 _intAsRawFloat_adjustedNormDist_T_119
+  215 ite 27 151 84 214 _intAsRawFloat_adjustedNormDist_T_120
+  216 ite 27 152 85 215 _intAsRawFloat_adjustedNormDist_T_121
+  217 ite 27 153 86 216 _intAsRawFloat_adjustedNormDist_T_122
+  218 ite 27 154 87 217 _intAsRawFloat_adjustedNormDist_T_123
+  219 ite 27 155 88 218 _intAsRawFloat_adjustedNormDist_T_124
+  220 ite 27 156 89 219 _intAsRawFloat_adjustedNormDist_T_125
+  221 ite 27 157 90 220 intAsRawFloat_adjustedNormDist
+  222 sort bitvec 127
+  223 concat 222 25 94 
+  224 concat 222 23 221 
+  225 sll 222 223 224 _intAsRawFloat_sig_T
+  226 slice 3 225 63 0 intAsRawFloat_sig
+  227 slice 1 225 63 63 _intAsRawFloat_out_isZero_T
+  228 xor 1 227 21 intAsRawFloat_isZero
+  229 xor 27 221 28 _intAsRawFloat_out_sExp_T_1
+  230 sort bitvec 9
+  231 concat 230 17 229 intAsRawFloat_sExp
+  232 sort bitvec 65
+  233 concat 232 26 226 intAsRawFloat_sig
+  234 set 7 8 228 io_in_isZero
+  235 set 7 9 92 io_in_sign
+  236 set 7 10 231 io_in_sExp
+  237 set 7 11 233 io_in_sig
+  238 set 7 12 6 io_roundingMode
+  239 output 15 io_out
+  240 output 16 io_exceptionFlags
+}

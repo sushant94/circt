@@ -1,0 +1,104 @@
+include DivSqrtRecF64ToRaw_mulAddZ31.btor2pp
+include RoundRawFNToRecFN_e11_s53_1.btor2pp
+
+module DivSqrtRecF64_mulAddZ31 {
+  1 sort bitvec 1
+  2 input 1 reset
+  3 input 1 io_inValid
+  4 input 1 io_sqrtOp
+  5 sort bitvec 65
+  6 input 5 io_a
+  7 input 5 io_b
+  8 sort bitvec 3
+  9 input 8 io_roundingMode
+  10 sort bitvec 105
+  11 input 10 io_mulAddResult_3
+  12 inst DivSqrtRecF64ToRaw_mulAddZ31
+  13 ref DivSqrtRecF64ToRaw_mulAddZ31 2 reset
+  14 ref DivSqrtRecF64ToRaw_mulAddZ31 3 io_inValid
+  15 ref DivSqrtRecF64ToRaw_mulAddZ31 4 io_sqrtOp
+  16 ref DivSqrtRecF64ToRaw_mulAddZ31 6 io_a
+  17 ref DivSqrtRecF64ToRaw_mulAddZ31 7 io_b
+  18 ref DivSqrtRecF64ToRaw_mulAddZ31 9 io_roundingMode
+  19 ref DivSqrtRecF64ToRaw_mulAddZ31 11 io_mulAddResult_3
+  20 ref DivSqrtRecF64ToRaw_mulAddZ31 959 io_inReady_div
+  21 ref DivSqrtRecF64ToRaw_mulAddZ31 960 io_inReady_sqrt
+  22 ref DivSqrtRecF64ToRaw_mulAddZ31 961 io_usingMulAdd
+  23 ref DivSqrtRecF64ToRaw_mulAddZ31 962 io_latchMulAddA_0
+  24 ref DivSqrtRecF64ToRaw_mulAddZ31 963 io_mulAddA_0
+  25 ref DivSqrtRecF64ToRaw_mulAddZ31 964 io_latchMulAddB_0
+  26 ref DivSqrtRecF64ToRaw_mulAddZ31 965 io_mulAddB_0
+  27 ref DivSqrtRecF64ToRaw_mulAddZ31 966 io_mulAddC_2
+  28 ref DivSqrtRecF64ToRaw_mulAddZ31 967 io_rawOutValid_div
+  29 ref DivSqrtRecF64ToRaw_mulAddZ31 968 io_rawOutValid_sqrt
+  30 ref DivSqrtRecF64ToRaw_mulAddZ31 969 io_roundingModeOut
+  31 ref DivSqrtRecF64ToRaw_mulAddZ31 970 io_invalidExc
+  32 ref DivSqrtRecF64ToRaw_mulAddZ31 971 io_infiniteExc
+  33 ref DivSqrtRecF64ToRaw_mulAddZ31 972 io_rawOut_isNaN
+  34 ref DivSqrtRecF64ToRaw_mulAddZ31 973 io_rawOut_isInf
+  35 ref DivSqrtRecF64ToRaw_mulAddZ31 974 io_rawOut_isZero
+  36 ref DivSqrtRecF64ToRaw_mulAddZ31 975 io_rawOut_sign
+  37 ref DivSqrtRecF64ToRaw_mulAddZ31 976 io_rawOut_sExp
+  38 ref DivSqrtRecF64ToRaw_mulAddZ31 977 io_rawOut_sig
+  39 get 12 20 io_inReady_div
+  40 get 12 21 io_inReady_sqrt
+  41 get 12 22 io_usingMulAdd
+  42 get 12 23 io_latchMulAddA_0
+  43 get 12 24 io_mulAddA_0
+  44 get 12 25 io_latchMulAddB_0
+  45 get 12 26 io_mulAddB_0
+  46 get 12 27 io_mulAddC_2
+  47 get 12 28 io_rawOutValid_div
+  48 get 12 29 io_rawOutValid_sqrt
+  49 get 12 30 io_roundingModeOut
+  50 get 12 31 io_invalidExc
+  51 get 12 32 io_infiniteExc
+  52 get 12 33 io_rawOut_isNaN
+  53 get 12 34 io_rawOut_isInf
+  54 get 12 35 io_rawOut_isZero
+  55 get 12 36 io_rawOut_sign
+  56 get 12 37 io_rawOut_sExp
+  57 get 12 38 io_rawOut_sig
+  58 inst RoundRawFNToRecFN_e11_s53_1
+  59 ref RoundRawFNToRecFN_e11_s53_1 2 io_invalidExc
+  60 ref RoundRawFNToRecFN_e11_s53_1 3 io_infiniteExc
+  61 ref RoundRawFNToRecFN_e11_s53_1 4 io_in_isNaN
+  62 ref RoundRawFNToRecFN_e11_s53_1 5 io_in_isInf
+  63 ref RoundRawFNToRecFN_e11_s53_1 6 io_in_isZero
+  64 ref RoundRawFNToRecFN_e11_s53_1 7 io_in_sign
+  65 ref RoundRawFNToRecFN_e11_s53_1 9 io_in_sExp
+  66 ref RoundRawFNToRecFN_e11_s53_1 11 io_in_sig
+  67 ref RoundRawFNToRecFN_e11_s53_1 13 io_roundingMode
+  68 ref RoundRawFNToRecFN_e11_s53_1 37 io_out
+  69 ref RoundRawFNToRecFN_e11_s53_1 38 io_exceptionFlags
+  70 get 58 68 io_out
+  71 get 58 69 io_exceptionFlags
+  72 set 12 60 2 reset
+  73 set 12 61 3 io_inValid
+  74 set 12 62 4 io_sqrtOp
+  75 set 12 63 6 io_a
+  76 set 12 64 7 io_b
+  77 set 12 65 9 io_roundingMode
+  78 set 12 66 11 io_mulAddResult_3
+  79 set 58 59 50 io_invalidExc
+  80 set 58 60 51 io_infiniteExc
+  81 set 58 61 52 io_in_isNaN
+  82 set 58 62 53 io_in_isInf
+  83 set 58 63 54 io_in_isZero
+  84 set 58 64 55 io_in_sign
+  85 set 58 65 56 io_in_sExp
+  86 set 58 66 57 io_in_sig
+  87 set 58 67 49 io_roundingMode
+  88 output 39 io_inReady_div
+  89 output 40 io_inReady_sqrt
+  90 output 41 io_usingMulAdd
+  91 output 42 io_latchMulAddA_0
+  92 output 43 io_mulAddA_0
+  93 output 44 io_latchMulAddB_0
+  94 output 45 io_mulAddB_0
+  95 output 46 io_mulAddC_2
+  96 output 47 io_outValid_div
+  97 output 48 io_outValid_sqrt
+  98 output 70 io_out
+  99 output 71 io_exceptionFlags
+}

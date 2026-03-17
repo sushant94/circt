@@ -1,0 +1,75 @@
+include DivSqrtRecF64_mulAddZ31.btor2pp
+include Mul54.btor2pp
+
+module DivSqrtRecF64 {
+  1 sort bitvec 1
+  2 input 1 reset
+  3 input 1 io_inValid
+  4 input 1 io_sqrtOp
+  5 sort bitvec 65
+  6 input 5 io_a
+  7 input 5 io_b
+  8 sort bitvec 3
+  9 input 8 io_roundingMode
+  10 inst DivSqrtRecF64_mulAddZ31
+  11 ref DivSqrtRecF64_mulAddZ31 2 reset
+  12 ref DivSqrtRecF64_mulAddZ31 3 io_inValid
+  13 ref DivSqrtRecF64_mulAddZ31 4 io_sqrtOp
+  14 ref DivSqrtRecF64_mulAddZ31 6 io_a
+  15 ref DivSqrtRecF64_mulAddZ31 7 io_b
+  16 ref DivSqrtRecF64_mulAddZ31 9 io_roundingMode
+  17 ref DivSqrtRecF64_mulAddZ31 11 io_mulAddResult_3
+  18 ref DivSqrtRecF64_mulAddZ31 88 io_inReady_div
+  19 ref DivSqrtRecF64_mulAddZ31 89 io_inReady_sqrt
+  20 ref DivSqrtRecF64_mulAddZ31 90 io_usingMulAdd
+  21 ref DivSqrtRecF64_mulAddZ31 91 io_latchMulAddA_0
+  22 ref DivSqrtRecF64_mulAddZ31 92 io_mulAddA_0
+  23 ref DivSqrtRecF64_mulAddZ31 93 io_latchMulAddB_0
+  24 ref DivSqrtRecF64_mulAddZ31 94 io_mulAddB_0
+  25 ref DivSqrtRecF64_mulAddZ31 95 io_mulAddC_2
+  26 ref DivSqrtRecF64_mulAddZ31 96 io_outValid_div
+  27 ref DivSqrtRecF64_mulAddZ31 97 io_outValid_sqrt
+  28 ref DivSqrtRecF64_mulAddZ31 98 io_out
+  29 ref DivSqrtRecF64_mulAddZ31 99 io_exceptionFlags
+  30 get 10 18 io_inReady_div
+  31 get 10 19 io_inReady_sqrt
+  32 get 10 20 io_usingMulAdd
+  33 get 10 21 io_latchMulAddA_0
+  34 get 10 22 io_mulAddA_0
+  35 get 10 23 io_latchMulAddB_0
+  36 get 10 24 io_mulAddB_0
+  37 get 10 25 io_mulAddC_2
+  38 get 10 26 io_outValid_div
+  39 get 10 27 io_outValid_sqrt
+  40 get 10 28 io_out
+  41 get 10 29 io_exceptionFlags
+  42 inst Mul54
+  43 ref Mul54 2 io_val_s0
+  44 ref Mul54 3 io_latch_a_s0
+  45 ref Mul54 5 io_a_s0
+  46 ref Mul54 6 io_latch_b_s0
+  47 ref Mul54 7 io_b_s0
+  48 ref Mul54 9 io_c_s2
+  49 ref Mul54 30 io_result_s3
+  50 get 42 49 io_result_s3
+  51 slice 1 32 0 0 mul.io_val_s0
+  52 set 10 43 2 reset
+  53 set 10 44 3 io_inValid
+  54 set 10 45 4 io_sqrtOp
+  55 set 10 46 6 io_a
+  56 set 10 47 7 io_b
+  57 set 10 48 9 io_roundingMode
+  58 set 10 17 50 io_mulAddResult_3
+  59 set 42 43 51 io_val_s0
+  60 set 42 44 33 io_latch_a_s0
+  61 set 42 45 34 io_a_s0
+  62 set 42 46 35 io_latch_b_s0
+  63 set 42 47 36 io_b_s0
+  64 set 42 48 37 io_c_s2
+  65 output 30 io_inReady_div
+  66 output 31 io_inReady_sqrt
+  67 output 38 io_outValid_div
+  68 output 39 io_outValid_sqrt
+  69 output 40 io_out
+  70 output 41 io_exceptionFlags
+}

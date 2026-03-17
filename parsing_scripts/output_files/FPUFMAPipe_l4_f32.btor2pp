@@ -1,0 +1,86 @@
+include MulAddRecFNPipe_l2_e8_s24.btor2pp
+
+module FPUFMAPipe_l4_f32 {
+  1 sort bitvec 1
+  2 input 1 reset
+  3 input 1 io_in_valid
+  4 input 1 io_in_bits_ren3
+  5 input 1 io_in_bits_swap23
+  6 sort bitvec 3
+  7 input 6 io_in_bits_rm
+  8 sort bitvec 2
+  9 input 8 io_in_bits_fmaCmd
+  10 sort bitvec 65
+  11 input 10 io_in_bits_in1
+  12 input 10 io_in_bits_in2
+  13 input 10 io_in_bits_in3
+  14 state 1 valid
+  15 state 6 in_rm
+  16 state 8 in_fmaCmd
+  17 state 10 in_in1
+  18 state 10 in_in2
+  19 state 10 in_in3
+  20 state 1 io_out_pipe_v
+  21 state 10 io_out_pipe_b_data
+  22 sort bitvec 5
+  23 state 22 io_out_pipe_b_exc
+  24 inst MulAddRecFNPipe_l2_e8_s24
+  25 ref MulAddRecFNPipe_l2_e8_s24 2 reset
+  26 ref MulAddRecFNPipe_l2_e8_s24 3 io_validin
+  27 ref MulAddRecFNPipe_l2_e8_s24 5 io_op
+  28 ref MulAddRecFNPipe_l2_e8_s24 7 io_a
+  29 ref MulAddRecFNPipe_l2_e8_s24 8 io_b
+  30 ref MulAddRecFNPipe_l2_e8_s24 9 io_c
+  31 ref MulAddRecFNPipe_l2_e8_s24 11 io_roundingMode
+  32 ref MulAddRecFNPipe_l2_e8_s24 202 io_out
+  33 ref MulAddRecFNPipe_l2_e8_s24 203 io_exceptionFlags
+  34 ref MulAddRecFNPipe_l2_e8_s24 204 io_validout
+  35 get 24 32 io_out
+  36 get 24 33 io_exceptionFlags
+  37 get 24 34 io_validout
+  38 sort bitvec 32
+  39 consth 38 0
+  40 sort bitvec 33
+  41 consth 40 100000000
+  42 consth 10 80000000
+  43 consth 1 0
+  44 slice 40 11 32 0 
+  45 slice 40 12 32 0 
+  46 xor 40 44 45 _zero_T
+  47 and 40 46 41 
+  48 concat 10 39 47 
+  49 ite 6 3 7 15 
+  50 ite 8 3 9 16 
+  51 ite 10 3 11 17 
+  52 ite 10 5 42 12 
+  53 ite 10 3 52 18 
+  54 or 1 4 5 
+  55 ite 10 54 13 48 
+  56 ite 10 3 55 19 
+  57 slice 40 17 32 0 fma.io_a
+  58 slice 40 18 32 0 fma.io_b
+  59 slice 40 19 32 0 fma.io_c
+  60 concat 10 39 35 res_data
+  61 ite 10 37 60 21 
+  62 ite 22 37 36 23 
+  63 set 24 25 2 reset
+  64 set 24 26 14 io_validin
+  65 set 24 27 16 io_op
+  66 set 24 28 57 io_a
+  67 set 24 29 58 io_b
+  68 set 24 30 59 io_c
+  69 set 24 31 15 io_roundingMode
+  70 output 20 io_out_valid
+  71 output 21 io_out_bits_data
+  72 output 23 io_out_bits_exc
+  73 next 1 14 3
+  74 next 6 15 49
+  75 next 8 16 50
+  76 next 10 17 51
+  77 next 10 18 53
+  78 next 10 19 56
+  79 ite 1 2 43 37 res_exc
+  80 next 1 20 37
+  81 next 10 21 61
+  82 next 22 23 62
+}

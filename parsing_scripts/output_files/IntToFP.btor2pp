@@ -1,0 +1,441 @@
+include INToRecFN_i64_e8_s24.btor2pp
+include INToRecFN_i64_e11_s53.btor2pp
+
+module IntToFP {
+  1 sort bitvec 1
+  2 input 1 reset
+  3 input 1 io_in_valid
+  4 sort bitvec 2
+  5 input 4 io_in_bits_typeTagIn
+  6 input 1 io_in_bits_wflags
+  7 sort bitvec 3
+  8 input 7 io_in_bits_rm
+  9 input 4 io_in_bits_typ
+  10 sort bitvec 64
+  11 input 10 io_in_bits_in1
+  12 state 1 in_pipe_v
+  13 state 4 in_pipe_b_typeTagIn
+  14 state 1 in_pipe_b_wflags
+  15 state 7 in_pipe_b_rm
+  16 state 4 in_pipe_b_typ
+  17 state 10 in_pipe_b_in1
+  18 state 1 io_out_pipe_v
+  19 sort bitvec 65
+  20 state 19 io_out_pipe_b_data
+  21 sort bitvec 5
+  22 state 21 io_out_pipe_b_exc
+  23 inst INToRecFN_i64_e8_s24
+  24 ref INToRecFN_i64_e8_s24 2 io_signedIn
+  25 ref INToRecFN_i64_e8_s24 4 io_in
+  26 ref INToRecFN_i64_e8_s24 6 io_roundingMode
+  27 ref INToRecFN_i64_e8_s24 239 io_out
+  28 ref INToRecFN_i64_e8_s24 240 io_exceptionFlags
+  29 get 23 27 io_out
+  30 get 23 28 io_exceptionFlags
+  31 inst INToRecFN_i64_e11_s53
+  32 ref INToRecFN_i64_e11_s53 2 io_signedIn
+  33 ref INToRecFN_i64_e11_s53 4 io_in
+  34 ref INToRecFN_i64_e11_s53 6 io_roundingMode
+  35 ref INToRecFN_i64_e11_s53 239 io_out
+  36 ref INToRecFN_i64_e11_s53 240 io_exceptionFlags
+  37 get 31 35 io_out
+  38 get 31 36 io_exceptionFlags
+  39 sort bitvec 7
+  40 consth 39 20
+  41 consth 21 1F
+  42 sort bitvec 4
+  43 consth 42 F
+  44 sort bitvec 10
+  45 consth 44 100
+  46 sort bitvec 6
+  47 consth 46 3F
+  48 consth 21 19
+  49 consth 7 7
+  50 sort bitvec 20
+  51 consth 50 FFFFF
+  52 sort bitvec 49
+  53 consth 52 0
+  54 sort bitvec 31
+  55 consth 54 0
+  56 sort bitvec 23
+  57 consth 56 0
+  58 sort bitvec 8
+  59 consth 58 0
+  60 consth 4 3
+  61 sort bitvec 109
+  62 consth 61 0
+  63 sort bitvec 63
+  64 consth 63 0
+  65 sort bitvec 52
+  66 consth 65 0
+  67 consth 1 1
+  68 sort bitvec 11
+  69 consth 68 0
+  70 consth 10 FFFFFFFF00000000
+  71 consth 46 31
+  72 consth 46 30
+  73 consth 46 2F
+  74 consth 46 2E
+  75 consth 46 2D
+  76 consth 46 2C
+  77 consth 46 2B
+  78 consth 46 2A
+  79 consth 46 29
+  80 consth 46 28
+  81 consth 46 27
+  82 consth 46 26
+  83 consth 46 25
+  84 consth 46 24
+  85 consth 46 23
+  86 consth 46 22
+  87 consth 46 21
+  88 consth 46 20
+  89 consth 21 16
+  90 consth 21 15
+  91 consth 21 14
+  92 consth 21 13
+  93 consth 21 12
+  94 consth 21 11
+  95 consth 21 10
+  96 consth 4 2
+  97 consth 7 0
+  98 consth 21 0
+  99 consth 10 0
+  100 consth 46 1F
+  101 consth 46 1E
+  102 consth 46 1D
+  103 consth 46 1C
+  104 consth 46 1B
+  105 consth 46 1A
+  106 consth 46 19
+  107 consth 46 18
+  108 consth 46 17
+  109 consth 46 16
+  110 consth 46 15
+  111 consth 46 14
+  112 consth 46 13
+  113 consth 46 12
+  114 consth 46 11
+  115 consth 46 10
+  116 consth 46 F
+  117 consth 46 E
+  118 consth 46 D
+  119 consth 46 C
+  120 consth 46 B
+  121 consth 46 A
+  122 consth 46 9
+  123 consth 46 8
+  124 consth 46 7
+  125 consth 46 6
+  126 consth 46 5
+  127 consth 46 4
+  128 consth 46 3
+  129 consth 46 2
+  130 consth 46 1
+  131 consth 46 0
+  132 consth 4 1
+  133 consth 21 F
+  134 consth 21 E
+  135 consth 21 D
+  136 consth 21 C
+  137 consth 21 B
+  138 consth 21 A
+  139 consth 21 9
+  140 consth 21 8
+  141 consth 21 7
+  142 consth 21 6
+  143 consth 21 5
+  144 consth 21 4
+  145 consth 21 3
+  146 consth 21 2
+  147 consth 21 1
+  148 consth 19 1EFEFFFFFFFFFFFFF
+  149 consth 1 0
+  150 ite 4 3 5 13 
+  151 ite 1 3 6 14 
+  152 ite 7 3 8 15 
+  153 ite 4 3 9 16 
+  154 ite 10 3 11 17 
+  155 slice 1 13 0 0 mux_data_truncIdx
+  156 ite 10 155 99 70 _mux_data_T_1
+  157 or 10 156 17 _mux_data_T_2
+  158 slice 1 157 63 63 mux_data_rawIn_sign
+  159 slice 68 157 62 52 mux_data_rawIn_expIn
+  160 slice 65 157 51 0 mux_data_rawIn_fractIn
+  161 eq 1 159 69 mux_data_rawIn_isZeroExpIn
+  162 neq 1 160 66 _mux_data_rawIn_out_isNaN_T
+  163 xor 1 162 67 mux_data_rawIn_isZeroFractIn
+  164 slice 1 157 1 1 _mux_data_rawIn_normDist_T_1
+  165 slice 1 157 2 2 _mux_data_rawIn_normDist_T_2
+  166 slice 1 157 3 3 _mux_data_rawIn_normDist_T_3
+  167 slice 1 157 4 4 _mux_data_rawIn_normDist_T_4
+  168 slice 1 157 5 5 _mux_data_rawIn_normDist_T_5
+  169 slice 1 157 6 6 _mux_data_rawIn_normDist_T_6
+  170 slice 1 157 7 7 _mux_data_rawIn_normDist_T_7
+  171 slice 1 157 8 8 _mux_data_rawIn_normDist_T_8
+  172 slice 1 157 9 9 _mux_data_rawIn_normDist_T_9
+  173 slice 1 157 10 10 _mux_data_rawIn_normDist_T_10
+  174 slice 1 157 11 11 _mux_data_rawIn_normDist_T_11
+  175 slice 1 157 12 12 _mux_data_rawIn_normDist_T_12
+  176 slice 1 157 13 13 _mux_data_rawIn_normDist_T_13
+  177 slice 1 157 14 14 _mux_data_rawIn_normDist_T_14
+  178 slice 1 157 15 15 _mux_data_rawIn_normDist_T_15
+  179 slice 1 157 16 16 _mux_data_rawIn_normDist_T_16
+  180 slice 1 157 17 17 _mux_data_rawIn_normDist_T_17
+  181 slice 1 157 18 18 _mux_data_rawIn_normDist_T_18
+  182 slice 1 157 19 19 _mux_data_rawIn_normDist_T_19
+  183 slice 1 157 20 20 _mux_data_rawIn_normDist_T_20
+  184 slice 1 157 21 21 _mux_data_rawIn_normDist_T_21
+  185 slice 1 157 22 22 _mux_data_rawIn_normDist_T_22
+  186 slice 1 157 23 23 _mux_data_rawIn_normDist_T_23
+  187 slice 1 157 24 24 _mux_data_rawIn_normDist_T_24
+  188 slice 1 157 25 25 _mux_data_rawIn_normDist_T_25
+  189 slice 1 157 26 26 _mux_data_rawIn_normDist_T_26
+  190 slice 1 157 27 27 _mux_data_rawIn_normDist_T_27
+  191 slice 1 157 28 28 _mux_data_rawIn_normDist_T_28
+  192 slice 1 157 29 29 _mux_data_rawIn_normDist_T_29
+  193 slice 1 157 30 30 _mux_data_rawIn_normDist_T_30
+  194 slice 1 157 31 31 _mux_data_rawIn_normDist_T_31
+  195 slice 1 157 32 32 _mux_data_rawIn_normDist_T_32
+  196 slice 1 157 33 33 _mux_data_rawIn_normDist_T_33
+  197 slice 1 157 34 34 _mux_data_rawIn_normDist_T_34
+  198 slice 1 157 35 35 _mux_data_rawIn_normDist_T_35
+  199 slice 1 157 36 36 _mux_data_rawIn_normDist_T_36
+  200 slice 1 157 37 37 _mux_data_rawIn_normDist_T_37
+  201 slice 1 157 38 38 _mux_data_rawIn_normDist_T_38
+  202 slice 1 157 39 39 _mux_data_rawIn_normDist_T_39
+  203 slice 1 157 40 40 _mux_data_rawIn_normDist_T_40
+  204 slice 1 157 41 41 _mux_data_rawIn_normDist_T_41
+  205 slice 1 157 42 42 _mux_data_rawIn_normDist_T_42
+  206 slice 1 157 43 43 _mux_data_rawIn_normDist_T_43
+  207 slice 1 157 44 44 _mux_data_rawIn_normDist_T_44
+  208 slice 1 157 45 45 _mux_data_rawIn_normDist_T_45
+  209 slice 1 157 46 46 _mux_data_rawIn_normDist_T_46
+  210 slice 1 157 47 47 _mux_data_rawIn_normDist_T_47
+  211 slice 1 157 48 48 _mux_data_rawIn_normDist_T_48
+  212 slice 1 157 49 49 _mux_data_rawIn_normDist_T_49
+  213 slice 1 157 50 50 _mux_data_rawIn_normDist_T_50
+  214 slice 1 157 51 51 _mux_data_rawIn_normDist_T_51
+  215 xor 1 164 67 
+  216 concat 46 48 215 _mux_data_rawIn_normDist_T_52
+  217 ite 46 165 71 216 _mux_data_rawIn_normDist_T_53
+  218 ite 46 166 72 217 _mux_data_rawIn_normDist_T_54
+  219 ite 46 167 73 218 _mux_data_rawIn_normDist_T_55
+  220 ite 46 168 74 219 _mux_data_rawIn_normDist_T_56
+  221 ite 46 169 75 220 _mux_data_rawIn_normDist_T_57
+  222 ite 46 170 76 221 _mux_data_rawIn_normDist_T_58
+  223 ite 46 171 77 222 _mux_data_rawIn_normDist_T_59
+  224 ite 46 172 78 223 _mux_data_rawIn_normDist_T_60
+  225 ite 46 173 79 224 _mux_data_rawIn_normDist_T_61
+  226 ite 46 174 80 225 _mux_data_rawIn_normDist_T_62
+  227 ite 46 175 81 226 _mux_data_rawIn_normDist_T_63
+  228 ite 46 176 82 227 _mux_data_rawIn_normDist_T_64
+  229 ite 46 177 83 228 _mux_data_rawIn_normDist_T_65
+  230 ite 46 178 84 229 _mux_data_rawIn_normDist_T_66
+  231 ite 46 179 85 230 _mux_data_rawIn_normDist_T_67
+  232 ite 46 180 86 231 _mux_data_rawIn_normDist_T_68
+  233 ite 46 181 87 232 _mux_data_rawIn_normDist_T_69
+  234 ite 46 182 88 233 _mux_data_rawIn_normDist_T_70
+  235 ite 46 183 100 234 _mux_data_rawIn_normDist_T_71
+  236 ite 46 184 101 235 _mux_data_rawIn_normDist_T_72
+  237 ite 46 185 102 236 _mux_data_rawIn_normDist_T_73
+  238 ite 46 186 103 237 _mux_data_rawIn_normDist_T_74
+  239 ite 46 187 104 238 _mux_data_rawIn_normDist_T_75
+  240 ite 46 188 105 239 _mux_data_rawIn_normDist_T_76
+  241 ite 46 189 106 240 _mux_data_rawIn_normDist_T_77
+  242 ite 46 190 107 241 _mux_data_rawIn_normDist_T_78
+  243 ite 46 191 108 242 _mux_data_rawIn_normDist_T_79
+  244 ite 46 192 109 243 _mux_data_rawIn_normDist_T_80
+  245 ite 46 193 110 244 _mux_data_rawIn_normDist_T_81
+  246 ite 46 194 111 245 _mux_data_rawIn_normDist_T_82
+  247 ite 46 195 112 246 _mux_data_rawIn_normDist_T_83
+  248 ite 46 196 113 247 _mux_data_rawIn_normDist_T_84
+  249 ite 46 197 114 248 _mux_data_rawIn_normDist_T_85
+  250 ite 46 198 115 249 _mux_data_rawIn_normDist_T_86
+  251 ite 46 199 116 250 _mux_data_rawIn_normDist_T_87
+  252 ite 46 200 117 251 _mux_data_rawIn_normDist_T_88
+  253 ite 46 201 118 252 _mux_data_rawIn_normDist_T_89
+  254 ite 46 202 119 253 _mux_data_rawIn_normDist_T_90
+  255 ite 46 203 120 254 _mux_data_rawIn_normDist_T_91
+  256 ite 46 204 121 255 _mux_data_rawIn_normDist_T_92
+  257 ite 46 205 122 256 _mux_data_rawIn_normDist_T_93
+  258 ite 46 206 123 257 _mux_data_rawIn_normDist_T_94
+  259 ite 46 207 124 258 _mux_data_rawIn_normDist_T_95
+  260 ite 46 208 125 259 _mux_data_rawIn_normDist_T_96
+  261 ite 46 209 126 260 _mux_data_rawIn_normDist_T_97
+  262 ite 46 210 127 261 _mux_data_rawIn_normDist_T_98
+  263 ite 46 211 128 262 _mux_data_rawIn_normDist_T_99
+  264 ite 46 212 129 263 _mux_data_rawIn_normDist_T_100
+  265 ite 46 213 130 264 _mux_data_rawIn_normDist_T_101
+  266 ite 46 214 131 265 mux_data_rawIn_normDist
+  267 sort bitvec 115
+  268 concat 267 64 160 
+  269 concat 267 62 266 
+  270 sll 267 268 269 _mux_data_rawIn_subnormFract_T
+  271 sort bitvec 51
+  272 slice 271 270 50 0 _mux_data_rawIn_subnormFract_T_1
+  273 concat 65 272 149 mux_data_rawIn_subnormFract
+  274 xor 46 266 47 
+  275 sort bitvec 12
+  276 concat 275 47 274 _mux_data_rawIn_adjustedExp_T
+  277 concat 275 149 159 
+  278 ite 275 161 276 277 _mux_data_rawIn_adjustedExp_T_1
+  279 ite 4 161 96 132 _mux_data_rawIn_adjustedExp_T_2
+  280 concat 275 45 279 
+  281 add 275 278 280 _mux_data_rawIn_adjustedExp_T_4
+  282 and 1 161 163 mux_data_rawIn_isZero
+  283 slice 4 281 11 10 _mux_data_rawIn_isSpecial_T
+  284 eq 1 283 60 mux_data_rawIn_isSpecial
+  285 and 1 284 162 mux_data_rawIn_isNaN
+  286 ite 65 161 273 160 _mux_data_rawIn_out_sig_T_2
+  287 slice 7 281 11 9 _mux_data_T_3
+  288 ite 7 282 97 287 _mux_data_T_4
+  289 slice 4 288 2 1 
+  290 slice 1 288 0 0 
+  291 or 1 290 285 
+  292 sort bitvec 9
+  293 slice 292 281 8 0 _mux_data_T_8
+  294 slice 1 157 31 31 mux_data_rawIn_1_sign
+  295 slice 58 157 30 23 mux_data_rawIn_expIn_1
+  296 slice 56 157 22 0 mux_data_rawIn_fractIn_1
+  297 eq 1 295 59 mux_data_rawIn_isZeroExpIn_1
+  298 neq 1 296 57 _mux_data_rawIn_out_isNaN_T_2
+  299 xor 1 298 67 mux_data_rawIn_isZeroFractIn_1
+  300 slice 1 157 1 1 _mux_data_rawIn_normDist_T_103
+  301 slice 1 157 2 2 _mux_data_rawIn_normDist_T_104
+  302 slice 1 157 3 3 _mux_data_rawIn_normDist_T_105
+  303 slice 1 157 4 4 _mux_data_rawIn_normDist_T_106
+  304 slice 1 157 5 5 _mux_data_rawIn_normDist_T_107
+  305 slice 1 157 6 6 _mux_data_rawIn_normDist_T_108
+  306 slice 1 157 7 7 _mux_data_rawIn_normDist_T_109
+  307 slice 1 157 8 8 _mux_data_rawIn_normDist_T_110
+  308 slice 1 157 9 9 _mux_data_rawIn_normDist_T_111
+  309 slice 1 157 10 10 _mux_data_rawIn_normDist_T_112
+  310 slice 1 157 11 11 _mux_data_rawIn_normDist_T_113
+  311 slice 1 157 12 12 _mux_data_rawIn_normDist_T_114
+  312 slice 1 157 13 13 _mux_data_rawIn_normDist_T_115
+  313 slice 1 157 14 14 _mux_data_rawIn_normDist_T_116
+  314 slice 1 157 15 15 _mux_data_rawIn_normDist_T_117
+  315 slice 1 157 16 16 _mux_data_rawIn_normDist_T_118
+  316 slice 1 157 17 17 _mux_data_rawIn_normDist_T_119
+  317 slice 1 157 18 18 _mux_data_rawIn_normDist_T_120
+  318 slice 1 157 19 19 _mux_data_rawIn_normDist_T_121
+  319 slice 1 157 20 20 _mux_data_rawIn_normDist_T_122
+  320 slice 1 157 21 21 _mux_data_rawIn_normDist_T_123
+  321 slice 1 157 22 22 _mux_data_rawIn_normDist_T_124
+  322 ite 21 300 90 89 _mux_data_rawIn_normDist_T_125
+  323 ite 21 301 91 322 _mux_data_rawIn_normDist_T_126
+  324 ite 21 302 92 323 _mux_data_rawIn_normDist_T_127
+  325 ite 21 303 93 324 _mux_data_rawIn_normDist_T_128
+  326 ite 21 304 94 325 _mux_data_rawIn_normDist_T_129
+  327 ite 21 305 95 326 _mux_data_rawIn_normDist_T_130
+  328 ite 21 306 133 327 _mux_data_rawIn_normDist_T_131
+  329 ite 21 307 134 328 _mux_data_rawIn_normDist_T_132
+  330 ite 21 308 135 329 _mux_data_rawIn_normDist_T_133
+  331 ite 21 309 136 330 _mux_data_rawIn_normDist_T_134
+  332 ite 21 310 137 331 _mux_data_rawIn_normDist_T_135
+  333 ite 21 311 138 332 _mux_data_rawIn_normDist_T_136
+  334 ite 21 312 139 333 _mux_data_rawIn_normDist_T_137
+  335 ite 21 313 140 334 _mux_data_rawIn_normDist_T_138
+  336 ite 21 314 141 335 _mux_data_rawIn_normDist_T_139
+  337 ite 21 315 142 336 _mux_data_rawIn_normDist_T_140
+  338 ite 21 316 143 337 _mux_data_rawIn_normDist_T_141
+  339 ite 21 317 144 338 _mux_data_rawIn_normDist_T_142
+  340 ite 21 318 145 339 _mux_data_rawIn_normDist_T_143
+  341 ite 21 319 146 340 _mux_data_rawIn_normDist_T_144
+  342 ite 21 320 147 341 _mux_data_rawIn_normDist_T_145
+  343 ite 21 321 98 342 mux_data_rawIn_normDist_1
+  344 sort bitvec 54
+  345 concat 344 55 296 
+  346 concat 344 53 343 
+  347 sll 344 345 346 _mux_data_rawIn_subnormFract_T_2
+  348 sort bitvec 22
+  349 slice 348 347 21 0 _mux_data_rawIn_subnormFract_T_3
+  350 concat 56 349 149 mux_data_rawIn_subnormFract_1
+  351 xor 21 343 41 
+  352 concat 292 43 351 _mux_data_rawIn_adjustedExp_T_5
+  353 concat 292 149 295 
+  354 ite 292 297 352 353 _mux_data_rawIn_adjustedExp_T_6
+  355 ite 4 297 96 132 _mux_data_rawIn_adjustedExp_T_7
+  356 concat 292 40 355 
+  357 add 292 354 356 _mux_data_rawIn_adjustedExp_T_9
+  358 and 1 297 299 mux_data_rawIn_1_isZero
+  359 slice 4 357 8 7 _mux_data_rawIn_isSpecial_T_1
+  360 eq 1 359 60 mux_data_rawIn_isSpecial_1
+  361 and 1 360 298 mux_data_rawIn_1_isNaN
+  362 ite 56 297 350 296 _mux_data_rawIn_out_sig_T_6
+  363 slice 7 357 8 6 _mux_data_T_12
+  364 ite 7 358 97 363 _mux_data_T_13
+  365 slice 1 364 0 0 
+  366 or 1 365 361 
+  367 slice 46 357 5 0 _mux_data_T_17
+  368 slice 50 286 51 32 _mux_data_swizzledNaN_T_5
+  369 eq 1 368 51 _mux_data_swizzledNaN_T_2
+  370 slice 39 281 7 1 _mux_data_swizzledNaN_T_3
+  371 slice 1 364 2 2 _mux_data_swizzledNaN_T_4
+  372 slice 1 364 1 1 
+  373 concat 7 289 291 _mux_data_T_21
+  374 eq 1 373 49 _mux_data_T_22
+  375 sort bitvec 61
+  376 concat 375 369 370 
+  377 concat 375 376 371 
+  378 concat 375 377 368 
+  379 concat 375 378 294 
+  380 concat 375 379 372 
+  381 concat 375 380 366 
+  382 concat 375 381 367 
+  383 concat 375 382 362 
+  384 concat 375 293 286 
+  385 ite 375 374 383 384 
+  386 concat 19 158 289 _mux_data_T_23
+  387 concat 19 386 291 _mux_data_T_23
+  388 concat 19 387 385 _mux_data_T_23
+  389 sort bitvec 32
+  390 slice 389 17 31 0 intValue_smallInt
+  391 slice 1 16 1 1 _intValue_T
+  392 slice 1 16 0 0 _intValue_res_T_1
+  393 slice 1 17 31 31 
+  394 xor 1 392 67 
+  395 and 1 394 393 
+  396 sext 389 395 31 
+  397 concat 10 396 390 
+  398 ite 10 391 17 397 intValue_res
+  399 slice 1 16 0 0 _i2fResults_i2f_io_signedIn_T_2
+  400 xor 1 399 67 i2fResults_i2f.io_signedIn
+  401 xor 1 399 67 i2fResults_i2f_1.io_signedIn
+  402 slice 7 37 63 61 _i2fResults_T
+  403 neq 1 402 49 
+  404 sext 19 403 64 
+  405 or 19 404 148 
+  406 and 19 405 37 i2fResults_1_1
+  407 slice 389 406 64 33 _dataPadded_T
+  408 concat 19 407 29 dataPadded_0
+  409 slice 1 13 0 0 mux_data_truncIdx_1
+  410 ite 19 409 406 408 _mux_data_T_25
+  411 ite 19 14 410 388 mux_data
+  412 slice 1 13 0 0 mux_exc_truncIdx
+  413 ite 21 412 38 30 _mux_exc_T_1
+  414 ite 21 14 413 98 mux_exc
+  415 ite 19 12 411 20 
+  416 ite 21 12 414 22 
+  417 set 23 32 400 io_signedIn
+  418 set 23 33 398 io_in
+  419 set 23 34 15 io_roundingMode
+  420 set 31 32 401 io_signedIn
+  421 set 31 33 398 io_in
+  422 set 31 34 15 io_roundingMode
+  423 output 18 io_out_valid
+  424 output 20 io_out_bits_data
+  425 output 22 io_out_bits_exc
+  426 ite 1 2 149 3 io_in_valid
+  427 next 1 12 426
+  428 next 4 13 150
+  429 next 1 14 151
+  430 next 7 15 152
+  431 next 4 16 153
+  432 next 10 17 154
+  433 ite 1 2 149 12 in_valid
+  434 next 1 18 433
+  435 next 19 20 415
+  436 next 21 22 416
+}

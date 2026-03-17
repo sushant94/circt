@@ -1,0 +1,529 @@
+
+module RenameFreeList_1 {
+  1 sort bitvec 1
+  2 input 1 reset
+  3 input 1 io_reqs_0
+  4 input 1 io_dealloc_pregs_0_valid
+  5 sort bitvec 6
+  6 input 5 io_dealloc_pregs_0_bits
+  7 input 1 io_ren_br_tags_0_valid
+  8 sort bitvec 3
+  9 input 8 io_ren_br_tags_0_bits
+  10 input 8 io_brupdate_b2_uop_br_tag
+  11 input 1 io_brupdate_b2_mispredict
+  12 input 1 io_debug_pipeline_empty
+  13 sort bitvec 48
+  14 state 13 free_list
+  15 state 13 br_alloc_lists_0
+  16 state 13 br_alloc_lists_1
+  17 state 13 br_alloc_lists_2
+  18 state 13 br_alloc_lists_3
+  19 state 13 br_alloc_lists_4
+  20 state 13 br_alloc_lists_5
+  21 state 13 br_alloc_lists_6
+  22 state 13 br_alloc_lists_7
+  23 state 1 r_valid
+  24 state 5 r_sel
+  25 consth 5 E
+  26 sort bitvec 47
+  27 consth 26 0
+  28 sort bitvec 8
+  29 consth 28 1
+  30 sort bitvec 64
+  31 consth 30 1
+  32 consth 13 FFFFFFFFFFFE
+  33 consth 13 0
+  34 consth 1 0
+  35 consth 13 FFFFFFFFFFFF
+  36 consth 1 1
+  37 consth 13 2
+  38 consth 13 4
+  39 consth 13 8
+  40 consth 13 10
+  41 consth 13 20
+  42 consth 13 40
+  43 consth 13 80
+  44 consth 13 100
+  45 consth 13 200
+  46 consth 13 400
+  47 consth 13 800
+  48 consth 13 1000
+  49 consth 13 2000
+  50 consth 13 4000
+  51 consth 13 8000
+  52 consth 13 10000
+  53 consth 13 20000
+  54 consth 13 40000
+  55 consth 13 80000
+  56 consth 13 100000
+  57 consth 13 200000
+  58 consth 13 400000
+  59 consth 13 800000
+  60 consth 13 1000000
+  61 consth 13 2000000
+  62 consth 13 4000000
+  63 consth 13 8000000
+  64 consth 13 10000000
+  65 consth 13 20000000
+  66 consth 13 40000000
+  67 consth 13 80000000
+  68 consth 13 100000000
+  69 consth 13 200000000
+  70 consth 13 400000000
+  71 consth 13 800000000
+  72 consth 13 1000000000
+  73 consth 13 2000000000
+  74 consth 13 4000000000
+  75 consth 13 8000000000
+  76 consth 13 10000000000
+  77 consth 13 20000000000
+  78 consth 13 40000000000
+  79 consth 13 80000000000
+  80 consth 13 100000000000
+  81 consth 13 200000000000
+  82 consth 13 400000000000
+  83 consth 13 1
+  84 sort bitvec 58
+  85 consth 84 0
+  86 sort bitvec 5
+  87 consth 86 0
+  88 sort bitvec 16
+  89 consth 88 0
+  90 consth 28 0
+  91 sort bitvec 4
+  92 consth 91 0
+  93 sort bitvec 2
+  94 consth 93 0
+  95 sort bitvec 49
+  96 consth 95 0
+  97 slice 1 14 0 0 _sels_sels_0_T
+  98 slice 1 14 1 1 _sels_sels_0_T_1
+  99 slice 1 14 2 2 _sels_sels_0_T_2
+  100 slice 1 14 3 3 _sels_sels_0_T_3
+  101 slice 1 14 4 4 _sels_sels_0_T_4
+  102 slice 1 14 5 5 _sels_sels_0_T_5
+  103 slice 1 14 6 6 _sels_sels_0_T_6
+  104 slice 1 14 7 7 _sels_sels_0_T_7
+  105 slice 1 14 8 8 _sels_sels_0_T_8
+  106 slice 1 14 9 9 _sels_sels_0_T_9
+  107 slice 1 14 10 10 _sels_sels_0_T_10
+  108 slice 1 14 11 11 _sels_sels_0_T_11
+  109 slice 1 14 12 12 _sels_sels_0_T_12
+  110 slice 1 14 13 13 _sels_sels_0_T_13
+  111 slice 1 14 14 14 _sels_sels_0_T_14
+  112 slice 1 14 15 15 _sels_sels_0_T_15
+  113 slice 1 14 16 16 _sels_sels_0_T_16
+  114 slice 1 14 17 17 _sels_sels_0_T_17
+  115 slice 1 14 18 18 _sels_sels_0_T_18
+  116 slice 1 14 19 19 _sels_sels_0_T_19
+  117 slice 1 14 20 20 _sels_sels_0_T_20
+  118 slice 1 14 21 21 _sels_sels_0_T_21
+  119 slice 1 14 22 22 _sels_sels_0_T_22
+  120 slice 1 14 23 23 _sels_sels_0_T_23
+  121 slice 1 14 24 24 _sels_sels_0_T_24
+  122 slice 1 14 25 25 _sels_sels_0_T_25
+  123 slice 1 14 26 26 _sels_sels_0_T_26
+  124 slice 1 14 27 27 _sels_sels_0_T_27
+  125 slice 1 14 28 28 _sels_sels_0_T_28
+  126 slice 1 14 29 29 _sels_sels_0_T_29
+  127 slice 1 14 30 30 _sels_sels_0_T_30
+  128 slice 1 14 31 31 _sels_sels_0_T_31
+  129 slice 1 14 32 32 _sels_sels_0_T_32
+  130 slice 1 14 33 33 _sels_sels_0_T_33
+  131 slice 1 14 34 34 _sels_sels_0_T_34
+  132 slice 1 14 35 35 _sels_sels_0_T_35
+  133 slice 1 14 36 36 _sels_sels_0_T_36
+  134 slice 1 14 37 37 _sels_sels_0_T_37
+  135 slice 1 14 38 38 _sels_sels_0_T_38
+  136 slice 1 14 39 39 _sels_sels_0_T_39
+  137 slice 1 14 40 40 _sels_sels_0_T_40
+  138 slice 1 14 41 41 _sels_sels_0_T_41
+  139 slice 1 14 42 42 _sels_sels_0_T_42
+  140 slice 1 14 43 43 _sels_sels_0_T_43
+  141 slice 1 14 44 44 _sels_sels_0_T_44
+  142 slice 1 14 45 45 _sels_sels_0_T_45
+  143 slice 1 14 46 46 _sels_sels_0_T_46
+  144 slice 1 14 47 47 _sels_sels_0_T_47
+  145 concat 13 144 27 _sels_sels_0_T_48
+  146 ite 13 143 82 145 _sels_sels_0_T_49
+  147 ite 13 142 81 146 _sels_sels_0_T_50
+  148 ite 13 141 80 147 _sels_sels_0_T_51
+  149 ite 13 140 79 148 _sels_sels_0_T_52
+  150 ite 13 139 78 149 _sels_sels_0_T_53
+  151 ite 13 138 77 150 _sels_sels_0_T_54
+  152 ite 13 137 76 151 _sels_sels_0_T_55
+  153 ite 13 136 75 152 _sels_sels_0_T_56
+  154 ite 13 135 74 153 _sels_sels_0_T_57
+  155 ite 13 134 73 154 _sels_sels_0_T_58
+  156 ite 13 133 72 155 _sels_sels_0_T_59
+  157 ite 13 132 71 156 _sels_sels_0_T_60
+  158 ite 13 131 70 157 _sels_sels_0_T_61
+  159 ite 13 130 69 158 _sels_sels_0_T_62
+  160 ite 13 129 68 159 _sels_sels_0_T_63
+  161 ite 13 128 67 160 _sels_sels_0_T_64
+  162 ite 13 127 66 161 _sels_sels_0_T_65
+  163 ite 13 126 65 162 _sels_sels_0_T_66
+  164 ite 13 125 64 163 _sels_sels_0_T_67
+  165 ite 13 124 63 164 _sels_sels_0_T_68
+  166 ite 13 123 62 165 _sels_sels_0_T_69
+  167 ite 13 122 61 166 _sels_sels_0_T_70
+  168 ite 13 121 60 167 _sels_sels_0_T_71
+  169 ite 13 120 59 168 _sels_sels_0_T_72
+  170 ite 13 119 58 169 _sels_sels_0_T_73
+  171 ite 13 118 57 170 _sels_sels_0_T_74
+  172 ite 13 117 56 171 _sels_sels_0_T_75
+  173 ite 13 116 55 172 _sels_sels_0_T_76
+  174 ite 13 115 54 173 _sels_sels_0_T_77
+  175 ite 13 114 53 174 _sels_sels_0_T_78
+  176 ite 13 113 52 175 _sels_sels_0_T_79
+  177 ite 13 112 51 176 _sels_sels_0_T_80
+  178 ite 13 111 50 177 _sels_sels_0_T_81
+  179 ite 13 110 49 178 _sels_sels_0_T_82
+  180 ite 13 109 48 179 _sels_sels_0_T_83
+  181 ite 13 108 47 180 _sels_sels_0_T_84
+  182 ite 13 107 46 181 _sels_sels_0_T_85
+  183 ite 13 106 45 182 _sels_sels_0_T_86
+  184 ite 13 105 44 183 _sels_sels_0_T_87
+  185 ite 13 104 43 184 _sels_sels_0_T_88
+  186 ite 13 103 42 185 _sels_sels_0_T_89
+  187 ite 13 102 41 186 _sels_sels_0_T_90
+  188 ite 13 101 40 187 _sels_sels_0_T_91
+  189 ite 13 100 39 188 _sels_sels_0_T_92
+  190 ite 13 99 38 189 _sels_sels_0_T_93
+  191 ite 13 98 37 190 _sels_sels_0_T_94
+  192 ite 13 97 83 191 sels_0
+  193 concat 30 85 24 
+  194 sll 30 31 193 allocs_0
+  195 sext 13 3 47 _alloc_masks_T
+  196 slice 13 194 47 0 
+  197 and 13 196 195 
+  198 xor 1 23 36 _sel_fire_0_T
+  199 or 1 198 3 _sel_fire_0_T_1
+  200 neq 1 192 33 can_sel
+  201 and 1 199 200 sel_fire_0
+  202 sext 13 201 47 _sel_mask_T
+  203 and 13 192 202 sel_mask
+  204 sext 13 11 47 _br_deallocs_T
+  205 sort bitvec 384
+  206 concat 205 22 21 
+  207 concat 205 206 20 
+  208 concat 205 207 19 
+  209 concat 205 208 18 
+  210 concat 205 209 17 
+  211 concat 205 210 16 
+  212 concat 205 211 15 
+  213 slice 13 212 47 0 
+  214 slice 13 212 95 48 
+  215 slice 13 212 143 96 
+  216 slice 13 212 191 144 
+  217 slice 13 212 239 192 
+  218 slice 13 212 287 240 
+  219 slice 13 212 335 288 
+  220 slice 13 212 383 336 
+  221 slice 1 10 0 0 
+  222 slice 1 10 1 1 
+  223 slice 1 10 2 2 
+  224 ite 13 221 220 219 
+  225 ite 13 221 218 217 
+  226 ite 13 222 224 225 
+  227 ite 13 221 216 215 
+  228 ite 13 221 214 213 
+  229 ite 13 222 227 228 
+  230 ite 13 223 226 229 
+  231 and 13 230 204 br_deallocs
+  232 concat 30 85 6 
+  233 sll 30 31 232 _dealloc_mask_T
+  234 slice 13 233 47 0 _dealloc_mask_T_1
+  235 sext 13 4 47 _dealloc_mask_T_2
+  236 and 13 234 235 _dealloc_mask_T_3
+  237 or 13 236 231 dealloc_mask
+  238 concat 28 87 9 
+  239 sll 28 29 238 _list_req_T_14
+  240 slice 1 239 0 0 _list_req_T_1
+  241 and 1 240 7 list_req
+  242 xor 13 231 35 _br_alloc_lists_7_T_1
+  243 and 13 15 242 _br_alloc_lists_0_T_2
+  244 or 13 243 197 
+  245 ite 13 241 33 244 _br_alloc_lists_0_T_4
+  246 slice 1 239 1 1 _list_req_T_3
+  247 and 1 246 7 list_req_1
+  248 and 13 16 242 _br_alloc_lists_1_T_2
+  249 or 13 248 197 
+  250 ite 13 247 33 249 _br_alloc_lists_1_T_4
+  251 slice 1 239 2 2 _list_req_T_5
+  252 and 1 251 7 list_req_2
+  253 and 13 17 242 _br_alloc_lists_2_T_2
+  254 or 13 253 197 
+  255 ite 13 252 33 254 _br_alloc_lists_2_T_4
+  256 slice 1 239 3 3 _list_req_T_7
+  257 and 1 256 7 list_req_3
+  258 and 13 18 242 _br_alloc_lists_3_T_2
+  259 or 13 258 197 
+  260 ite 13 257 33 259 _br_alloc_lists_3_T_4
+  261 slice 1 239 4 4 _list_req_T_9
+  262 and 1 261 7 list_req_4
+  263 and 13 19 242 _br_alloc_lists_4_T_2
+  264 or 13 263 197 
+  265 ite 13 262 33 264 _br_alloc_lists_4_T_4
+  266 slice 1 239 5 5 _list_req_T_11
+  267 and 1 266 7 list_req_5
+  268 and 13 20 242 _br_alloc_lists_5_T_2
+  269 or 13 268 197 
+  270 ite 13 267 33 269 _br_alloc_lists_5_T_4
+  271 slice 1 239 6 6 _list_req_T_13
+  272 and 1 271 7 list_req_6
+  273 and 13 21 242 _br_alloc_lists_6_T_2
+  274 or 13 273 197 
+  275 ite 13 272 33 274 _br_alloc_lists_6_T_4
+  276 slice 1 239 7 7 _list_req_T_15
+  277 and 1 276 7 list_req_7
+  278 and 13 22 242 _br_alloc_lists_7_T_2
+  279 or 13 278 197 
+  280 ite 13 277 33 279 _br_alloc_lists_7_T_4
+  281 xor 13 203 35 _free_list_T_1
+  282 and 13 14 281 _free_list_T_2
+  283 or 13 282 237 _free_list_T_3
+  284 and 13 283 32 _free_list_T_5
+  285 slice 88 192 47 32 r_sel_hi
+  286 neq 1 285 89 _r_sel_T
+  287 sort bitvec 15
+  288 slice 287 192 47 33 
+  289 sort bitvec 31
+  290 concat 289 89 288 
+  291 slice 289 192 31 1 
+  292 or 289 290 291 _r_sel_T_1
+  293 slice 88 292 30 15 r_sel_hi_1
+  294 neq 1 293 89 _r_sel_T_2
+  295 slice 287 292 30 16 
+  296 slice 287 292 14 0 
+  297 or 287 295 296 _r_sel_T_3
+  298 slice 28 297 14 7 r_sel_hi_2
+  299 neq 1 298 90 _r_sel_T_4
+  300 sort bitvec 7
+  301 slice 300 297 14 8 
+  302 slice 300 297 6 0 
+  303 or 300 301 302 _r_sel_T_5
+  304 slice 91 303 6 3 r_sel_hi_3
+  305 neq 1 304 92 _r_sel_T_6
+  306 slice 8 303 6 4 
+  307 slice 8 303 2 0 
+  308 or 8 306 307 _r_sel_T_7
+  309 slice 93 308 2 1 r_sel_hi_4
+  310 neq 1 309 94 _r_sel_T_8
+  311 slice 1 308 2 2 
+  312 slice 1 308 0 0 
+  313 or 1 311 312 _r_sel_T_9
+  314 concat 5 286 294 _r_sel_T_15
+  315 concat 5 314 299 _r_sel_T_15
+  316 concat 5 315 305 _r_sel_T_15
+  317 concat 5 316 310 _r_sel_T_15
+  318 concat 5 317 313 _r_sel_T_15
+  319 ite 5 201 318 24 
+  320 xor 1 3 36 _r_valid_T
+  321 and 1 23 320 _r_valid_T_1
+  322 concat 95 321 192 
+  323 neq 1 322 96 _r_valid_T_2
+  324 sext 13 23 47 _io_debug_freelist_T_1
+  325 and 13 196 324 
+  326 or 13 14 325 io_debug_freelist
+  327 and 13 326 237 
+  328 eq 1 327 33 
+  329 xor 1 2 36 
+  330 xor 1 12 36 
+  331 slice 1 326 0 0 
+  332 slice 1 326 1 1 
+  333 slice 1 326 2 2 
+  334 slice 1 326 3 3 
+  335 slice 1 326 4 4 
+  336 slice 1 326 5 5 
+  337 slice 1 326 6 6 
+  338 slice 1 326 7 7 
+  339 slice 1 326 8 8 
+  340 slice 1 326 9 9 
+  341 slice 1 326 10 10 
+  342 slice 1 326 11 11 
+  343 slice 1 326 12 12 
+  344 slice 1 326 13 13 
+  345 slice 1 326 14 14 
+  346 slice 1 326 15 15 
+  347 slice 1 326 16 16 
+  348 slice 1 326 17 17 
+  349 slice 1 326 18 18 
+  350 slice 1 326 19 19 
+  351 slice 1 326 20 20 
+  352 slice 1 326 21 21 
+  353 slice 1 326 22 22 
+  354 slice 1 326 23 23 
+  355 slice 1 326 24 24 
+  356 slice 1 326 25 25 
+  357 slice 1 326 26 26 
+  358 slice 1 326 27 27 
+  359 slice 1 326 28 28 
+  360 slice 1 326 29 29 
+  361 slice 1 326 30 30 
+  362 slice 1 326 31 31 
+  363 slice 1 326 32 32 
+  364 slice 1 326 33 33 
+  365 slice 1 326 34 34 
+  366 slice 1 326 35 35 
+  367 slice 1 326 36 36 
+  368 slice 1 326 37 37 
+  369 slice 1 326 38 38 
+  370 slice 1 326 39 39 
+  371 slice 1 326 40 40 
+  372 slice 1 326 41 41 
+  373 slice 1 326 42 42 
+  374 slice 1 326 43 43 
+  375 slice 1 326 44 44 
+  376 slice 1 326 45 45 
+  377 slice 1 326 46 46 
+  378 slice 1 326 47 47 
+  379 concat 93 34 332 
+  380 concat 93 34 333 
+  381 concat 93 34 331 
+  382 add 93 381 379 
+  383 add 93 382 380 
+  384 concat 93 34 335 
+  385 concat 93 34 336 
+  386 concat 93 34 334 
+  387 add 93 386 384 
+  388 add 93 387 385 
+  389 concat 8 34 383 
+  390 concat 8 34 388 
+  391 add 8 389 390 
+  392 concat 93 34 338 
+  393 concat 93 34 339 
+  394 concat 93 34 337 
+  395 add 93 394 392 
+  396 add 93 395 393 
+  397 concat 93 34 341 
+  398 concat 93 34 342 
+  399 concat 93 34 340 
+  400 add 93 399 397 
+  401 add 93 400 398 
+  402 concat 8 34 396 
+  403 concat 8 34 401 
+  404 add 8 402 403 
+  405 concat 91 34 391 
+  406 concat 91 34 404 
+  407 add 91 405 406 
+  408 concat 93 34 344 
+  409 concat 93 34 345 
+  410 concat 93 34 343 
+  411 add 93 410 408 
+  412 add 93 411 409 
+  413 concat 93 34 347 
+  414 concat 93 34 348 
+  415 concat 93 34 346 
+  416 add 93 415 413 
+  417 add 93 416 414 
+  418 concat 8 34 412 
+  419 concat 8 34 417 
+  420 add 8 418 419 
+  421 concat 93 34 350 
+  422 concat 93 34 351 
+  423 concat 93 34 349 
+  424 add 93 423 421 
+  425 add 93 424 422 
+  426 concat 93 34 353 
+  427 concat 93 34 354 
+  428 concat 93 34 352 
+  429 add 93 428 426 
+  430 add 93 429 427 
+  431 concat 8 34 425 
+  432 concat 8 34 430 
+  433 add 8 431 432 
+  434 concat 91 34 420 
+  435 concat 91 34 433 
+  436 add 91 434 435 
+  437 concat 86 34 407 
+  438 concat 86 34 436 
+  439 add 86 437 438 
+  440 concat 93 34 356 
+  441 concat 93 34 357 
+  442 concat 93 34 355 
+  443 add 93 442 440 
+  444 add 93 443 441 
+  445 concat 93 34 359 
+  446 concat 93 34 360 
+  447 concat 93 34 358 
+  448 add 93 447 445 
+  449 add 93 448 446 
+  450 concat 8 34 444 
+  451 concat 8 34 449 
+  452 add 8 450 451 
+  453 concat 93 34 362 
+  454 concat 93 34 363 
+  455 concat 93 34 361 
+  456 add 93 455 453 
+  457 add 93 456 454 
+  458 concat 93 34 365 
+  459 concat 93 34 366 
+  460 concat 93 34 364 
+  461 add 93 460 458 
+  462 add 93 461 459 
+  463 concat 8 34 457 
+  464 concat 8 34 462 
+  465 add 8 463 464 
+  466 concat 91 34 452 
+  467 concat 91 34 465 
+  468 add 91 466 467 
+  469 concat 93 34 368 
+  470 concat 93 34 369 
+  471 concat 93 34 367 
+  472 add 93 471 469 
+  473 add 93 472 470 
+  474 concat 93 34 371 
+  475 concat 93 34 372 
+  476 concat 93 34 370 
+  477 add 93 476 474 
+  478 add 93 477 475 
+  479 concat 8 34 473 
+  480 concat 8 34 478 
+  481 add 8 479 480 
+  482 concat 93 34 374 
+  483 concat 93 34 375 
+  484 concat 93 34 373 
+  485 add 93 484 482 
+  486 add 93 485 483 
+  487 concat 93 34 377 
+  488 concat 93 34 378 
+  489 concat 93 34 376 
+  490 add 93 489 487 
+  491 add 93 490 488 
+  492 concat 8 34 486 
+  493 concat 8 34 491 
+  494 add 8 492 493 
+  495 concat 91 34 481 
+  496 concat 91 34 494 
+  497 add 91 495 496 
+  498 concat 86 34 468 
+  499 concat 86 34 497 
+  500 add 86 498 499 
+  501 concat 5 34 439 
+  502 concat 5 34 500 
+  503 add 5 501 502 
+  504 ugt 1 503 25 
+  505 or 1 330 504 
+  506 implies 1 329 328
+  507 not 1 506 
+  508 bad 507
+  509 implies 1 329 505
+  510 not 1 509 
+  511 bad 510
+  512 output 23 io_alloc_pregs_0_valid
+  513 output 24 io_alloc_pregs_0_bits
+  514 ite 13 2 32 284 _free_list_T_5
+  515 next 13 14 514
+  516 next 13 15 245
+  517 next 13 16 250
+  518 next 13 17 255
+  519 next 13 18 260
+  520 next 13 19 265
+  521 next 13 20 270
+  522 next 13 21 275
+  523 next 13 22 280
+  524 ite 1 2 34 323 _r_valid_T_2
+  525 next 1 23 524
+  526 next 5 24 319
+}

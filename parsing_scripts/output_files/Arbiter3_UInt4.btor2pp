@@ -1,0 +1,17 @@
+
+module Arbiter3_UInt4 {
+  1 sort bitvec 1
+  2 input 1 io_in_0_valid
+  3 sort bitvec 4
+  4 input 3 io_in_0_bits
+  5 input 1 io_in_1_valid
+  6 input 3 io_in_1_bits
+  7 input 3 io_in_2_bits
+  8 consth 1 1
+  9 ite 3 5 6 7 
+  10 ite 3 2 4 9 io_out_bits
+  11 or 1 2 5 _io_out_valid_T
+  12 xor 1 11 8 grant_2
+  13 output 12 io_in_2_ready
+  14 output 10 io_out_bits
+}

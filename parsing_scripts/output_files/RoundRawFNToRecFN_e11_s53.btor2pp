@@ -1,0 +1,39 @@
+include RoundAnyRawFNToRecFN_ie11_is55_oe11_os53.btor2pp
+
+module RoundRawFNToRecFN_e11_s53 {
+  1 sort bitvec 1
+  2 input 1 io_invalidExc
+  3 input 1 io_in_isNaN
+  4 input 1 io_in_isInf
+  5 input 1 io_in_isZero
+  6 input 1 io_in_sign
+  7 sort bitvec 13
+  8 input 7 io_in_sExp
+  9 sort bitvec 56
+  10 input 9 io_in_sig
+  11 sort bitvec 3
+  12 input 11 io_roundingMode
+  13 inst RoundAnyRawFNToRecFN_ie11_is55_oe11_os53
+  14 ref RoundAnyRawFNToRecFN_ie11_is55_oe11_os53 2 io_invalidExc
+  15 ref RoundAnyRawFNToRecFN_ie11_is55_oe11_os53 3 io_in_isNaN
+  16 ref RoundAnyRawFNToRecFN_ie11_is55_oe11_os53 4 io_in_isInf
+  17 ref RoundAnyRawFNToRecFN_ie11_is55_oe11_os53 5 io_in_isZero
+  18 ref RoundAnyRawFNToRecFN_ie11_is55_oe11_os53 6 io_in_sign
+  19 ref RoundAnyRawFNToRecFN_ie11_is55_oe11_os53 8 io_in_sExp
+  20 ref RoundAnyRawFNToRecFN_ie11_is55_oe11_os53 10 io_in_sig
+  21 ref RoundAnyRawFNToRecFN_ie11_is55_oe11_os53 12 io_roundingMode
+  22 ref RoundAnyRawFNToRecFN_ie11_is55_oe11_os53 342 io_out
+  23 ref RoundAnyRawFNToRecFN_ie11_is55_oe11_os53 343 io_exceptionFlags
+  24 get 13 22 io_out
+  25 get 13 23 io_exceptionFlags
+  26 set 13 14 2 io_invalidExc
+  27 set 13 15 3 io_in_isNaN
+  28 set 13 16 4 io_in_isInf
+  29 set 13 17 5 io_in_isZero
+  30 set 13 18 6 io_in_sign
+  31 set 13 19 8 io_in_sExp
+  32 set 13 20 10 io_in_sig
+  33 set 13 21 12 io_roundingMode
+  34 output 24 io_out
+  35 output 25 io_exceptionFlags
+}

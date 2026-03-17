@@ -1,0 +1,207 @@
+
+module ALU {
+  1 sort bitvec 1
+  2 input 1 io_dw
+  3 sort bitvec 5
+  4 input 3 io_fn
+  5 sort bitvec 64
+  6 input 5 io_in2
+  7 input 5 io_in1
+  8 consth 1 1
+  9 consth 3 A
+  10 consth 3 7
+  11 consth 3 6
+  12 consth 3 4
+  13 consth 3 1
+  14 consth 3 B
+  15 consth 3 5
+  16 consth 3 0
+  17 sort bitvec 63
+  18 consth 17 0
+  19 sort bitvec 59
+  20 consth 19 0
+  21 sort bitvec 4
+  22 consth 21 0
+  23 sort bitvec 8
+  24 consth 23 0
+  25 sort bitvec 16
+  26 consth 25 0
+  27 sort bitvec 2
+  28 consth 27 0
+  29 consth 1 0
+  30 sort bitvec 32
+  31 consth 30 0
+  32 consth 3 12
+  33 consth 3 13
+  34 consth 3 19
+  35 consth 3 1A
+  36 consth 3 18
+  37 sort bitvec 48
+  38 consth 37 FFFF0000FFFF
+  39 sort bitvec 56
+  40 consth 39 FF00FF00FF00FF
+  41 sort bitvec 60
+  42 consth 41 F0F0F0F0F0F0F0F
+  43 sort bitvec 62
+  44 consth 43 3333333333333333
+  45 consth 17 5555555555555555
+  46 consth 5 0
+  47 slice 1 4 3 3 _shout_r_T
+  48 sext 5 47 63 
+  49 xor 5 48 6 in2_inv
+  50 xor 5 7 49 in1_xor_in2
+  51 and 5 7 49 in1_and_in2
+  52 concat 5 18 47 
+  53 add 5 7 49 _io_adder_out_T_3
+  54 add 5 53 52 _io_adder_out_T_3
+  55 slice 1 7 63 63 _slt_T_6
+  56 slice 1 6 63 63 _slt_T_5
+  57 eq 1 55 56 _slt_T_2
+  58 slice 1 54 63 63 _slt_T_3
+  59 slice 1 4 1 1 _slt_T_4
+  60 ite 1 59 56 55 _slt_T_7
+  61 ite 1 57 58 60 slt
+  62 slice 1 7 31 31 _shin_hi_32_T_1
+  63 and 1 47 62 _shin_hi_32_T_2
+  64 sext 30 63 31 shin_hi_32
+  65 slice 30 7 63 32 _shin_hi_T_1
+  66 ite 30 2 65 64 shin_hi
+  67 slice 1 6 5 5 _shamt_T
+  68 and 1 67 2 _shamt_T_2
+  69 slice 3 6 4 0 _shamt_T_3
+  70 slice 30 7 31 0 _popc_in_T_2
+  71 concat 5 66 70 shin_r
+  72 eq 1 4 15 _shout_T
+  73 eq 1 4 14 _shout_T_1
+  74 eq 1 4 32 _shin_T_2
+  75 eq 1 4 33 _bext_mask_T
+  76 or 1 72 73 _shin_T_6
+  77 or 1 76 74 _shin_T_6
+  78 or 1 77 75 _shin_T_6
+  79 concat 5 31 66 
+  80 concat 5 70 31 _shin_T_15
+  81 or 5 79 80 _shin_T_16
+  82 slice 37 81 63 16 _shin_T_20
+  83 and 37 82 38 
+  84 concat 5 26 83 
+  85 slice 37 81 47 0 _shin_T_22
+  86 and 37 85 38 
+  87 concat 5 86 26 _shin_T_25
+  88 or 5 84 87 _shin_T_26
+  89 slice 39 88 63 8 _shin_T_30
+  90 and 39 89 40 
+  91 concat 5 24 90 
+  92 slice 39 88 55 0 _shin_T_32
+  93 and 39 92 40 
+  94 concat 5 93 24 _shin_T_35
+  95 or 5 91 94 _shin_T_36
+  96 slice 41 95 63 4 _shin_T_40
+  97 and 41 96 42 
+  98 concat 5 22 97 
+  99 slice 41 95 59 0 _shin_T_42
+  100 and 41 99 42 
+  101 concat 5 100 22 _shin_T_45
+  102 or 5 98 101 _shin_T_46
+  103 slice 43 102 63 2 _shin_T_50
+  104 and 43 103 44 
+  105 concat 5 28 104 
+  106 slice 43 102 61 0 _shin_T_52
+  107 and 43 106 44 
+  108 concat 5 107 28 _shin_T_55
+  109 or 5 105 108 _shin_T_56
+  110 slice 17 109 63 1 _shin_T_60
+  111 and 17 110 45 
+  112 concat 5 29 111 
+  113 slice 17 109 62 0 _shin_T_62
+  114 and 17 113 45 
+  115 concat 5 114 29 _shin_T_65
+  116 or 5 112 115 _shin_T_66
+  117 ite 5 78 71 116 shin
+  118 slice 1 117 63 63 _shout_r_T_1
+  119 and 1 47 118 _shout_r_T_2
+  120 sort bitvec 65
+  121 concat 120 119 117 _shout_r_T_3
+  122 concat 120 20 68 
+  123 concat 120 122 69 
+  124 sra 120 121 123 _shout_r_T_5
+  125 slice 5 124 63 0 shout_r
+  126 slice 30 124 63 32 _shout_l_T_2
+  127 concat 5 31 126 
+  128 slice 30 124 31 0 _shout_l_T_4
+  129 concat 5 128 31 _shout_l_T_7
+  130 or 5 127 129 _shout_l_T_8
+  131 slice 37 130 63 16 _shout_l_T_12
+  132 and 37 131 38 
+  133 concat 5 26 132 
+  134 slice 37 130 47 0 _shout_l_T_14
+  135 and 37 134 38 
+  136 concat 5 135 26 _shout_l_T_17
+  137 or 5 133 136 _shout_l_T_18
+  138 slice 39 137 63 8 _shout_l_T_22
+  139 and 39 138 40 
+  140 concat 5 24 139 
+  141 slice 39 137 55 0 _shout_l_T_24
+  142 and 39 141 40 
+  143 concat 5 142 24 _shout_l_T_27
+  144 or 5 140 143 _shout_l_T_28
+  145 slice 41 144 63 4 _shout_l_T_32
+  146 and 41 145 42 
+  147 concat 5 22 146 
+  148 slice 41 144 59 0 _shout_l_T_34
+  149 and 41 148 42 
+  150 concat 5 149 22 _shout_l_T_37
+  151 or 5 147 150 _shout_l_T_38
+  152 slice 43 151 63 2 _shout_l_T_42
+  153 and 43 152 44 
+  154 concat 5 28 153 
+  155 slice 43 151 61 0 _shout_l_T_44
+  156 and 43 155 44 
+  157 concat 5 156 28 _shout_l_T_47
+  158 or 5 154 157 _shout_l_T_48
+  159 slice 17 158 63 1 _shout_l_T_52
+  160 and 17 159 45 
+  161 concat 5 29 160 
+  162 slice 17 158 62 0 _shout_l_T_54
+  163 and 17 162 45 
+  164 concat 5 163 29 _shout_l_T_57
+  165 or 5 161 164 shout_l
+  166 or 1 72 73 _shout_T_4
+  167 or 1 166 75 _shout_T_4
+  168 ite 5 167 125 46 _shout_T_5
+  169 eq 1 4 13 _shout_T_6
+  170 ite 5 169 165 46 _shout_T_7
+  171 eq 1 4 12 _logic_T
+  172 eq 1 4 11 _logic_T_8
+  173 eq 1 4 34 _logic_T_11
+  174 eq 1 4 35 _logic_T_5
+  175 or 1 171 172 _logic_T_6
+  176 or 1 175 173 _logic_T_6
+  177 or 1 176 174 _logic_T_6
+  178 ite 5 177 50 46 _logic_T_7
+  179 eq 1 4 10 _logic_T_9
+  180 eq 1 4 36 _logic_T_13
+  181 or 1 172 179 _logic_T_14
+  182 or 1 181 173 _logic_T_14
+  183 or 1 182 180 _logic_T_14
+  184 ite 5 183 51 46 _logic_T_15
+  185 ugt 1 4 14 _shift_logic_T
+  186 slice 1 4 4 4 
+  187 xor 1 186 8 _shift_logic_T_1
+  188 and 1 185 187 _shift_logic_T_3
+  189 and 1 188 61 _shift_logic_T_3
+  190 concat 5 18 189 
+  191 or 5 190 178 shift_logic
+  192 or 5 191 184 shift_logic
+  193 or 5 192 168 shift_logic
+  194 or 5 193 170 shift_logic
+  195 eq 1 4 16 _out_T
+  196 eq 1 4 9 _out_T_2
+  197 or 1 196 195 
+  198 ite 5 197 54 194 out
+  199 slice 1 198 31 31 _io_out_T
+  200 sext 30 199 31 _io_out_T_1
+  201 slice 30 198 31 0 _io_out_T_2
+  202 concat 5 200 201 _io_out_T_3
+  203 ite 5 2 198 202 io_out
+  204 output 203 io_out
+}

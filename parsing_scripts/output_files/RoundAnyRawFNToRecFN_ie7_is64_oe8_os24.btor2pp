@@ -1,0 +1,90 @@
+
+module RoundAnyRawFNToRecFN_ie7_is64_oe8_os24 {
+  1 sort bitvec 1
+  2 input 1 io_in_isZero
+  3 input 1 io_in_sign
+  4 sort bitvec 9
+  5 input 4 io_in_sExp
+  6 sort bitvec 65
+  7 input 6 io_in_sig
+  8 sort bitvec 3
+  9 input 8 io_roundingMode
+  10 sort bitvec 7
+  11 consth 10 0
+  12 sort bitvec 25
+  13 consth 12 0
+  14 consth 12 1FFFFFF
+  15 sort bitvec 2
+  16 consth 15 0
+  17 consth 4 80
+  18 consth 4 1FF
+  19 sort bitvec 39
+  20 consth 19 0
+  21 consth 1 0
+  22 consth 8 0
+  23 consth 8 2
+  24 consth 8 3
+  25 consth 8 4
+  26 consth 8 6
+  27 consth 4 1C0
+  28 sort bitvec 26
+  29 consth 28 1
+  30 consth 4 0
+  31 sort bitvec 23
+  32 consth 31 0
+  33 sort bitvec 4
+  34 consth 33 0
+  35 consth 1 1
+  36 eq 1 9 22 roundingMode_near_even
+  37 eq 1 9 23 roundingMode_min
+  38 eq 1 9 24 roundingMode_max
+  39 eq 1 9 25 roundingMode_near_maxMag
+  40 eq 1 9 26 roundingMode_odd
+  41 and 1 37 3 _roundMagUp_T
+  42 xor 1 3 35 _roundMagUp_T_1
+  43 and 1 38 42 _roundMagUp_T_2
+  44 or 1 41 43 roundMagUp
+  45 slice 19 7 38 0 _adjustedSig_T_1
+  46 neq 1 45 20 _adjustedSig_T_2
+  47 slice 1 7 39 39 
+  48 slice 1 7 39 39 
+  49 concat 15 47 46 
+  50 neq 1 49 16 anyRound
+  51 or 1 36 39 _overflow_roundMagUp_T
+  52 and 1 51 48 _roundIncr_T_1
+  53 and 1 44 50 _roundIncr_T_2
+  54 or 1 52 53 roundIncr
+  55 slice 12 7 64 40 _roundedSig_T_1
+  56 concat 28 21 55 
+  57 add 28 56 29 _roundedSig_T_2
+  58 xor 1 46 35 _roundedSig_T_4
+  59 and 1 36 48 _roundedSig_T_5
+  60 and 1 59 58 _roundedSig_T_5
+  61 xor 1 60 35 
+  62 concat 28 14 61 _roundedSig_T_8
+  63 and 28 57 62 _roundedSig_T_9
+  64 slice 12 7 64 40 _roundedSig_T_12
+  65 and 1 40 50 _roundedSig_T_13
+  66 concat 28 13 65 _roundedSig_T_15
+  67 concat 28 21 64 
+  68 or 28 67 66 _roundedSig_T_16
+  69 ite 28 54 63 68 roundedSig
+  70 slice 15 69 25 24 _sRoundedExp_T
+  71 concat 4 11 70 
+  72 add 4 5 71 sRoundedExp
+  73 add 4 72 17 sRoundedExp
+  74 slice 31 69 22 0 common_fractOut
+  75 xor 1 2 35 _commonCase_T_3
+  76 and 1 75 50 inexact
+  77 ite 4 2 27 30 _expOut_T_1
+  78 xor 4 77 18 _expOut_T_2
+  79 and 4 73 78 _expOut_T_10
+  80 ite 31 2 32 74 fractOut
+  81 sort bitvec 33
+  82 concat 81 3 79 io_out
+  83 concat 81 82 80 io_out
+  84 sort bitvec 5
+  85 concat 84 34 76 io_exceptionFlags
+  86 output 83 io_out
+  87 output 85 io_exceptionFlags
+}

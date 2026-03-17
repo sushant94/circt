@@ -1,7 +1,7 @@
 import os
 import re
 
-INPUT_FILE = os.path.join(os.path.dirname(__file__), '..', 'Sodor5.btor2pp')
+INPUT_FILE = os.path.join(os.path.dirname(__file__), '..', 'debug.txt')
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'output_files')
 
 # Ensure output directory exists

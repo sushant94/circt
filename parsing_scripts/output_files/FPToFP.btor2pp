@@ -1,0 +1,163 @@
+include RecFNToRecFN.btor2pp
+
+module FPToFP {
+  1 sort bitvec 1
+  2 input 1 reset
+  3 input 1 io_in_valid
+  4 input 1 io_in_bits_ren2
+  5 sort bitvec 2
+  6 input 5 io_in_bits_typeTagOut
+  7 input 1 io_in_bits_wflags
+  8 sort bitvec 3
+  9 input 8 io_in_bits_rm
+  10 sort bitvec 65
+  11 input 10 io_in_bits_in1
+  12 input 10 io_in_bits_in2
+  13 input 1 io_lt
+  14 state 1 in_pipe_v
+  15 state 1 in_pipe_b_ren2
+  16 state 5 in_pipe_b_typeTagOut
+  17 state 1 in_pipe_b_wflags
+  18 state 8 in_pipe_b_rm
+  19 state 10 in_pipe_b_in1
+  20 state 10 in_pipe_b_in2
+  21 state 1 io_out_pipe_v
+  22 state 10 io_out_pipe_b_data
+  23 sort bitvec 5
+  24 state 23 io_out_pipe_b_exc
+  25 state 1 io_out_pipe_pipe_v
+  26 state 10 io_out_pipe_pipe_b_data
+  27 state 23 io_out_pipe_pipe_b_exc
+  28 state 1 io_out_pipe_pipe_pipe_v
+  29 state 10 io_out_pipe_pipe_pipe_b_data
+  30 state 23 io_out_pipe_pipe_pipe_b_exc
+  31 inst RecFNToRecFN
+  32 ref RecFNToRecFN 2 io_in
+  33 ref RecFNToRecFN 4 io_roundingMode
+  34 ref RecFNToRecFN 6 io_detectTininess
+  35 ref RecFNToRecFN 57 io_out
+  36 ref RecFNToRecFN 58 io_exceptionFlags
+  37 get 31 35 io_out
+  38 get 31 36 io_exceptionFlags
+  39 consth 8 5
+  40 sort bitvec 9
+  41 consth 40 100
+  42 consth 8 0
+  43 consth 5 0
+  44 sort bitvec 4
+  45 consth 44 0
+  46 consth 8 7
+  47 consth 10 E008000000000000
+  48 consth 1 1
+  49 consth 23 0
+  50 consth 1 0
+  51 ite 1 3 4 15 
+  52 ite 5 3 6 16 
+  53 ite 1 3 7 17 
+  54 ite 8 3 9 18 
+  55 ite 10 3 11 19 
+  56 ite 10 3 12 20 
+  57 slice 1 18 1 1 _signNum_T
+  58 slice 1 19 64 64 
+  59 slice 1 20 64 64 
+  60 xor 1 58 59 _signNum_T_1
+  61 slice 1 18 0 0 _isLHS_T
+  62 slice 1 20 64 64 
+  63 xor 1 61 62 _signNum_T_4
+  64 ite 1 57 60 63 signNum
+  65 sort bitvec 64
+  66 slice 65 19 63 0 _fsgnj_T_1
+  67 concat 10 64 66 fsgnj
+  68 slice 8 19 63 61 _isInvalid_T
+  69 eq 1 68 46 isnan1
+  70 slice 8 20 63 61 _isInvalid_T_5
+  71 eq 1 70 46 isnan2
+  72 eq 1 68 46 _isInvalid_T_1
+  73 slice 1 19 51 51 _isInvalid_T_2
+  74 xor 1 73 48 _isInvalid_T_3
+  75 and 1 72 74 _isInvalid_T_4
+  76 eq 1 70 46 _isInvalid_T_6
+  77 slice 1 20 51 51 _isInvalid_T_7
+  78 xor 1 77 48 _isInvalid_T_8
+  79 and 1 76 78 _isInvalid_T_9
+  80 or 1 75 79 isInvalid
+  81 and 1 69 71 isNaNOut
+  82 neq 1 61 13 _isLHS_T_1
+  83 xor 1 69 48 _isLHS_T_2
+  84 and 1 82 83 _isLHS_T_3
+  85 or 1 71 84 isLHS
+  86 concat 23 80 45 _fsgnjMux_exc_T
+  87 ite 23 17 86 49 
+  88 ite 10 85 19 20 _fsgnjMux_data_T
+  89 ite 10 81 47 88 _fsgnjMux_data_T_1
+  90 ite 10 17 89 67 
+  91 eq 1 16 43 
+  92 xor 1 15 48 
+  93 and 1 17 92 
+  94 slice 8 19 63 61 _fsgnjMux_exc_T_1
+  95 eq 1 94 46 _widened_T_1
+  96 ite 10 95 47 19 widened
+  97 ite 10 93 96 90 fsgnjMux_data
+  98 sort bitvec 32
+  99 slice 98 97 64 33 _mux_data_T
+  100 slice 1 97 64 64 mux_data_sign
+  101 sort bitvec 23
+  102 slice 101 97 51 29 mux_data_fractOut
+  103 slice 8 97 63 61 mux_data_expOut_expCode
+  104 slice 40 97 60 52 
+  105 add 40 104 41 _mux_data_expOut_commonCase_T
+  106 eq 1 103 42 _mux_data_expOut_T
+  107 ugt 1 103 39 _mux_data_expOut_T_1
+  108 or 1 106 107 _mux_data_expOut_T_2
+  109 sort bitvec 6
+  110 slice 109 105 5 0 _mux_data_expOut_T_3
+  111 concat 40 103 110 _mux_data_expOut_T_4
+  112 ite 40 108 111 105 mux_data_expOut
+  113 concat 10 99 100 _mux_data_T_2
+  114 concat 10 113 112 _mux_data_T_2
+  115 concat 10 114 102 _mux_data_T_2
+  116 eq 1 94 46 _fsgnjMux_exc_T_2
+  117 slice 1 19 51 51 _fsgnjMux_exc_T_3
+  118 xor 1 117 48 _fsgnjMux_exc_T_4
+  119 and 1 116 118 _fsgnjMux_exc_T_5
+  120 concat 23 119 45 _fsgnjMux_exc_T_6
+  121 ite 23 93 120 87 fsgnjMux_exc
+  122 slice 98 97 64 33 _mux_data_T_3
+  123 concat 10 122 37 _mux_data_T_4
+  124 ite 10 93 123 115 
+  125 ite 10 91 124 97 mux_data
+  126 and 1 93 91 
+  127 ite 23 126 38 121 mux_exc
+  128 ite 10 14 125 22 
+  129 ite 23 14 127 24 
+  130 ite 10 21 22 26 
+  131 ite 23 21 24 27 
+  132 ite 10 25 26 29 
+  133 ite 23 25 27 30 
+  134 set 31 32 19 io_in
+  135 set 31 33 18 io_roundingMode
+  136 set 31 34 48 io_detectTininess
+  137 output 28 io_out_valid
+  138 output 29 io_out_bits_data
+  139 output 30 io_out_bits_exc
+  140 ite 1 2 50 3 io_in_valid
+  141 next 1 14 140
+  142 next 1 15 51
+  143 next 5 16 52
+  144 next 1 17 53
+  145 next 8 18 54
+  146 next 10 19 55
+  147 next 10 20 56
+  148 ite 1 2 50 14 in_valid
+  149 next 1 21 148
+  150 next 10 22 128
+  151 next 23 24 129
+  152 ite 1 2 50 21 
+  153 next 1 25 152
+  154 next 10 26 130
+  155 next 23 27 131
+  156 ite 1 2 50 25 
+  157 next 1 28 156
+  158 next 10 29 132
+  159 next 23 30 133
+}

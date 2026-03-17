@@ -1,0 +1,61 @@
+
+module RenameBusyTable {
+  1 sort bitvec 1
+  2 input 1 reset
+  3 sort bitvec 6
+  4 input 3 io_ren_uops_0_pdst
+  5 input 3 io_ren_uops_0_prs1
+  6 input 3 io_ren_uops_0_prs2
+  7 input 1 io_rebusy_reqs_0
+  8 input 3 io_wb_pdsts_0
+  9 input 3 io_wb_pdsts_1
+  10 input 3 io_wb_pdsts_2
+  11 input 1 io_wb_valids_0
+  12 input 1 io_wb_valids_1
+  13 input 1 io_wb_valids_2
+  14 sort bitvec 52
+  15 state 14 busy_table
+  16 consth 14 FFFFFFFFFFFFF
+  17 sort bitvec 64
+  18 consth 17 1
+  19 sort bitvec 46
+  20 consth 19 0
+  21 sort bitvec 58
+  22 consth 21 0
+  23 consth 14 0
+  24 concat 17 22 8 
+  25 sll 17 18 24 _busy_table_wb_T
+  26 sext 14 11 51 _busy_table_wb_T_1
+  27 slice 14 25 51 0 
+  28 and 14 27 26 
+  29 concat 17 22 9 
+  30 sll 17 18 29 _busy_table_wb_T_3
+  31 sext 14 12 51 _busy_table_wb_T_4
+  32 slice 14 30 51 0 
+  33 and 14 32 31 
+  34 concat 17 22 10 
+  35 sll 17 18 34 _busy_table_wb_T_6
+  36 sext 14 13 51 _busy_table_wb_T_7
+  37 slice 14 35 51 0 
+  38 and 14 37 36 
+  39 or 14 28 33 
+  40 or 14 39 38 
+  41 xor 14 40 16 
+  42 and 14 41 15 
+  43 concat 17 22 4 
+  44 sll 17 18 43 _busy_table_next_T
+  45 sext 14 7 51 _busy_table_next_T_1
+  46 slice 14 44 51 0 
+  47 and 14 46 45 
+  48 or 14 42 47 
+  49 concat 14 20 5 
+  50 srl 14 15 49 _io_busy_resps_0_prs1_busy_T
+  51 slice 1 50 0 0 io_busy_resps_0_prs1_busy
+  52 concat 14 20 6 
+  53 srl 14 15 52 _io_busy_resps_0_prs2_busy_T
+  54 slice 1 53 0 0 io_busy_resps_0_prs2_busy
+  55 output 51 io_busy_resps_0_prs1_busy
+  56 output 54 io_busy_resps_0_prs2_busy
+  57 ite 14 2 23 48 
+  58 next 14 15 57
+}

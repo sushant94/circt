@@ -1,0 +1,419 @@
+include CompareRecFN.btor2pp
+include RecFNToIN_e11_s53_i64.btor2pp
+include RecFNToIN_e11_s53_i32.btor2pp
+
+module FPToInt {
+  1 sort bitvec 1
+  2 input 1 io_in_valid
+  3 input 1 io_in_bits_ren2
+  4 sort bitvec 2
+  5 input 4 io_in_bits_typeTagOut
+  6 input 1 io_in_bits_wflags
+  7 sort bitvec 3
+  8 input 7 io_in_bits_rm
+  9 input 4 io_in_bits_typ
+  10 input 4 io_in_bits_fmt
+  11 sort bitvec 65
+  12 input 11 io_in_bits_in1
+  13 input 11 io_in_bits_in2
+  14 state 1 in_ren2
+  15 state 4 in_typeTagOut
+  16 state 1 in_wflags
+  17 state 7 in_rm
+  18 state 4 in_typ
+  19 state 4 in_fmt
+  20 state 11 in_in1
+  21 state 11 in_in2
+  22 inst CompareRecFN
+  23 ref CompareRecFN 2 io_a
+  24 ref CompareRecFN 3 io_b
+  25 ref CompareRecFN 5 io_signaling
+  26 ref CompareRecFN 91 io_lt
+  27 ref CompareRecFN 92 io_eq
+  28 ref CompareRecFN 93 io_exceptionFlags
+  29 get 22 26 io_lt
+  30 get 22 27 io_eq
+  31 get 22 28 io_exceptionFlags
+  32 inst RecFNToIN_e11_s53_i64
+  33 ref RecFNToIN_e11_s53_i64 2 io_in
+  34 ref RecFNToIN_e11_s53_i64 4 io_roundingMode
+  35 ref RecFNToIN_e11_s53_i64 6 io_signedOut
+  36 ref RecFNToIN_e11_s53_i64 141 io_out
+  37 ref RecFNToIN_e11_s53_i64 142 io_intExceptionFlags
+  38 get 32 36 io_out
+  39 get 32 37 io_intExceptionFlags
+  40 inst RecFNToIN_e11_s53_i32
+  41 ref RecFNToIN_e11_s53_i32 2 io_in
+  42 ref RecFNToIN_e11_s53_i32 4 io_roundingMode
+  43 ref RecFNToIN_e11_s53_i32 6 io_signedOut
+  44 ref RecFNToIN_e11_s53_i32 120 io_intExceptionFlags
+  45 get 40 44 io_intExceptionFlags
+  46 consth 11 1FFFFFFFFFFFFFFFF
+  47 sort bitvec 9
+  48 consth 47 0
+  49 sort bitvec 6
+  50 consth 49 0
+  51 consth 7 5
+  52 consth 47 100
+  53 sort bitvec 11
+  54 consth 53 3FF
+  55 sort bitvec 8
+  56 consth 55 7F
+  57 sort bitvec 5
+  58 consth 57 1
+  59 consth 49 1
+  60 consth 11 0
+  61 sort bitvec 10
+  62 consth 61 2
+  63 consth 4 1
+  64 consth 7 1
+  65 sort bitvec 7
+  66 consth 65 2
+  67 consth 61 82
+  68 sort bitvec 13
+  69 consth 68 402
+  70 sort bitvec 63
+  71 consth 70 0
+  72 sort bitvec 54
+  73 consth 72 0
+  74 consth 4 0
+  75 consth 7 7
+  76 sort bitvec 19
+  77 consth 76 0
+  78 sort bitvec 47
+  79 consth 78 0
+  80 consth 4 3
+  81 consth 1 1
+  82 consth 53 0
+  83 consth 55 0
+  84 sort bitvec 32
+  85 consth 84 0
+  86 consth 4 2
+  87 consth 7 0
+  88 sort bitvec 52
+  89 consth 88 0
+  90 sort bitvec 23
+  91 consth 90 0
+  92 consth 57 0
+  93 consth 1 0
+  94 ite 1 2 3 14 
+  95 ite 4 2 5 15 
+  96 ite 1 2 6 16 
+  97 ite 7 2 8 17 
+  98 ite 4 2 9 18 
+  99 ite 4 2 10 19 
+  100 ite 11 2 12 20 
+  101 ite 11 2 13 21 
+  102 slice 1 17 1 1 _dcmp_io_signaling_T
+  103 xor 1 102 81 dcmp.io_signaling
+  104 sort bitvec 12
+  105 slice 104 20 63 52 classify_out_expIn
+  106 slice 7 20 63 61 _toint_ieee_unrecoded_rawIn_isZero_T
+  107 neq 1 106 87 _toint_ieee_unrecoded_rawIn_out_sig_T
+  108 slice 4 20 63 62 _toint_ieee_unrecoded_rawIn_isSpecial_T
+  109 eq 1 108 80 toint_ieee_unrecoded_rawIn_isSpecial
+  110 slice 1 20 61 61 _toint_ieee_unrecoded_rawIn_out_isInf_T
+  111 xor 1 110 81 _toint_ieee_unrecoded_rawIn_out_isInf_T_1
+  112 and 1 109 111 toint_ieee_unrecoded_rawIn_isInf
+  113 slice 1 20 64 64 classify_out_sign
+  114 concat 68 93 105 toint_ieee_unrecoded_rawIn_sExp
+  115 slice 88 20 51 0 classify_out_fractIn
+  116 slt 1 114 69 toint_ieee_unrecoded_isSubnormal
+  117 slice 49 20 57 52 _toint_ieee_unrecoded_denormShiftDist_T
+  118 sub 49 59 117 _toint_ieee_unrecoded_denormShiftDist_T_1
+  119 sort bitvec 51
+  120 slice 119 20 51 1 
+  121 sort bitvec 53
+  122 concat 121 93 107 _toint_ieee_unrecoded_denormFract_T
+  123 concat 121 122 120 _toint_ieee_unrecoded_denormFract_T
+  124 concat 121 79 118 
+  125 srl 121 123 124 _toint_ieee_unrecoded_denormFract_T_1
+  126 slice 84 20 31 0 
+  127 ite 84 112 85 126 _toint_ieee_unrecoded_fractOut_T_1
+  128 slice 84 125 31 0 
+  129 ite 84 116 128 127 toint_ieee_unrecoded_fractOut
+  130 slice 1 20 31 31 _io_out_bits_store_prevRecoded_T_3
+  131 slice 1 20 52 52 _io_out_bits_store_prevRecoded_T_4
+  132 slice 55 20 30 23 _toint_ieee_prevUnrecoded_expOut_T
+  133 slice 4 20 30 29 
+  134 concat 7 131 133 _toint_ieee_prevUnrecoded_rawIn_isZero_T
+  135 neq 1 134 87 _toint_ieee_prevUnrecoded_rawIn_out_sig_T
+  136 slice 1 20 30 30 
+  137 concat 4 131 136 _toint_ieee_prevUnrecoded_rawIn_isSpecial_T
+  138 eq 1 137 80 toint_ieee_prevUnrecoded_rawIn_isSpecial
+  139 slice 1 20 29 29 _toint_ieee_prevUnrecoded_rawIn_out_isInf_T
+  140 and 1 138 139 toint_ieee_prevUnrecoded_rawIn_isNaN
+  141 xor 1 139 81 _toint_ieee_prevUnrecoded_rawIn_out_isInf_T_1
+  142 and 1 138 141 toint_ieee_prevUnrecoded_rawIn_isInf
+  143 concat 61 93 131 toint_ieee_prevUnrecoded_rawIn_sExp
+  144 concat 61 143 132 toint_ieee_prevUnrecoded_rawIn_sExp
+  145 slice 90 20 22 0 _toint_ieee_prevUnrecoded_rawIn_out_sig_T_2
+  146 slt 1 144 67 toint_ieee_prevUnrecoded_isSubnormal
+  147 slice 57 20 27 23 _toint_ieee_prevUnrecoded_denormShiftDist_T
+  148 sub 57 58 147 _toint_ieee_prevUnrecoded_denormShiftDist_T_1
+  149 sort bitvec 22
+  150 slice 149 20 22 1 
+  151 sort bitvec 24
+  152 concat 151 93 135 _toint_ieee_prevUnrecoded_denormFract_T
+  153 concat 151 152 150 _toint_ieee_prevUnrecoded_denormFract_T
+  154 concat 151 77 148 
+  155 srl 151 153 154 _toint_ieee_prevUnrecoded_denormFract_T_1
+  156 slice 90 155 22 0 toint_ieee_prevUnrecoded_denormFract
+  157 add 55 132 56 _toint_ieee_prevUnrecoded_expOut_T_1
+  158 ite 55 146 83 157 _toint_ieee_prevUnrecoded_expOut_T_3
+  159 or 1 140 142 _toint_ieee_prevUnrecoded_expOut_T_4
+  160 sext 55 159 7 _toint_ieee_prevUnrecoded_expOut_T_5
+  161 or 55 158 160 toint_ieee_prevUnrecoded_expOut
+  162 ite 90 142 91 145 _toint_ieee_prevUnrecoded_fractOut_T_1
+  163 ite 90 146 156 162 toint_ieee_prevUnrecoded_fractOut
+  164 concat 84 130 161 toint_ieee_prevUnrecoded
+  165 concat 84 164 163 toint_ieee_prevUnrecoded
+  166 slice 7 20 63 61 classify_out_code_1
+  167 eq 1 166 75 _toint_ieee_T_2
+  168 ite 84 167 165 129 _toint_ieee_T_4
+  169 sort bitvec 64
+  170 concat 84 168 168 ; Check me!
+  171 concat 169 170 168 ; Check me!
+  172 slice 7 20 63 61 _toint_ieee_unrecoded_rawIn_isZero_T_1
+  173 neq 1 172 87 _toint_ieee_unrecoded_rawIn_out_sig_T_4
+  174 slice 4 20 63 62 _toint_ieee_unrecoded_rawIn_isSpecial_T_1
+  175 eq 1 174 80 toint_ieee_unrecoded_rawIn_isSpecial_1
+  176 slice 1 20 61 61 _toint_ieee_unrecoded_rawIn_out_isInf_T_3
+  177 and 1 175 176 toint_ieee_unrecoded_rawIn_1_isNaN
+  178 xor 1 176 81 _toint_ieee_unrecoded_rawIn_out_isInf_T_4
+  179 and 1 175 178 toint_ieee_unrecoded_rawIn_1_isInf
+  180 slt 1 114 69 toint_ieee_unrecoded_isSubnormal_1
+  181 slice 49 20 57 52 _toint_ieee_unrecoded_denormShiftDist_T_2
+  182 sub 49 59 181 _toint_ieee_unrecoded_denormShiftDist_T_3
+  183 slice 119 20 51 1 
+  184 concat 121 93 173 _toint_ieee_unrecoded_denormFract_T_2
+  185 concat 121 184 183 _toint_ieee_unrecoded_denormFract_T_2
+  186 concat 121 79 182 
+  187 srl 121 185 186 _toint_ieee_unrecoded_denormFract_T_3
+  188 slice 88 187 51 0 toint_ieee_unrecoded_denormFract_1
+  189 slice 53 20 62 52 _toint_ieee_unrecoded_expOut_T_6
+  190 add 53 189 54 _toint_ieee_unrecoded_expOut_T_7
+  191 ite 53 180 82 190 _toint_ieee_unrecoded_expOut_T_9
+  192 or 1 177 179 _toint_ieee_unrecoded_expOut_T_10
+  193 sext 53 192 10 _toint_ieee_unrecoded_expOut_T_11
+  194 or 53 191 193 toint_ieee_unrecoded_expOut_1
+  195 ite 88 179 89 115 _toint_ieee_unrecoded_fractOut_T_3
+  196 ite 88 180 188 195 toint_ieee_unrecoded_fractOut_1
+  197 slice 55 20 30 23 _toint_ieee_prevUnrecoded_expOut_T_6
+  198 slice 4 20 30 29 
+  199 concat 7 131 198 _toint_ieee_prevUnrecoded_rawIn_isZero_T_1
+  200 neq 1 199 87 _toint_ieee_prevUnrecoded_rawIn_out_sig_T_4
+  201 slice 1 20 30 30 
+  202 concat 4 131 201 _toint_ieee_prevUnrecoded_rawIn_isSpecial_T_1
+  203 eq 1 202 80 toint_ieee_prevUnrecoded_rawIn_isSpecial_1
+  204 slice 1 20 29 29 _toint_ieee_prevUnrecoded_rawIn_out_isInf_T_3
+  205 and 1 203 204 toint_ieee_prevUnrecoded_rawIn_1_isNaN
+  206 xor 1 204 81 _toint_ieee_prevUnrecoded_rawIn_out_isInf_T_4
+  207 and 1 203 206 toint_ieee_prevUnrecoded_rawIn_1_isInf
+  208 concat 61 93 131 toint_ieee_prevUnrecoded_rawIn_1_sExp
+  209 concat 61 208 197 toint_ieee_prevUnrecoded_rawIn_1_sExp
+  210 slice 90 20 22 0 _toint_ieee_prevUnrecoded_rawIn_out_sig_T_6
+  211 slt 1 209 67 toint_ieee_prevUnrecoded_isSubnormal_1
+  212 slice 57 20 27 23 _toint_ieee_prevUnrecoded_denormShiftDist_T_2
+  213 sub 57 58 212 _toint_ieee_prevUnrecoded_denormShiftDist_T_3
+  214 slice 149 20 22 1 
+  215 concat 151 93 200 _toint_ieee_prevUnrecoded_denormFract_T_2
+  216 concat 151 215 214 _toint_ieee_prevUnrecoded_denormFract_T_2
+  217 concat 151 77 213 
+  218 srl 151 216 217 _toint_ieee_prevUnrecoded_denormFract_T_3
+  219 slice 90 218 22 0 toint_ieee_prevUnrecoded_denormFract_1
+  220 add 55 197 56 _toint_ieee_prevUnrecoded_expOut_T_7
+  221 ite 55 211 83 220 _toint_ieee_prevUnrecoded_expOut_T_9
+  222 or 1 205 207 _toint_ieee_prevUnrecoded_expOut_T_10
+  223 sext 55 222 7 _toint_ieee_prevUnrecoded_expOut_T_11
+  224 or 55 221 223 toint_ieee_prevUnrecoded_expOut_1
+  225 ite 90 207 91 210 _toint_ieee_prevUnrecoded_fractOut_T_3
+  226 ite 90 211 219 225 toint_ieee_prevUnrecoded_fractOut_1
+  227 concat 84 130 224 toint_ieee_prevUnrecoded_1
+  228 concat 84 227 226 toint_ieee_prevUnrecoded_1
+  229 sort bitvec 20
+  230 slice 229 196 51 32 
+  231 eq 1 166 75 _toint_ieee_T_10
+  232 slice 84 196 31 0 _toint_ieee_T_11
+  233 ite 84 231 228 232 _toint_ieee_T_12
+  234 concat 169 113 194 _toint_ieee_T_14
+  235 concat 169 234 230 _toint_ieee_T_14
+  236 concat 169 235 233 _toint_ieee_T_14
+  237 slice 1 15 0 0 toint_ieee_truncIdx
+  238 ite 169 237 236 170 toint_ieee
+  239 slice 1 19 0 0 _intType_T
+  240 slice 4 17 1 0 
+  241 xor 4 240 80 _toint_T_3
+  242 concat 4 29 30 _toint_T_4
+  243 and 4 241 242 
+  244 neq 1 243 74 _toint_T_6
+  245 concat 169 71 244 
+  246 slice 84 238 63 32 _toint_T_7
+  247 concat 169 246 85 _toint_T_8
+  248 or 169 245 247 _toint_T_9
+  249 slice 1 18 1 1 cvtType
+  250 xor 1 249 81 
+  251 slice 1 39 2 2 _invalid_T
+  252 slice 1 45 1 1 _invalid_T_1
+  253 or 1 251 252 invalid
+  254 and 1 250 253 
+  255 slice 84 38 63 32 _toint_T_10
+  256 slice 1 18 0 0 _narrow_io_signedOut_T
+  257 xor 1 256 81 conv.io_signedOut
+  258 neq 1 166 75 _excSign_T_3
+  259 and 1 113 258 excSign
+  260 eq 1 257 259 _excOut_T
+  261 xor 1 259 81 _excOut_T_1
+  262 sort bitvec 31
+  263 sext 262 261 30 _excOut_T_2
+  264 concat 169 255 260 _toint_T_11
+  265 concat 169 264 263 _toint_T_11
+  266 ite 169 254 265 38 
+  267 ite 169 14 248 266 
+  268 slice 1 17 0 0 
+  269 slice 1 15 0 0 classify_out_truncIdx
+  270 eq 1 166 75 classify_out_isNaN_1
+  271 slice 1 20 51 51 _classify_out_isQNaN_T_1
+  272 and 1 270 271 classify_out_isQNaN_1
+  273 xor 1 271 81 _classify_out_isSNaN_T_3
+  274 and 1 270 273 classify_out_isSNaN_1
+  275 slice 4 20 63 62 classify_out_codeHi_1
+  276 eq 1 275 80 classify_out_isSpecial_1
+  277 slice 1 20 61 61 _classify_out_isInf_T_2
+  278 xor 1 277 81 _classify_out_isInf_T_3
+  279 and 1 276 278 classify_out_isInf_1
+  280 xor 1 113 81 _classify_out_T_20
+  281 and 1 279 280 _classify_out_T_15
+  282 eq 1 275 63 _classify_out_isNormal_T_4
+  283 slice 47 20 61 53 
+  284 neq 1 283 48 _classify_out_isNormal_T_5
+  285 and 1 282 284 _classify_out_isNormal_T_6
+  286 eq 1 275 86 _classify_out_isNormal_T_7
+  287 or 1 285 286 classify_out_isNormal_1
+  288 and 1 287 280 _classify_out_T_17
+  289 eq 1 166 64 _classify_out_isSubnormal_T_3
+  290 slice 61 20 61 52 _classify_out_isHighSubnormalIn_T_1
+  291 ult 1 290 62 classify_out_isHighSubnormalIn_1
+  292 and 1 282 291 _classify_out_isSubnormal_T_5
+  293 or 1 289 292 classify_out_isSubnormal_1
+  294 and 1 293 280 _classify_out_T_19
+  295 eq 1 166 87 classify_out_isZero_1
+  296 and 1 295 280 _classify_out_T_21
+  297 and 1 295 113 _classify_out_T_22
+  298 and 1 293 113 _classify_out_T_23
+  299 and 1 287 113 _classify_out_T_24
+  300 and 1 279 113 _classify_out_T_25
+  301 concat 61 272 274 _classify_out_T_26
+  302 concat 61 301 281 _classify_out_T_26
+  303 concat 61 302 288 _classify_out_T_26
+  304 concat 61 303 294 _classify_out_T_26
+  305 concat 61 304 296 _classify_out_T_26
+  306 concat 61 305 297 _classify_out_T_26
+  307 concat 61 306 298 _classify_out_T_26
+  308 concat 61 307 299 _classify_out_T_26
+  309 concat 61 308 300 _classify_out_T_26
+  310 slice 7 20 63 61 classify_out_expOut_expCode
+  311 eq 1 310 87 _classify_out_expOut_T
+  312 ugt 1 310 51 _classify_out_expOut_T_1
+  313 or 1 311 312 _classify_out_expOut_T_2
+  314 slice 47 20 60 52 
+  315 add 47 314 52 _classify_out_expOut_commonCase_T
+  316 slice 49 315 5 0 _classify_out_expOut_T_3
+  317 concat 47 310 316 _classify_out_expOut_T_4
+  318 ite 47 313 317 315 classify_out_expOut
+  319 slice 7 318 8 6 classify_out_code
+  320 eq 1 319 75 classify_out_isNaN
+  321 slice 1 20 51 51 _classify_out_isQNaN_T
+  322 and 1 320 321 classify_out_isQNaN
+  323 xor 1 321 81 _classify_out_isSNaN_T_1
+  324 and 1 320 323 classify_out_isSNaN
+  325 slice 4 318 8 7 classify_out_codeHi
+  326 eq 1 325 80 classify_out_isSpecial
+  327 slice 1 318 6 6 _classify_out_isInf_T
+  328 xor 1 327 81 _classify_out_isInf_T_1
+  329 and 1 326 328 classify_out_isInf
+  330 xor 1 113 81 _classify_out_T_7
+  331 and 1 329 330 _classify_out_T_2
+  332 eq 1 325 63 _classify_out_isNormal_T
+  333 slice 49 318 6 1 
+  334 neq 1 333 50 _classify_out_isNormal_T_1
+  335 and 1 332 334 _classify_out_isNormal_T_2
+  336 eq 1 325 86 _classify_out_isNormal_T_3
+  337 or 1 335 336 classify_out_isNormal
+  338 and 1 337 330 _classify_out_T_4
+  339 eq 1 319 64 _classify_out_isSubnormal_T
+  340 slice 65 318 6 0 _classify_out_isHighSubnormalIn_T
+  341 ult 1 340 66 classify_out_isHighSubnormalIn
+  342 and 1 332 341 _classify_out_isSubnormal_T_2
+  343 or 1 339 342 classify_out_isSubnormal
+  344 and 1 343 330 _classify_out_T_6
+  345 eq 1 319 87 classify_out_isZero
+  346 and 1 345 330 _classify_out_T_8
+  347 and 1 345 113 _classify_out_T_9
+  348 and 1 343 113 _classify_out_T_10
+  349 and 1 337 113 _classify_out_T_11
+  350 and 1 329 113 _classify_out_T_12
+  351 concat 61 322 324 _classify_out_T_13
+  352 concat 61 351 331 _classify_out_T_13
+  353 concat 61 352 338 _classify_out_T_13
+  354 concat 61 353 344 _classify_out_T_13
+  355 concat 61 354 346 _classify_out_T_13
+  356 concat 61 355 347 _classify_out_T_13
+  357 concat 61 356 348 _classify_out_T_13
+  358 concat 61 357 349 _classify_out_T_13
+  359 concat 61 358 350 _classify_out_T_13
+  360 ite 61 269 309 359 classify_out
+  361 concat 169 73 360 
+  362 slice 84 238 63 32 _toint_T
+  363 concat 169 362 85 _toint_T_1
+  364 or 169 361 363 _toint_T_2
+  365 ite 169 268 364 238 
+  366 ite 169 16 267 365 toint
+  367 slice 84 366 31 0 _io_out_bits_toint_T
+  368 slice 1 366 31 31 _io_out_bits_toint_T_1
+  369 sext 84 368 31 _io_out_bits_toint_T_2
+  370 concat 169 369 367 _io_out_bits_toint_T_3
+  371 xor 1 14 81 
+  372 and 1 371 249 
+  373 xor 1 268 81 
+  374 and 1 373 239 
+  375 ite 1 16 372 374 intType
+  376 ite 169 375 366 370 io_out_bits_toint
+  377 slice 4 39 2 1 _io_out_bits_exc_T
+  378 neq 1 377 74 _io_out_bits_exc_T_1
+  379 slice 1 39 0 0 _io_out_bits_exc_T_5
+  380 concat 57 378 87 _io_out_bits_exc_T_3
+  381 concat 57 380 379 _io_out_bits_exc_T_3
+  382 xor 1 256 81 narrow.io_signedOut
+  383 xor 1 253 81 _io_out_bits_exc_T_4
+  384 and 1 383 379 _io_out_bits_exc_T_6
+  385 concat 57 253 87 _io_out_bits_exc_T_7
+  386 concat 57 385 384 _io_out_bits_exc_T_7
+  387 ite 57 249 381 386 
+  388 ite 57 14 31 387 
+  389 ite 57 16 388 92 io_out_bits_exc
+  390 slt 1 20 60 _io_out_bits_lt_T_1
+  391 sgt 1 21 46 _io_out_bits_lt_T_3
+  392 and 1 390 391 _io_out_bits_lt_T_4
+  393 or 1 29 392 io_out_bits_lt
+  394 set 22 41 20 io_a
+  395 set 22 42 21 io_b
+  396 set 22 43 103 io_signaling
+  397 set 32 41 20 io_in
+  398 set 32 42 17 io_roundingMode
+  399 set 32 43 257 io_signedOut
+  400 set 40 41 20 io_in
+  401 set 40 42 17 io_roundingMode
+  402 set 40 43 382 io_signedOut
+  403 output 393 io_out_bits_lt
+  404 output 376 io_out_bits_toint
+  405 output 389 io_out_bits_exc
+  406 next 1 14 94
+  407 next 4 15 95
+  408 next 1 16 96
+  409 next 7 17 97
+  410 next 4 18 98
+  411 next 4 19 99
+  412 next 11 20 100
+  413 next 11 21 101
+}
