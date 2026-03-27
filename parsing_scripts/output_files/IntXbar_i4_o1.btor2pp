@@ -1,0 +1,14 @@
+
+module IntXbar_i4_o1 {
+  1 sort bitvec 1
+  2 input 1 auto_anon_in_3_0
+  3 input 1 auto_anon_in_2_0
+  4 input 1 auto_anon_in_1_0
+  5 input 1 auto_anon_in_1_1
+  6 input 1 auto_anon_in_0_0
+  7 output 6 auto_anon_out_0
+  8 output 4 auto_anon_out_1
+  9 output 5 auto_anon_out_2
+  10 output 3 auto_anon_out_3
+  11 output 2 auto_anon_out_4
+}

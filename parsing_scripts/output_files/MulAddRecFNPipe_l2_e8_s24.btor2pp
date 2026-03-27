@@ -47,166 +47,166 @@ module MulAddRecFNPipe_l2_e8_s24 {
   42 sort bitvec 27
   43 state 42 roundRawFNToRecFN_io_in_pipe_b_sig
   44 state 10 roundRawFNToRecFN_io_roundingMode_pipe_b
-  45 state 1 io_validout_pipe_v
-  46 inst MulAddRecFNToRaw_preMul_e8_s24
-  47 ref MulAddRecFNToRaw_preMul_e8_s24 2 io_op
-  48 ref MulAddRecFNToRaw_preMul_e8_s24 4 io_a
-  49 ref MulAddRecFNToRaw_preMul_e8_s24 5 io_b
-  50 ref MulAddRecFNToRaw_preMul_e8_s24 6 io_c
-  51 ref MulAddRecFNToRaw_preMul_e8_s24 175 io_mulAddA
-  52 ref MulAddRecFNToRaw_preMul_e8_s24 176 io_mulAddB
-  53 ref MulAddRecFNToRaw_preMul_e8_s24 177 io_mulAddC
-  54 ref MulAddRecFNToRaw_preMul_e8_s24 178 io_toPostMul_isSigNaNAny
-  55 ref MulAddRecFNToRaw_preMul_e8_s24 179 io_toPostMul_isNaNAOrB
-  56 ref MulAddRecFNToRaw_preMul_e8_s24 180 io_toPostMul_isInfA
-  57 ref MulAddRecFNToRaw_preMul_e8_s24 181 io_toPostMul_isZeroA
-  58 ref MulAddRecFNToRaw_preMul_e8_s24 182 io_toPostMul_isInfB
-  59 ref MulAddRecFNToRaw_preMul_e8_s24 183 io_toPostMul_isZeroB
-  60 ref MulAddRecFNToRaw_preMul_e8_s24 184 io_toPostMul_signProd
-  61 ref MulAddRecFNToRaw_preMul_e8_s24 185 io_toPostMul_isNaNC
-  62 ref MulAddRecFNToRaw_preMul_e8_s24 186 io_toPostMul_isInfC
-  63 ref MulAddRecFNToRaw_preMul_e8_s24 187 io_toPostMul_isZeroC
-  64 ref MulAddRecFNToRaw_preMul_e8_s24 188 io_toPostMul_sExpSum
-  65 ref MulAddRecFNToRaw_preMul_e8_s24 189 io_toPostMul_doSubMags
-  66 ref MulAddRecFNToRaw_preMul_e8_s24 190 io_toPostMul_CIsDominant
-  67 ref MulAddRecFNToRaw_preMul_e8_s24 191 io_toPostMul_CDom_CAlignDist
-  68 ref MulAddRecFNToRaw_preMul_e8_s24 192 io_toPostMul_highAlignedSigC
-  69 ref MulAddRecFNToRaw_preMul_e8_s24 193 io_toPostMul_bit0AlignedSigC
-  70 get 46 51 io_mulAddA
-  71 get 46 52 io_mulAddB
-  72 get 46 53 io_mulAddC
-  73 get 46 54 io_toPostMul_isSigNaNAny
-  74 get 46 55 io_toPostMul_isNaNAOrB
-  75 get 46 56 io_toPostMul_isInfA
-  76 get 46 57 io_toPostMul_isZeroA
-  77 get 46 58 io_toPostMul_isInfB
-  78 get 46 59 io_toPostMul_isZeroB
-  79 get 46 60 io_toPostMul_signProd
-  80 get 46 61 io_toPostMul_isNaNC
-  81 get 46 62 io_toPostMul_isInfC
-  82 get 46 63 io_toPostMul_isZeroC
-  83 get 46 64 io_toPostMul_sExpSum
-  84 get 46 65 io_toPostMul_doSubMags
-  85 get 46 66 io_toPostMul_CIsDominant
-  86 get 46 67 io_toPostMul_CDom_CAlignDist
-  87 get 46 68 io_toPostMul_highAlignedSigC
-  88 get 46 69 io_toPostMul_bit0AlignedSigC
-  89 inst MulAddRecFNToRaw_postMul_e8_s24
-  90 ref MulAddRecFNToRaw_postMul_e8_s24 2 io_fromPreMul_isSigNaNAny
-  91 ref MulAddRecFNToRaw_postMul_e8_s24 3 io_fromPreMul_isNaNAOrB
-  92 ref MulAddRecFNToRaw_postMul_e8_s24 4 io_fromPreMul_isInfA
-  93 ref MulAddRecFNToRaw_postMul_e8_s24 5 io_fromPreMul_isZeroA
-  94 ref MulAddRecFNToRaw_postMul_e8_s24 6 io_fromPreMul_isInfB
-  95 ref MulAddRecFNToRaw_postMul_e8_s24 7 io_fromPreMul_isZeroB
-  96 ref MulAddRecFNToRaw_postMul_e8_s24 8 io_fromPreMul_signProd
-  97 ref MulAddRecFNToRaw_postMul_e8_s24 9 io_fromPreMul_isNaNC
-  98 ref MulAddRecFNToRaw_postMul_e8_s24 10 io_fromPreMul_isInfC
-  99 ref MulAddRecFNToRaw_postMul_e8_s24 11 io_fromPreMul_isZeroC
-  100 ref MulAddRecFNToRaw_postMul_e8_s24 13 io_fromPreMul_sExpSum
-  101 ref MulAddRecFNToRaw_postMul_e8_s24 14 io_fromPreMul_doSubMags
-  102 ref MulAddRecFNToRaw_postMul_e8_s24 15 io_fromPreMul_CIsDominant
-  103 ref MulAddRecFNToRaw_postMul_e8_s24 17 io_fromPreMul_CDom_CAlignDist
-  104 ref MulAddRecFNToRaw_postMul_e8_s24 19 io_fromPreMul_highAlignedSigC
-  105 ref MulAddRecFNToRaw_postMul_e8_s24 20 io_fromPreMul_bit0AlignedSigC
-  106 ref MulAddRecFNToRaw_postMul_e8_s24 22 io_mulAddResult
-  107 ref MulAddRecFNToRaw_postMul_e8_s24 24 io_roundingMode
-  108 ref MulAddRecFNToRaw_postMul_e8_s24 328 io_invalidExc
-  109 ref MulAddRecFNToRaw_postMul_e8_s24 329 io_rawOut_isNaN
-  110 ref MulAddRecFNToRaw_postMul_e8_s24 330 io_rawOut_isInf
-  111 ref MulAddRecFNToRaw_postMul_e8_s24 331 io_rawOut_isZero
-  112 ref MulAddRecFNToRaw_postMul_e8_s24 332 io_rawOut_sign
-  113 ref MulAddRecFNToRaw_postMul_e8_s24 333 io_rawOut_sExp
-  114 ref MulAddRecFNToRaw_postMul_e8_s24 334 io_rawOut_sig
-  115 get 89 108 io_invalidExc
-  116 get 89 109 io_rawOut_isNaN
-  117 get 89 110 io_rawOut_isInf
-  118 get 89 111 io_rawOut_isZero
-  119 get 89 112 io_rawOut_sign
-  120 get 89 113 io_rawOut_sExp
-  121 get 89 114 io_rawOut_sig
-  122 inst RoundRawFNToRecFN_e8_s24
-  123 ref RoundRawFNToRecFN_e8_s24 2 io_invalidExc
-  124 ref RoundRawFNToRecFN_e8_s24 3 io_in_isNaN
-  125 ref RoundRawFNToRecFN_e8_s24 4 io_in_isInf
-  126 ref RoundRawFNToRecFN_e8_s24 5 io_in_isZero
-  127 ref RoundRawFNToRecFN_e8_s24 6 io_in_sign
-  128 ref RoundRawFNToRecFN_e8_s24 8 io_in_sExp
-  129 ref RoundRawFNToRecFN_e8_s24 10 io_in_sig
-  130 ref RoundRawFNToRecFN_e8_s24 12 io_roundingMode
-  131 ref RoundRawFNToRecFN_e8_s24 34 io_out
-  132 ref RoundRawFNToRecFN_e8_s24 35 io_exceptionFlags
-  133 get 122 131 io_out
-  134 get 122 132 io_exceptionFlags
+  45 inst MulAddRecFNToRaw_preMul_e8_s24
+  46 ref MulAddRecFNToRaw_preMul_e8_s24 2 io_op
+  47 ref MulAddRecFNToRaw_preMul_e8_s24 4 io_a
+  48 ref MulAddRecFNToRaw_preMul_e8_s24 5 io_b
+  49 ref MulAddRecFNToRaw_preMul_e8_s24 6 io_c
+  50 ref MulAddRecFNToRaw_preMul_e8_s24 175 io_mulAddA
+  51 ref MulAddRecFNToRaw_preMul_e8_s24 176 io_mulAddB
+  52 ref MulAddRecFNToRaw_preMul_e8_s24 177 io_mulAddC
+  53 ref MulAddRecFNToRaw_preMul_e8_s24 178 io_toPostMul_isSigNaNAny
+  54 ref MulAddRecFNToRaw_preMul_e8_s24 179 io_toPostMul_isNaNAOrB
+  55 ref MulAddRecFNToRaw_preMul_e8_s24 180 io_toPostMul_isInfA
+  56 ref MulAddRecFNToRaw_preMul_e8_s24 181 io_toPostMul_isZeroA
+  57 ref MulAddRecFNToRaw_preMul_e8_s24 182 io_toPostMul_isInfB
+  58 ref MulAddRecFNToRaw_preMul_e8_s24 183 io_toPostMul_isZeroB
+  59 ref MulAddRecFNToRaw_preMul_e8_s24 184 io_toPostMul_signProd
+  60 ref MulAddRecFNToRaw_preMul_e8_s24 185 io_toPostMul_isNaNC
+  61 ref MulAddRecFNToRaw_preMul_e8_s24 186 io_toPostMul_isInfC
+  62 ref MulAddRecFNToRaw_preMul_e8_s24 187 io_toPostMul_isZeroC
+  63 ref MulAddRecFNToRaw_preMul_e8_s24 188 io_toPostMul_sExpSum
+  64 ref MulAddRecFNToRaw_preMul_e8_s24 189 io_toPostMul_doSubMags
+  65 ref MulAddRecFNToRaw_preMul_e8_s24 190 io_toPostMul_CIsDominant
+  66 ref MulAddRecFNToRaw_preMul_e8_s24 191 io_toPostMul_CDom_CAlignDist
+  67 ref MulAddRecFNToRaw_preMul_e8_s24 192 io_toPostMul_highAlignedSigC
+  68 ref MulAddRecFNToRaw_preMul_e8_s24 193 io_toPostMul_bit0AlignedSigC
+  69 get 45 50 io_mulAddA
+  70 get 45 51 io_mulAddB
+  71 get 45 52 io_mulAddC
+  72 get 45 53 io_toPostMul_isSigNaNAny
+  73 get 45 54 io_toPostMul_isNaNAOrB
+  74 get 45 55 io_toPostMul_isInfA
+  75 get 45 56 io_toPostMul_isZeroA
+  76 get 45 57 io_toPostMul_isInfB
+  77 get 45 58 io_toPostMul_isZeroB
+  78 get 45 59 io_toPostMul_signProd
+  79 get 45 60 io_toPostMul_isNaNC
+  80 get 45 61 io_toPostMul_isInfC
+  81 get 45 62 io_toPostMul_isZeroC
+  82 get 45 63 io_toPostMul_sExpSum
+  83 get 45 64 io_toPostMul_doSubMags
+  84 get 45 65 io_toPostMul_CIsDominant
+  85 get 45 66 io_toPostMul_CDom_CAlignDist
+  86 get 45 67 io_toPostMul_highAlignedSigC
+  87 get 45 68 io_toPostMul_bit0AlignedSigC
+  88 inst MulAddRecFNToRaw_postMul_e8_s24
+  89 ref MulAddRecFNToRaw_postMul_e8_s24 2 io_fromPreMul_isSigNaNAny
+  90 ref MulAddRecFNToRaw_postMul_e8_s24 3 io_fromPreMul_isNaNAOrB
+  91 ref MulAddRecFNToRaw_postMul_e8_s24 4 io_fromPreMul_isInfA
+  92 ref MulAddRecFNToRaw_postMul_e8_s24 5 io_fromPreMul_isZeroA
+  93 ref MulAddRecFNToRaw_postMul_e8_s24 6 io_fromPreMul_isInfB
+  94 ref MulAddRecFNToRaw_postMul_e8_s24 7 io_fromPreMul_isZeroB
+  95 ref MulAddRecFNToRaw_postMul_e8_s24 8 io_fromPreMul_signProd
+  96 ref MulAddRecFNToRaw_postMul_e8_s24 9 io_fromPreMul_isNaNC
+  97 ref MulAddRecFNToRaw_postMul_e8_s24 10 io_fromPreMul_isInfC
+  98 ref MulAddRecFNToRaw_postMul_e8_s24 11 io_fromPreMul_isZeroC
+  99 ref MulAddRecFNToRaw_postMul_e8_s24 13 io_fromPreMul_sExpSum
+  100 ref MulAddRecFNToRaw_postMul_e8_s24 14 io_fromPreMul_doSubMags
+  101 ref MulAddRecFNToRaw_postMul_e8_s24 15 io_fromPreMul_CIsDominant
+  102 ref MulAddRecFNToRaw_postMul_e8_s24 17 io_fromPreMul_CDom_CAlignDist
+  103 ref MulAddRecFNToRaw_postMul_e8_s24 19 io_fromPreMul_highAlignedSigC
+  104 ref MulAddRecFNToRaw_postMul_e8_s24 20 io_fromPreMul_bit0AlignedSigC
+  105 ref MulAddRecFNToRaw_postMul_e8_s24 22 io_mulAddResult
+  106 ref MulAddRecFNToRaw_postMul_e8_s24 24 io_roundingMode
+  107 ref MulAddRecFNToRaw_postMul_e8_s24 328 io_invalidExc
+  108 ref MulAddRecFNToRaw_postMul_e8_s24 329 io_rawOut_isNaN
+  109 ref MulAddRecFNToRaw_postMul_e8_s24 330 io_rawOut_isInf
+  110 ref MulAddRecFNToRaw_postMul_e8_s24 331 io_rawOut_isZero
+  111 ref MulAddRecFNToRaw_postMul_e8_s24 332 io_rawOut_sign
+  112 ref MulAddRecFNToRaw_postMul_e8_s24 333 io_rawOut_sExp
+  113 ref MulAddRecFNToRaw_postMul_e8_s24 334 io_rawOut_sig
+  114 get 88 107 io_invalidExc
+  115 get 88 108 io_rawOut_isNaN
+  116 get 88 109 io_rawOut_isInf
+  117 get 88 110 io_rawOut_isZero
+  118 get 88 111 io_rawOut_sign
+  119 get 88 112 io_rawOut_sExp
+  120 get 88 113 io_rawOut_sig
+  121 inst RoundRawFNToRecFN_e8_s24
+  122 ref RoundRawFNToRecFN_e8_s24 2 io_invalidExc
+  123 ref RoundRawFNToRecFN_e8_s24 3 io_infiniteExc
+  124 ref RoundRawFNToRecFN_e8_s24 4 io_in_isNaN
+  125 ref RoundRawFNToRecFN_e8_s24 5 io_in_isInf
+  126 ref RoundRawFNToRecFN_e8_s24 6 io_in_isZero
+  127 ref RoundRawFNToRecFN_e8_s24 7 io_in_sign
+  128 ref RoundRawFNToRecFN_e8_s24 9 io_in_sExp
+  129 ref RoundRawFNToRecFN_e8_s24 11 io_in_sig
+  130 ref RoundRawFNToRecFN_e8_s24 13 io_roundingMode
+  131 ref RoundRawFNToRecFN_e8_s24 37 io_out
+  132 ref RoundRawFNToRecFN_e8_s24 38 io_exceptionFlags
+  133 get 121 131 io_out
+  134 get 121 132 io_exceptionFlags
   135 sort bitvec 24
   136 consth 135 0
   137 consth 1 0
   138 sort bitvec 48
-  139 concat 138 136 70 
-  140 concat 138 136 71 
+  139 concat 138 136 69 
+  140 concat 138 136 70 
   141 mul 138 139 140 _mulAddResult_T
   142 concat 31 137 141 
-  143 concat 31 137 72 
+  143 concat 31 137 71 
   144 add 31 142 143 mulAddResult
-  145 ite 1 3 73 12 
-  146 ite 1 3 74 13 
-  147 ite 1 3 75 14 
-  148 ite 1 3 76 15 
-  149 ite 1 3 77 16 
-  150 ite 1 3 78 17 
-  151 ite 1 3 79 18 
-  152 ite 1 3 80 19 
-  153 ite 1 3 81 20 
-  154 ite 1 3 82 21 
-  155 ite 22 3 83 23 
-  156 ite 1 3 84 24 
-  157 ite 1 3 85 25 
-  158 ite 26 3 86 27 
-  159 ite 28 3 87 29 
-  160 ite 1 3 88 30 
+  145 ite 1 3 72 12 
+  146 ite 1 3 73 13 
+  147 ite 1 3 74 14 
+  148 ite 1 3 75 15 
+  149 ite 1 3 76 16 
+  150 ite 1 3 77 17 
+  151 ite 1 3 78 18 
+  152 ite 1 3 79 19 
+  153 ite 1 3 80 20 
+  154 ite 1 3 81 21 
+  155 ite 22 3 82 23 
+  156 ite 1 3 83 24 
+  157 ite 1 3 84 25 
+  158 ite 26 3 85 27 
+  159 ite 28 3 86 29 
+  160 ite 1 3 87 30 
   161 ite 31 3 144 32 
   162 ite 10 3 11 33 
   163 ite 10 3 11 34 
-  164 ite 1 35 115 36 
-  165 ite 1 35 116 37 
-  166 ite 1 35 117 38 
-  167 ite 1 35 118 39 
-  168 ite 1 35 119 40 
-  169 ite 22 35 120 41 
-  170 ite 42 35 121 43 
+  164 ite 1 35 114 36 
+  165 ite 1 35 115 37 
+  166 ite 1 35 116 38 
+  167 ite 1 35 117 39 
+  168 ite 1 35 118 40 
+  169 ite 22 35 119 41 
+  170 ite 42 35 120 43 
   171 ite 10 35 34 44 
-  172 set 46 123 5 io_op
-  173 set 46 124 7 io_a
-  174 set 46 125 8 io_b
-  175 set 46 126 9 io_c
-  176 set 89 123 12 io_fromPreMul_isSigNaNAny
-  177 set 89 124 13 io_fromPreMul_isNaNAOrB
-  178 set 89 125 14 io_fromPreMul_isInfA
-  179 set 89 126 15 io_fromPreMul_isZeroA
-  180 set 89 127 16 io_fromPreMul_isInfB
-  181 set 89 128 17 io_fromPreMul_isZeroB
-  182 set 89 129 18 io_fromPreMul_signProd
-  183 set 89 130 19 io_fromPreMul_isNaNC
-  184 set 89 98 20 io_fromPreMul_isInfC
-  185 set 89 99 21 io_fromPreMul_isZeroC
-  186 set 89 100 23 io_fromPreMul_sExpSum
-  187 set 89 101 24 io_fromPreMul_doSubMags
-  188 set 89 102 25 io_fromPreMul_CIsDominant
-  189 set 89 103 27 io_fromPreMul_CDom_CAlignDist
-  190 set 89 104 29 io_fromPreMul_highAlignedSigC
-  191 set 89 105 30 io_fromPreMul_bit0AlignedSigC
-  192 set 89 106 32 io_mulAddResult
-  193 set 89 107 33 io_roundingMode
-  194 set 122 123 36 io_invalidExc
-  195 set 122 124 37 io_in_isNaN
-  196 set 122 125 38 io_in_isInf
-  197 set 122 126 39 io_in_isZero
-  198 set 122 127 40 io_in_sign
-  199 set 122 128 41 io_in_sExp
-  200 set 122 129 43 io_in_sig
-  201 set 122 130 44 io_roundingMode
-  202 output 133 io_out
-  203 output 134 io_exceptionFlags
-  204 output 45 io_validout
+  172 set 45 122 5 io_op
+  173 set 45 123 7 io_a
+  174 set 45 124 8 io_b
+  175 set 45 125 9 io_c
+  176 set 88 122 12 io_fromPreMul_isSigNaNAny
+  177 set 88 123 13 io_fromPreMul_isNaNAOrB
+  178 set 88 124 14 io_fromPreMul_isInfA
+  179 set 88 125 15 io_fromPreMul_isZeroA
+  180 set 88 126 16 io_fromPreMul_isInfB
+  181 set 88 127 17 io_fromPreMul_isZeroB
+  182 set 88 128 18 io_fromPreMul_signProd
+  183 set 88 129 19 io_fromPreMul_isNaNC
+  184 set 88 130 20 io_fromPreMul_isInfC
+  185 set 88 98 21 io_fromPreMul_isZeroC
+  186 set 88 99 23 io_fromPreMul_sExpSum
+  187 set 88 100 24 io_fromPreMul_doSubMags
+  188 set 88 101 25 io_fromPreMul_CIsDominant
+  189 set 88 102 27 io_fromPreMul_CDom_CAlignDist
+  190 set 88 103 29 io_fromPreMul_highAlignedSigC
+  191 set 88 104 30 io_fromPreMul_bit0AlignedSigC
+  192 set 88 105 32 io_mulAddResult
+  193 set 88 106 33 io_roundingMode
+  194 set 121 122 36 io_invalidExc
+  195 set 121 123 137 io_infiniteExc
+  196 set 121 124 37 io_in_isNaN
+  197 set 121 125 38 io_in_isInf
+  198 set 121 126 39 io_in_isZero
+  199 set 121 127 40 io_in_sign
+  200 set 121 128 41 io_in_sExp
+  201 set 121 129 43 io_in_sig
+  202 set 121 130 44 io_roundingMode
+  203 output 133 io_out
+  204 output 134 io_exceptionFlags
   205 next 1 12 145
   206 next 1 13 146
   207 next 1 14 147
@@ -236,6 +236,4 @@ module MulAddRecFNPipe_l2_e8_s24 {
   231 next 22 41 169
   232 next 42 43 170
   233 next 10 44 171
-  234 ite 1 2 137 35 valid_stage0_pipe_v
-  235 next 1 45 234
 }

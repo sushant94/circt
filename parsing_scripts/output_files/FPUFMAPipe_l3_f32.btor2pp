@@ -1,0 +1,79 @@
+include MulAddRecFNPipe_l2_e8_s24.btor2pp
+
+module FPUFMAPipe_l3_f32 {
+  1 sort bitvec 1
+  2 input 1 reset
+  3 input 1 io_in_valid
+  4 input 1 io_in_bits_ren3
+  5 input 1 io_in_bits_swap23
+  6 sort bitvec 3
+  7 input 6 io_in_bits_rm
+  8 sort bitvec 2
+  9 input 8 io_in_bits_fmaCmd
+  10 sort bitvec 65
+  11 input 10 io_in_bits_in1
+  12 input 10 io_in_bits_in2
+  13 input 10 io_in_bits_in3
+  14 state 1 valid
+  15 state 6 in_rm
+  16 state 8 in_fmaCmd
+  17 state 10 in_in1
+  18 state 10 in_in2
+  19 state 10 in_in3
+  20 inst MulAddRecFNPipe_l2_e8_s24
+  21 ref MulAddRecFNPipe_l2_e8_s24 2 reset
+  22 ref MulAddRecFNPipe_l2_e8_s24 3 io_validin
+  23 ref MulAddRecFNPipe_l2_e8_s24 5 io_op
+  24 ref MulAddRecFNPipe_l2_e8_s24 7 io_a
+  25 ref MulAddRecFNPipe_l2_e8_s24 8 io_b
+  26 ref MulAddRecFNPipe_l2_e8_s24 9 io_c
+  27 ref MulAddRecFNPipe_l2_e8_s24 11 io_roundingMode
+  28 ref MulAddRecFNPipe_l2_e8_s24 203 io_out
+  29 ref MulAddRecFNPipe_l2_e8_s24 204 io_exceptionFlags
+  30 get 20 28 io_out
+  31 get 20 29 io_exceptionFlags
+  32 consth 6 7
+  33 sort bitvec 32
+  34 consth 33 0
+  35 sort bitvec 33
+  36 consth 35 100000000
+  37 consth 10 80000000
+  38 consth 35 1EF7FFFFF
+  39 slice 35 11 32 0 
+  40 slice 35 12 32 0 
+  41 xor 35 39 40 _zero_T
+  42 and 35 41 36 
+  43 concat 10 34 42 
+  44 ite 6 3 7 15 
+  45 ite 8 3 9 16 
+  46 ite 10 3 11 17 
+  47 ite 10 5 37 12 
+  48 ite 10 3 47 18 
+  49 or 1 4 5 
+  50 ite 10 49 13 43 
+  51 ite 10 3 50 19 
+  52 slice 35 17 32 0 fma.io_a
+  53 slice 35 18 32 0 fma.io_b
+  54 slice 35 19 32 0 fma.io_c
+  55 slice 6 30 31 29 _res_data_T
+  56 neq 1 55 32 
+  57 sext 35 56 32 
+  58 or 35 57 38 
+  59 and 35 58 30 _res_data_T_2
+  60 concat 10 34 59 res_data
+  61 set 20 21 2 reset
+  62 set 20 22 14 io_validin
+  63 set 20 23 16 io_op
+  64 set 20 24 52 io_a
+  65 set 20 25 53 io_b
+  66 set 20 26 54 io_c
+  67 set 20 27 15 io_roundingMode
+  68 output 60 io_out_bits_data
+  69 output 31 io_out_bits_exc
+  70 next 1 14 3
+  71 next 6 15 44
+  72 next 8 16 45
+  73 next 10 17 46
+  74 next 10 18 48
+  75 next 10 19 51
+}

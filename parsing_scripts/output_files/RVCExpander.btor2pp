@@ -1,0 +1,723 @@
+
+module RVCExpander {
+  1 sort bitvec 32
+  2 input 1 io_in
+  3 sort bitvec 8
+  4 consth 3 12
+  5 consth 3 13
+  6 sort bitvec 1
+  7 consth 6 1
+  8 sort bitvec 15
+  9 consth 8 73
+  10 consth 8 E7
+  11 consth 8 1F
+  12 consth 8 67
+  13 sort bitvec 10
+  14 consth 13 12
+  15 sort bitvec 11
+  16 consth 15 13
+  17 sort bitvec 12
+  18 consth 17 6F
+  19 consth 3 1
+  20 sort bitvec 30
+  21 consth 20 0
+  22 sort bitvec 4
+  23 consth 22 3
+  24 consth 13 23
+  25 sort bitvec 9
+  26 consth 25 23
+  27 consth 13 27
+  28 consth 25 3F
+  29 consth 22 1
+  30 consth 17 41
+  31 sort bitvec 5
+  32 consth 31 F
+  33 consth 31 E
+  34 consth 31 D
+  35 consth 31 C
+  36 consth 31 B
+  37 consth 31 A
+  38 consth 31 9
+  39 consth 31 8
+  40 consth 31 7
+  41 consth 31 6
+  42 consth 31 5
+  43 consth 31 4
+  44 consth 31 3
+  45 sort bitvec 6
+  46 consth 45 0
+  47 consth 3 0
+  48 sort bitvec 2
+  49 consth 48 3
+  50 sort bitvec 7
+  51 consth 50 13
+  52 consth 50 1F
+  53 consth 48 0
+  54 consth 48 1
+  55 sort bitvec 3
+  56 consth 55 0
+  57 consth 50 7
+  58 consth 55 3
+  59 consth 50 3
+  60 consth 55 2
+  61 consth 50 0
+  62 consth 17 0
+  63 consth 55 7
+  64 consth 22 0
+  65 consth 6 0
+  66 consth 48 2
+  67 consth 55 6
+  68 consth 50 33
+  69 consth 31 1F
+  70 consth 50 63
+  71 consth 55 1
+  72 consth 31 10
+  73 consth 31 11
+  74 consth 31 12
+  75 consth 31 13
+  76 consth 31 14
+  77 consth 31 15
+  78 consth 31 16
+  79 consth 31 17
+  80 consth 31 18
+  81 consth 31 19
+  82 consth 31 1A
+  83 consth 31 1B
+  84 consth 31 1C
+  85 consth 31 1D
+  86 consth 31 1E
+  87 consth 31 0
+  88 consth 31 1
+  89 consth 31 2
+  90 consth 50 1
+  91 slice 48 2 1 0 _io_ill_T
+  92 neq 6 91 49 io_rvc
+  93 slice 3 2 12 5 _io_out_s_opc_T
+  94 neq 6 93 47 _io_out_s_opc_T_1
+  95 ite 50 94 51 52 io_out_s_opc
+  96 slice 22 2 10 7 _io_out_s_T
+  97 slice 48 2 12 11 _io_out_s_T_1
+  98 slice 6 2 5 5 _io_out_s_T_185
+  99 slice 6 2 6 6 _io_ill_s_T_10
+  100 slice 55 2 4 2 _io_out_s_T_401
+  101 slice 31 2 31 27 io_out_s_9_rs3
+  102 concat 1 53 96 io_out_s_0_bits
+  103 concat 1 102 97 io_out_s_0_bits
+  104 concat 1 103 98 io_out_s_0_bits
+  105 concat 1 104 99 io_out_s_0_bits
+  106 concat 1 105 30 io_out_s_0_bits
+  107 concat 1 106 100 io_out_s_0_bits
+  108 concat 1 107 95 io_out_s_0_bits
+  109 slice 48 2 6 5 _io_out_s_T_403
+  110 slice 55 2 12 10 _io_ill_s_T_7
+  111 slice 55 2 9 7 _io_out_s_T_442
+  112 concat 31 54 111 io_out_s_1_rs1
+  113 concat 1 64 109 io_out_s_1_bits
+  114 concat 1 113 110 io_out_s_1_bits
+  115 concat 1 114 88 io_out_s_1_bits
+  116 concat 1 115 111 io_out_s_1_bits
+  117 concat 1 116 34 io_out_s_1_bits
+  118 concat 1 117 100 io_out_s_1_bits
+  119 concat 1 118 57 io_out_s_1_bits
+  120 concat 31 54 111 io_out_s_2_rs1
+  121 concat 1 87 98 io_out_s_2_bits
+  122 concat 1 121 110 io_out_s_2_bits
+  123 concat 1 122 99 io_out_s_2_bits
+  124 concat 1 123 29 io_out_s_2_bits
+  125 concat 1 124 111 io_out_s_2_bits
+  126 concat 1 125 38 io_out_s_2_bits
+  127 concat 1 126 100 io_out_s_2_bits
+  128 concat 1 127 59 io_out_s_2_bits
+  129 concat 31 54 111 io_out_s_3_rs1
+  130 concat 1 64 109 io_out_s_3_bits
+  131 concat 1 130 110 io_out_s_3_bits
+  132 concat 1 131 88 io_out_s_3_bits
+  133 concat 1 132 111 io_out_s_3_bits
+  134 concat 1 133 34 io_out_s_3_bits
+  135 concat 1 134 100 io_out_s_3_bits
+  136 concat 1 135 59 io_out_s_3_bits
+  137 slice 6 2 12 12 
+  138 slice 48 2 11 10 
+  139 concat 31 54 111 io_out_s_4_rs1
+  140 concat 1 87 98 io_out_s_4_bits
+  141 concat 1 140 137 io_out_s_4_bits
+  142 concat 1 141 54 io_out_s_4_bits
+  143 concat 1 142 100 io_out_s_4_bits
+  144 concat 1 143 54 io_out_s_4_bits
+  145 concat 1 144 111 io_out_s_4_bits
+  146 concat 1 145 60 io_out_s_4_bits
+  147 concat 1 146 138 io_out_s_4_bits
+  148 concat 1 147 99 io_out_s_4_bits
+  149 concat 1 148 28 io_out_s_4_bits
+  150 slice 6 2 12 12 
+  151 slice 48 2 11 10 
+  152 concat 31 54 111 io_out_s_5_rs1
+  153 concat 1 64 109 io_out_s_5_bits
+  154 concat 1 153 150 io_out_s_5_bits
+  155 concat 1 154 54 io_out_s_5_bits
+  156 concat 1 155 100 io_out_s_5_bits
+  157 concat 1 156 54 io_out_s_5_bits
+  158 concat 1 157 111 io_out_s_5_bits
+  159 concat 1 158 58 io_out_s_5_bits
+  160 concat 1 159 151 io_out_s_5_bits
+  161 concat 1 160 27 io_out_s_5_bits
+  162 slice 6 2 12 12 
+  163 slice 48 2 11 10 
+  164 concat 31 54 111 io_out_s_6_rs1
+  165 concat 1 87 98 io_out_s_6_bits
+  166 concat 1 165 162 io_out_s_6_bits
+  167 concat 1 166 54 io_out_s_6_bits
+  168 concat 1 167 100 io_out_s_6_bits
+  169 concat 1 168 54 io_out_s_6_bits
+  170 concat 1 169 111 io_out_s_6_bits
+  171 concat 1 170 60 io_out_s_6_bits
+  172 concat 1 171 163 io_out_s_6_bits
+  173 concat 1 172 99 io_out_s_6_bits
+  174 concat 1 173 26 io_out_s_6_bits
+  175 slice 6 2 12 12 
+  176 slice 48 2 11 10 
+  177 concat 31 54 100 io_out_s_7_rd
+  178 concat 31 54 111 io_out_s_7_rs1
+  179 concat 1 64 109 io_out_s_7_bits
+  180 concat 1 179 175 io_out_s_7_bits
+  181 concat 1 180 54 io_out_s_7_bits
+  182 concat 1 181 100 io_out_s_7_bits
+  183 concat 1 182 54 io_out_s_7_bits
+  184 concat 1 183 111 io_out_s_7_bits
+  185 concat 1 184 58 io_out_s_7_bits
+  186 concat 1 185 176 io_out_s_7_bits
+  187 concat 1 186 24 io_out_s_7_bits
+  188 slice 6 2 12 12 _io_ill_s_T_3
+  189 sext 50 188 6 _io_out_s_T_144
+  190 slice 31 2 6 2 io_out_s_23_rs2
+  191 slice 31 2 11 7 io_out_s_9_rd
+  192 concat 1 189 190 io_out_s_8_bits
+  193 concat 1 192 191 io_out_s_8_bits
+  194 concat 1 193 56 io_out_s_8_bits
+  195 concat 1 194 191 io_out_s_8_bits
+  196 concat 1 195 51 io_out_s_8_bits
+  197 eq 6 191 87 
+  198 sext 50 188 6 _io_out_s_T_156
+  199 concat 1 198 190 io_out_s_9_bits
+  200 concat 1 199 191 io_out_s_9_bits
+  201 concat 1 200 56 io_out_s_9_bits
+  202 concat 1 201 191 io_out_s_9_bits
+  203 concat 1 202 23 io_out_s_9_bits
+  204 concat 1 203 197 io_out_s_9_bits
+  205 concat 1 204 49 io_out_s_9_bits
+  206 sext 50 188 6 _io_out_s_T_168
+  207 concat 1 206 190 io_out_s_10_bits
+  208 concat 1 207 47 io_out_s_10_bits
+  209 concat 1 208 191 io_out_s_10_bits
+  210 concat 1 209 51 io_out_s_10_bits
+  211 sext 50 188 6 _io_out_s_opc_T_5
+  212 concat 17 211 190 _io_out_s_opc_T_7
+  213 eq 6 212 62 
+  214 eq 6 191 87 _io_out_s_T_178
+  215 eq 6 191 89 _io_out_s_T_180
+  216 or 6 214 215 _io_out_s_T_181
+  217 sext 50 188 6 _io_out_s_opc_T_10
+  218 concat 17 217 190 _io_out_s_opc_T_12
+  219 neq 6 218 62 _io_out_s_opc_T_13
+  220 ite 50 219 51 52 io_out_s_opc_3
+  221 slice 48 2 4 3 _io_out_s_T_366
+  222 slice 6 2 2 2 _io_out_s_T_364
+  223 sext 55 188 2 
+  224 sort bitvec 29
+  225 concat 224 221 98 
+  226 concat 224 225 222 
+  227 concat 224 226 99 
+  228 concat 224 227 64 
+  229 concat 224 228 191 
+  230 concat 224 229 56 
+  231 concat 224 230 191 
+  232 concat 224 231 220 
+  233 sext 17 188 11 
+  234 concat 224 233 190 
+  235 concat 224 234 191 
+  236 concat 224 235 58 
+  237 concat 224 236 213 
+  238 concat 224 237 63 
+  239 ite 224 216 232 238 
+  240 concat 1 223 239 io_out_s_11_bits
+  241 concat 55 188 109 _io_out_s_funct_T_2
+  242 eq 6 241 71 _io_out_s_funct_T_3
+  243 concat 55 242 53 _io_out_s_funct_T_4
+  244 sort bitvec 24
+  245 concat 244 58 60 
+  246 concat 244 245 56 
+  247 concat 244 246 56 
+  248 concat 244 247 63 
+  249 concat 244 248 67 
+  250 concat 244 249 243 
+  251 concat 244 250 243 
+  252 slice 55 251 2 0 
+  253 slice 55 251 5 3 
+  254 slice 55 251 8 6 
+  255 slice 55 251 11 9 
+  256 slice 55 251 14 12 
+  257 slice 55 251 17 15 
+  258 slice 55 251 20 18 
+  259 slice 55 251 23 21 
+  260 slice 6 241 0 0 
+  261 slice 6 241 1 1 
+  262 slice 6 241 2 2 
+  263 ite 55 260 259 258 
+  264 ite 55 260 257 256 
+  265 ite 55 261 263 264 
+  266 ite 55 260 255 254 
+  267 ite 55 260 253 252 
+  268 ite 55 261 266 267 
+  269 ite 55 262 265 268 
+  270 eq 6 109 53 _io_out_s_sub_T_1
+  271 sort bitvec 31
+  272 concat 271 270 21 io_out_s_sub
+  273 concat 271 19 100 
+  274 concat 271 273 54 
+  275 concat 271 274 111 
+  276 concat 271 275 269 
+  277 concat 271 276 54 
+  278 concat 271 277 111 
+  279 concat 271 278 58 
+  280 concat 271 279 188 
+  281 concat 271 280 58 
+  282 or 271 281 272 _io_out_s_T_230
+  283 slice 48 2 11 10 _io_out_s_T_365
+  284 eq 6 283 54 _io_out_s_T_232
+  285 eq 6 283 66 _io_out_s_T_234
+  286 sext 50 188 6 
+  287 sort bitvec 22
+  288 concat 287 286 190 
+  289 concat 287 288 54 
+  290 concat 287 289 111 
+  291 concat 287 290 85 
+  292 concat 287 65 284 
+  293 concat 287 292 64 
+  294 concat 287 293 188 
+  295 concat 287 294 190 
+  296 concat 287 295 54 
+  297 concat 287 296 111 
+  298 concat 287 297 77 
+  299 ite 287 285 291 298 
+  300 concat 1 299 111 _io_out_s_T_235
+  301 concat 1 300 51 _io_out_s_T_235
+  302 eq 6 283 49 _io_out_s_T_236
+  303 concat 1 65 282 
+  304 ite 1 302 303 301 io_out_s_12_bits
+  305 concat 31 54 111 io_out_s_12_rd
+  306 concat 31 54 111 io_out_s_12_rs1
+  307 slice 6 2 8 8 _io_out_s_T_280
+  308 slice 48 2 10 9 _io_out_s_T_281
+  309 slice 6 2 7 7 _io_out_s_T_283
+  310 slice 6 2 11 11 _io_out_s_T_285
+  311 slice 55 2 5 3 _io_out_s_T_286
+  312 sext 25 188 8 
+  313 concat 1 188 307 io_out_s_13_bits
+  314 concat 1 313 308 io_out_s_13_bits
+  315 concat 1 314 99 io_out_s_13_bits
+  316 concat 1 315 309 io_out_s_13_bits
+  317 concat 1 316 222 io_out_s_13_bits
+  318 concat 1 317 310 io_out_s_13_bits
+  319 concat 1 318 311 io_out_s_13_bits
+  320 concat 1 319 312 io_out_s_13_bits
+  321 concat 1 320 18 io_out_s_13_bits
+  322 concat 31 54 111 io_out_s_13_rs1
+  323 concat 31 54 100 io_out_s_13_rs2
+  324 sext 22 188 3 
+  325 concat 1 324 109 io_out_s_14_bits
+  326 concat 1 325 222 io_out_s_14_bits
+  327 concat 1 326 90 io_out_s_14_bits
+  328 concat 1 327 111 io_out_s_14_bits
+  329 concat 1 328 56 io_out_s_14_bits
+  330 concat 1 329 283 io_out_s_14_bits
+  331 concat 1 330 221 io_out_s_14_bits
+  332 concat 1 331 188 io_out_s_14_bits
+  333 concat 1 332 70 io_out_s_14_bits
+  334 concat 31 54 111 io_out_s_14_rd
+  335 concat 31 54 111 io_out_s_14_rs1
+  336 sext 22 188 3 
+  337 concat 1 336 109 io_out_s_15_bits
+  338 concat 1 337 222 io_out_s_15_bits
+  339 concat 1 338 90 io_out_s_15_bits
+  340 concat 1 339 111 io_out_s_15_bits
+  341 concat 1 340 71 io_out_s_15_bits
+  342 concat 1 341 283 io_out_s_15_bits
+  343 concat 1 342 221 io_out_s_15_bits
+  344 concat 1 343 188 io_out_s_15_bits
+  345 concat 1 344 70 io_out_s_15_bits
+  346 concat 31 54 111 io_out_s_15_rs1
+  347 neq 6 191 87 _io_out_s_load_opc_T_1
+  348 ite 50 347 59 52 io_out_s_load_opc
+  349 concat 1 46 188 io_out_s_16_bits
+  350 concat 1 349 190 io_out_s_16_bits
+  351 concat 1 350 191 io_out_s_16_bits
+  352 concat 1 351 71 io_out_s_16_bits
+  353 concat 1 352 191 io_out_s_16_bits
+  354 concat 1 353 51 io_out_s_16_bits
+  355 concat 1 56 100 io_out_s_17_bits
+  356 concat 1 355 188 io_out_s_17_bits
+  357 concat 1 356 109 io_out_s_17_bits
+  358 concat 1 357 16 io_out_s_17_bits
+  359 concat 1 358 191 io_out_s_17_bits
+  360 concat 1 359 57 io_out_s_17_bits
+  361 slice 48 2 3 2 _io_out_s_T_392
+  362 slice 55 2 6 4 _io_out_s_T_394
+  363 concat 1 64 361 io_out_s_18_bits
+  364 concat 1 363 188 io_out_s_18_bits
+  365 concat 1 364 362 io_out_s_18_bits
+  366 concat 1 365 14 io_out_s_18_bits
+  367 concat 1 366 191 io_out_s_18_bits
+  368 concat 1 367 348 io_out_s_18_bits
+  369 concat 1 56 100 io_out_s_19_bits
+  370 concat 1 369 188 io_out_s_19_bits
+  371 concat 1 370 109 io_out_s_19_bits
+  372 concat 1 371 16 io_out_s_19_bits
+  373 concat 1 372 191 io_out_s_19_bits
+  374 concat 1 373 348 io_out_s_19_bits
+  375 neq 6 191 87 _io_out_s_jr_reserved_T_1
+  376 ite 8 375 12 11 
+  377 neq 6 190 87 _io_out_s_jr_mv_T_1
+  378 sort bitvec 20
+  379 concat 378 47 191 
+  380 concat 378 379 68 
+  381 concat 378 191 376 
+  382 ite 378 377 380 381 
+  383 ite 31 377 191 87 io_out_s_jr_mv_rd
+  384 sort bitvec 25
+  385 concat 384 190 191 io_out_s_jalr
+  386 concat 384 385 10 io_out_s_jalr
+  387 slice 22 2 6 3 
+  388 concat 384 387 7 io_out_s_ebreak
+  389 concat 384 388 191 io_out_s_ebreak
+  390 concat 384 389 9 io_out_s_ebreak
+  391 neq 6 191 87 _io_out_s_jalr_ebreak_T_1
+  392 ite 384 391 386 390 _io_out_s_jalr_ebreak_T_2
+  393 neq 6 190 87 _io_out_s_jalr_add_T_1
+  394 concat 384 190 191 
+  395 concat 384 394 56 
+  396 concat 384 395 191 
+  397 concat 384 396 68 
+  398 ite 384 393 397 392 
+  399 ite 31 393 191 88 io_out_s_jalr_add_rd
+  400 concat 384 190 382 
+  401 ite 384 188 398 400 
+  402 concat 1 61 401 io_out_s_20_bits
+  403 ite 31 188 399 383 io_out_s_20_rd
+  404 xor 6 377 7 
+  405 or 6 188 404 
+  406 ite 31 405 191 87 io_out_s_20_rs1
+  407 slice 6 2 12 12 
+  408 slice 48 2 11 10 
+  409 concat 1 56 111 io_out_s_21_bits
+  410 concat 1 409 407 io_out_s_21_bits
+  411 concat 1 410 190 io_out_s_21_bits
+  412 concat 1 411 5 io_out_s_21_bits
+  413 concat 1 412 408 io_out_s_21_bits
+  414 concat 1 413 27 io_out_s_21_bits
+  415 slice 48 2 8 7 _io_out_s_T_429
+  416 slice 6 2 12 12 
+  417 slice 55 2 11 9 
+  418 concat 1 64 415 io_out_s_22_bits
+  419 concat 1 418 416 io_out_s_22_bits
+  420 concat 1 419 190 io_out_s_22_bits
+  421 concat 1 420 4 io_out_s_22_bits
+  422 concat 1 421 417 io_out_s_22_bits
+  423 concat 1 422 26 io_out_s_22_bits
+  424 slice 6 2 12 12 
+  425 slice 48 2 11 10 
+  426 concat 1 56 111 io_out_s_23_bits
+  427 concat 1 426 424 io_out_s_23_bits
+  428 concat 1 427 190 io_out_s_23_bits
+  429 concat 1 428 5 io_out_s_23_bits
+  430 concat 1 429 425 io_out_s_23_bits
+  431 concat 1 430 24 io_out_s_23_bits
+  432 slice 31 2 19 15 io_out_s_31_rs1
+  433 slice 31 2 24 20 io_out_s_31_rs2
+  434 slice 55 2 15 13 _io_ill_T_1
+  435 concat 31 91 434 _io_out_T_2
+  436 eq 6 435 88 _io_out_T_3
+  437 ite 1 436 119 108 _io_out_T_4_bits
+  438 eq 6 435 89 _io_out_T_5
+  439 ite 1 438 128 437 _io_out_T_6_bits
+  440 eq 6 435 44 _io_out_T_7
+  441 ite 1 440 136 439 _io_out_T_8_bits
+  442 eq 6 435 43 _io_out_T_9
+  443 ite 1 442 149 441 _io_out_T_10_bits
+  444 eq 6 435 42 _io_out_T_11
+  445 ite 1 444 161 443 _io_out_T_12_bits
+  446 eq 6 435 41 _io_out_T_13
+  447 ite 1 446 174 445 _io_out_T_14_bits
+  448 eq 6 435 40 _io_out_T_15
+  449 ite 1 448 187 447 _io_out_T_16_bits
+  450 eq 6 435 39 _io_out_T_17
+  451 ite 1 450 196 449 _io_out_T_18_bits
+  452 eq 6 435 38 _io_out_T_19
+  453 ite 1 452 205 451 _io_out_T_20_bits
+  454 eq 6 435 37 _io_out_T_21
+  455 ite 1 454 210 453 _io_out_T_22_bits
+  456 eq 6 435 36 _io_out_T_23
+  457 ite 1 456 240 455 _io_out_T_24_bits
+  458 eq 6 435 35 _io_out_T_25
+  459 ite 1 458 304 457 _io_out_T_26_bits
+  460 eq 6 435 34 _io_out_T_27
+  461 ite 1 460 321 459 _io_out_T_28_bits
+  462 eq 6 435 33 _io_out_T_29
+  463 ite 1 462 333 461 _io_out_T_30_bits
+  464 eq 6 435 32 _io_out_T_31
+  465 ite 1 464 345 463 _io_out_T_32_bits
+  466 or 6 464 462 
+  467 ite 31 466 87 323 _io_out_T_32_rs2
+  468 eq 6 435 72 _io_out_T_33
+  469 ite 1 468 354 465 _io_out_T_34_bits
+  470 eq 6 435 73 _io_out_T_35
+  471 ite 1 470 360 469 _io_out_T_36_bits
+  472 eq 6 435 74 _io_out_T_37
+  473 ite 1 472 368 471 _io_out_T_38_bits
+  474 eq 6 435 75 _io_out_T_39
+  475 ite 1 474 374 473 _io_out_T_40_bits
+  476 eq 6 435 76 _io_out_T_41
+  477 ite 1 476 402 475 _io_out_T_42_bits
+  478 eq 6 435 77 _io_out_T_43
+  479 ite 1 478 414 477 _io_out_T_44_bits
+  480 eq 6 435 78 _io_out_T_45
+  481 ite 1 480 423 479 _io_out_T_46_bits
+  482 eq 6 435 79 _io_out_T_47
+  483 ite 1 482 431 481 _io_out_T_48_bits
+  484 or 6 482 480 
+  485 or 6 484 478 
+  486 or 6 485 476 
+  487 or 6 486 474 
+  488 or 6 487 472 
+  489 or 6 488 470 
+  490 or 6 489 468 
+  491 ite 31 490 190 467 _io_out_T_48_rs2
+  492 eq 6 435 80 _io_out_T_49
+  493 eq 6 435 81 _io_out_T_51
+  494 eq 6 435 82 _io_out_T_53
+  495 eq 6 435 83 _io_out_T_55
+  496 eq 6 435 84 _io_out_T_57
+  497 eq 6 435 85 _io_out_T_59
+  498 eq 6 435 86 _io_out_T_61
+  499 eq 6 435 69 _io_out_T_63
+  500 or 6 499 498 
+  501 or 6 500 497 
+  502 or 6 501 496 
+  503 or 6 502 495 
+  504 or 6 503 494 
+  505 or 6 504 493 
+  506 or 6 505 492 
+  507 ite 1 506 2 483 io_out_bits
+  508 sort bitvec 160
+  509 concat 508 191 191 
+  510 concat 508 509 191 
+  511 concat 508 510 191 
+  512 concat 508 511 191 
+  513 concat 508 512 191 
+  514 concat 508 513 191 
+  515 concat 508 514 191 
+  516 concat 508 515 191 
+  517 concat 508 516 191 
+  518 concat 508 517 191 
+  519 concat 508 518 403 
+  520 concat 508 519 191 
+  521 concat 508 520 191 
+  522 concat 508 521 191 
+  523 concat 508 522 191 
+  524 concat 508 523 87 
+  525 concat 508 524 334 
+  526 concat 508 525 87 
+  527 concat 508 526 305 
+  528 concat 508 527 191 
+  529 concat 508 528 191 
+  530 concat 508 529 191 
+  531 concat 508 530 191 
+  532 concat 508 531 177 
+  533 concat 508 532 177 
+  534 concat 508 533 177 
+  535 concat 508 534 177 
+  536 concat 508 535 177 
+  537 concat 508 536 177 
+  538 concat 508 537 177 
+  539 concat 508 538 177 
+  540 slice 31 539 4 0 
+  541 slice 31 539 9 5 
+  542 slice 31 539 14 10 
+  543 slice 31 539 19 15 
+  544 slice 31 539 24 20 
+  545 slice 31 539 29 25 
+  546 slice 31 539 34 30 
+  547 slice 31 539 39 35 
+  548 slice 31 539 44 40 
+  549 slice 31 539 49 45 
+  550 slice 31 539 54 50 
+  551 slice 31 539 59 55 
+  552 slice 31 539 64 60 
+  553 slice 31 539 69 65 
+  554 slice 31 539 74 70 
+  555 slice 31 539 79 75 
+  556 slice 31 539 84 80 
+  557 slice 31 539 89 85 
+  558 slice 31 539 94 90 
+  559 slice 31 539 99 95 
+  560 slice 31 539 104 100 
+  561 slice 31 539 109 105 
+  562 slice 31 539 114 110 
+  563 slice 31 539 119 115 
+  564 slice 31 539 124 120 
+  565 slice 31 539 129 125 
+  566 slice 31 539 134 130 
+  567 slice 31 539 139 135 
+  568 slice 31 539 144 140 
+  569 slice 31 539 149 145 
+  570 slice 31 539 154 150 
+  571 slice 31 539 159 155 
+  572 slice 6 435 0 0 
+  573 slice 6 435 1 1 
+  574 slice 6 435 2 2 
+  575 slice 6 435 3 3 
+  576 slice 6 435 4 4 
+  577 ite 31 572 571 570 
+  578 ite 31 572 569 568 
+  579 ite 31 573 577 578 
+  580 ite 31 572 567 566 
+  581 ite 31 572 565 564 
+  582 ite 31 573 580 581 
+  583 ite 31 574 579 582 
+  584 ite 31 572 563 562 
+  585 ite 31 572 561 560 
+  586 ite 31 573 584 585 
+  587 ite 31 572 559 558 
+  588 ite 31 572 557 556 
+  589 ite 31 573 587 588 
+  590 ite 31 574 586 589 
+  591 ite 31 575 583 590 
+  592 ite 31 572 555 554 
+  593 ite 31 572 553 552 
+  594 ite 31 573 592 593 
+  595 ite 31 572 551 550 
+  596 ite 31 572 549 548 
+  597 ite 31 573 595 596 
+  598 ite 31 574 594 597 
+  599 ite 31 572 547 546 
+  600 ite 31 572 545 544 
+  601 ite 31 573 599 600 
+  602 ite 31 572 543 542 
+  603 ite 31 572 541 540 
+  604 ite 31 573 602 603 
+  605 ite 31 574 601 604 
+  606 ite 31 575 598 605 
+  607 ite 31 576 591 606 
+  608 concat 508 432 432 
+  609 concat 508 608 432 
+  610 concat 508 609 432 
+  611 concat 508 610 432 
+  612 concat 508 611 432 
+  613 concat 508 612 432 
+  614 concat 508 613 432 
+  615 concat 508 614 89 
+  616 concat 508 615 89 
+  617 concat 508 616 89 
+  618 concat 508 617 406 
+  619 concat 508 618 89 
+  620 concat 508 619 89 
+  621 concat 508 620 89 
+  622 concat 508 621 191 
+  623 concat 508 622 346 
+  624 concat 508 623 335 
+  625 concat 508 624 322 
+  626 concat 508 625 306 
+  627 concat 508 626 191 
+  628 concat 508 627 87 
+  629 concat 508 628 191 
+  630 concat 508 629 191 
+  631 concat 508 630 178 
+  632 concat 508 631 164 
+  633 concat 508 632 152 
+  634 concat 508 633 139 
+  635 concat 508 634 129 
+  636 concat 508 635 120 
+  637 concat 508 636 112 
+  638 concat 508 637 89 
+  639 slice 31 638 4 0 
+  640 slice 31 638 9 5 
+  641 slice 31 638 14 10 
+  642 slice 31 638 19 15 
+  643 slice 31 638 24 20 
+  644 slice 31 638 29 25 
+  645 slice 31 638 34 30 
+  646 slice 31 638 39 35 
+  647 slice 31 638 44 40 
+  648 slice 31 638 49 45 
+  649 slice 31 638 54 50 
+  650 slice 31 638 59 55 
+  651 slice 31 638 64 60 
+  652 slice 31 638 69 65 
+  653 slice 31 638 74 70 
+  654 slice 31 638 79 75 
+  655 slice 31 638 84 80 
+  656 slice 31 638 89 85 
+  657 slice 31 638 94 90 
+  658 slice 31 638 99 95 
+  659 slice 31 638 104 100 
+  660 slice 31 638 109 105 
+  661 slice 31 638 114 110 
+  662 slice 31 638 119 115 
+  663 slice 31 638 124 120 
+  664 slice 31 638 129 125 
+  665 slice 31 638 134 130 
+  666 slice 31 638 139 135 
+  667 slice 31 638 144 140 
+  668 slice 31 638 149 145 
+  669 slice 31 638 154 150 
+  670 slice 31 638 159 155 
+  671 slice 6 435 0 0 
+  672 slice 6 435 1 1 
+  673 slice 6 435 2 2 
+  674 slice 6 435 3 3 
+  675 slice 6 435 4 4 
+  676 ite 31 671 670 669 
+  677 ite 31 671 668 667 
+  678 ite 31 672 676 677 
+  679 ite 31 671 666 665 
+  680 ite 31 671 664 663 
+  681 ite 31 672 679 680 
+  682 ite 31 673 678 681 
+  683 ite 31 671 662 661 
+  684 ite 31 671 660 659 
+  685 ite 31 672 683 684 
+  686 ite 31 671 658 657 
+  687 ite 31 671 656 655 
+  688 ite 31 672 686 687 
+  689 ite 31 673 685 688 
+  690 ite 31 674 682 689 
+  691 ite 31 671 654 653 
+  692 ite 31 671 652 651 
+  693 ite 31 672 691 692 
+  694 ite 31 671 650 649 
+  695 ite 31 671 648 647 
+  696 ite 31 672 694 695 
+  697 ite 31 673 693 696 
+  698 ite 31 671 646 645 
+  699 ite 31 671 644 643 
+  700 ite 31 672 698 699 
+  701 ite 31 671 642 641 
+  702 ite 31 671 640 639 
+  703 ite 31 672 701 702 
+  704 ite 31 673 700 703 
+  705 ite 31 674 697 704 
+  706 ite 31 675 690 705 
+  707 or 6 499 498 
+  708 or 6 707 497 
+  709 or 6 708 496 
+  710 or 6 709 495 
+  711 or 6 710 494 
+  712 or 6 711 493 
+  713 or 6 712 492 
+  714 ite 31 713 433 491 io_out_rs2
+  715 output 507 io_out_bits
+  716 output 607 io_out_rd
+  717 output 706 io_out_rs1
+  718 output 714 io_out_rs2
+  719 output 101 io_out_rs3
+  720 output 92 io_rvc
+}

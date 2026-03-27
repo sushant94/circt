@@ -1,0 +1,91 @@
+
+module MaxPeriodFibonacciLFSR_1 {
+  1 sort bitvec 1
+  2 input 1 reset
+  3 input 1 io_increment
+  4 state 1 state_0
+  5 state 1 state_1
+  6 state 1 state_2
+  7 state 1 state_3
+  8 state 1 state_4
+  9 state 1 state_5
+  10 state 1 state_6
+  11 state 1 state_7
+  12 state 1 state_8
+  13 state 1 state_9
+  14 state 1 state_10
+  15 state 1 state_11
+  16 state 1 state_12
+  17 state 1 state_13
+  18 state 1 state_14
+  19 state 1 state_15
+  20 consth 1 1
+  21 consth 1 0
+  22 xor 1 19 17 
+  23 xor 1 22 16 
+  24 xor 1 23 14 
+  25 ite 1 3 24 4 
+  26 ite 1 3 4 5 
+  27 ite 1 3 5 6 
+  28 ite 1 3 6 7 
+  29 ite 1 3 7 8 
+  30 ite 1 3 8 9 
+  31 ite 1 3 9 10 
+  32 ite 1 3 10 11 
+  33 ite 1 3 11 12 
+  34 ite 1 3 12 13 
+  35 ite 1 3 13 14 
+  36 ite 1 3 14 15 
+  37 ite 1 3 15 16 
+  38 ite 1 3 16 17 
+  39 ite 1 3 17 18 
+  40 ite 1 3 18 19 
+  41 output 4 io_out_0
+  42 output 5 io_out_1
+  43 output 6 io_out_2
+  44 output 7 io_out_3
+  45 output 8 io_out_4
+  46 output 9 io_out_5
+  47 output 10 io_out_6
+  48 output 11 io_out_7
+  49 output 12 io_out_8
+  50 output 13 io_out_9
+  51 output 14 io_out_10
+  52 output 15 io_out_11
+  53 output 16 io_out_12
+  54 output 17 io_out_13
+  55 output 18 io_out_14
+  56 output 19 io_out_15
+  57 ite 1 2 20 25 
+  58 next 1 4 57
+  59 ite 1 2 21 26 
+  60 next 1 5 59
+  61 ite 1 2 21 27 
+  62 next 1 6 61
+  63 ite 1 2 21 28 
+  64 next 1 7 63
+  65 ite 1 2 21 29 
+  66 next 1 8 65
+  67 ite 1 2 21 30 
+  68 next 1 9 67
+  69 ite 1 2 21 31 
+  70 next 1 10 69
+  71 ite 1 2 21 32 
+  72 next 1 11 71
+  73 ite 1 2 21 33 
+  74 next 1 12 73
+  75 ite 1 2 21 34 
+  76 next 1 13 75
+  77 ite 1 2 21 35 
+  78 next 1 14 77
+  79 ite 1 2 21 36 
+  80 next 1 15 79
+  81 ite 1 2 21 37 
+  82 next 1 16 81
+  83 ite 1 2 21 38 
+  84 next 1 17 83
+  85 ite 1 2 21 39 
+  86 next 1 18 85
+  87 ite 1 2 21 40 
+  88 next 1 19 87
+}

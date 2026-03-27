@@ -1,62 +1,59 @@
-include RoundAnyRawFNToRecFN_ie11_is53_oe8_os24.btor2pp
+include RoundAnyRawFNToRecFN_ie11_is53_oe5_os11.btor2pp
 
 module RecFNToRecFN {
   1 sort bitvec 65
   2 input 1 io_in
   3 sort bitvec 3
   4 input 3 io_roundingMode
-  5 sort bitvec 1
-  6 input 5 io_detectTininess
-  7 inst RoundAnyRawFNToRecFN_ie11_is53_oe8_os24
-  8 ref RoundAnyRawFNToRecFN_ie11_is53_oe8_os24 2 io_invalidExc
-  9 ref RoundAnyRawFNToRecFN_ie11_is53_oe8_os24 3 io_in_isNaN
-  10 ref RoundAnyRawFNToRecFN_ie11_is53_oe8_os24 4 io_in_isInf
-  11 ref RoundAnyRawFNToRecFN_ie11_is53_oe8_os24 5 io_in_isZero
-  12 ref RoundAnyRawFNToRecFN_ie11_is53_oe8_os24 6 io_in_sign
-  13 ref RoundAnyRawFNToRecFN_ie11_is53_oe8_os24 8 io_in_sExp
-  14 ref RoundAnyRawFNToRecFN_ie11_is53_oe8_os24 10 io_in_sig
-  15 ref RoundAnyRawFNToRecFN_ie11_is53_oe8_os24 12 io_roundingMode
-  16 ref RoundAnyRawFNToRecFN_ie11_is53_oe8_os24 13 io_detectTininess
-  17 ref RoundAnyRawFNToRecFN_ie11_is53_oe8_os24 279 io_out
-  18 ref RoundAnyRawFNToRecFN_ie11_is53_oe8_os24 280 io_exceptionFlags
-  19 get 7 17 io_out
-  20 get 7 18 io_exceptionFlags
-  21 sort bitvec 2
-  22 consth 21 3
-  23 consth 5 1
-  24 consth 3 0
-  25 consth 5 0
-  26 sort bitvec 12
-  27 slice 26 2 63 52 rawIn_exp
-  28 slice 3 2 63 61 _rawIn_isZero_T
-  29 neq 5 28 24 _rawIn_out_sig_T
-  30 xor 5 29 23 rawIn_isZero
-  31 slice 21 2 63 62 _rawIn_isSpecial_T
-  32 eq 5 31 22 rawIn_isSpecial
-  33 slice 5 2 61 61 _rawIn_out_isInf_T
-  34 and 5 32 33 rawIn_isNaN
-  35 xor 5 33 23 _rawIn_out_isInf_T_1
-  36 and 5 32 35 rawIn_isInf
-  37 slice 5 2 64 64 rawIn_sign
-  38 sort bitvec 13
-  39 concat 38 25 27 rawIn_sExp
-  40 sort bitvec 52
-  41 slice 40 2 51 0 _rawIn_out_sig_T_2
-  42 sort bitvec 54
-  43 concat 42 25 29 rawIn_sig
-  44 concat 42 43 41 rawIn_sig
-  45 slice 5 2 51 51 _roundAnyRawFNToRecFN_io_invalidExc_T
-  46 xor 5 45 23 _roundAnyRawFNToRecFN_io_invalidExc_T_1
-  47 and 5 34 46 roundAnyRawFNToRecFN.io_invalidExc
-  48 set 7 8 47 io_invalidExc
-  49 set 7 9 34 io_in_isNaN
-  50 set 7 10 36 io_in_isInf
-  51 set 7 11 30 io_in_isZero
-  52 set 7 12 37 io_in_sign
-  53 set 7 13 39 io_in_sExp
-  54 set 7 14 44 io_in_sig
-  55 set 7 15 4 io_roundingMode
-  56 set 7 16 6 io_detectTininess
-  57 output 19 io_out
-  58 output 20 io_exceptionFlags
+  5 inst RoundAnyRawFNToRecFN_ie11_is53_oe5_os11
+  6 ref RoundAnyRawFNToRecFN_ie11_is53_oe5_os11 2 io_invalidExc
+  7 ref RoundAnyRawFNToRecFN_ie11_is53_oe5_os11 3 io_in_isNaN
+  8 ref RoundAnyRawFNToRecFN_ie11_is53_oe5_os11 4 io_in_isInf
+  9 ref RoundAnyRawFNToRecFN_ie11_is53_oe5_os11 5 io_in_isZero
+  10 ref RoundAnyRawFNToRecFN_ie11_is53_oe5_os11 6 io_in_sign
+  11 ref RoundAnyRawFNToRecFN_ie11_is53_oe5_os11 8 io_in_sExp
+  12 ref RoundAnyRawFNToRecFN_ie11_is53_oe5_os11 10 io_in_sig
+  13 ref RoundAnyRawFNToRecFN_ie11_is53_oe5_os11 12 io_roundingMode
+  14 ref RoundAnyRawFNToRecFN_ie11_is53_oe5_os11 273 io_out
+  15 ref RoundAnyRawFNToRecFN_ie11_is53_oe5_os11 274 io_exceptionFlags
+  16 get 5 14 io_out
+  17 get 5 15 io_exceptionFlags
+  18 sort bitvec 2
+  19 consth 18 3
+  20 sort bitvec 1
+  21 consth 20 1
+  22 consth 3 0
+  23 consth 20 0
+  24 sort bitvec 12
+  25 slice 24 2 63 52 rawIn_exp
+  26 slice 3 2 63 61 _rawIn_isZero_T
+  27 neq 20 26 22 _rawIn_out_sig_T
+  28 xor 20 27 21 rawIn_isZero
+  29 slice 18 2 63 62 _rawIn_isSpecial_T
+  30 eq 20 29 19 rawIn_isSpecial
+  31 slice 20 2 61 61 _rawIn_out_isInf_T
+  32 and 20 30 31 rawIn_isNaN
+  33 xor 20 31 21 _rawIn_out_isInf_T_1
+  34 and 20 30 33 rawIn_isInf
+  35 slice 20 2 64 64 rawIn_sign
+  36 sort bitvec 13
+  37 concat 36 23 25 rawIn_sExp
+  38 sort bitvec 52
+  39 slice 38 2 51 0 _rawIn_out_sig_T_2
+  40 sort bitvec 54
+  41 concat 40 23 27 rawIn_sig
+  42 concat 40 41 39 rawIn_sig
+  43 slice 20 2 51 51 _roundAnyRawFNToRecFN_io_invalidExc_T
+  44 xor 20 43 21 _roundAnyRawFNToRecFN_io_invalidExc_T_1
+  45 and 20 32 44 roundAnyRawFNToRecFN.io_invalidExc
+  46 set 5 6 45 io_invalidExc
+  47 set 5 7 32 io_in_isNaN
+  48 set 5 8 34 io_in_isInf
+  49 set 5 9 28 io_in_isZero
+  50 set 5 10 35 io_in_sign
+  51 set 5 11 37 io_in_sExp
+  52 set 5 12 42 io_in_sig
+  53 set 5 13 4 io_roundingMode
+  54 output 16 io_out
+  55 output 17 io_exceptionFlags
 }

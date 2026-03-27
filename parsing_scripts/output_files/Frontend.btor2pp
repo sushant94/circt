@@ -1,0 +1,1104 @@
+include ICache.btor2pp
+include ShiftQueue.btor2pp
+include ITLB.btor2pp
+include BTB.btor2pp
+
+module Frontend {
+  1 sort bitvec 1
+  2 input 1 reset
+  3 input 1 auto_icache_master_out_a_ready
+  4 input 1 auto_icache_master_out_d_valid
+  5 sort bitvec 3
+  6 input 5 auto_icache_master_out_d_bits_opcode
+  7 sort bitvec 4
+  8 input 7 auto_icache_master_out_d_bits_size
+  9 sort bitvec 64
+  10 input 9 auto_icache_master_out_d_bits_data
+  11 input 1 auto_icache_master_out_d_bits_corrupt
+  12 sort bitvec 32
+  13 input 12 auto_reset_vector_sink_in
+  14 input 1 io_cpu_might_request
+  15 input 1 io_cpu_req_valid
+  16 sort bitvec 40
+  17 input 16 io_cpu_req_bits_pc
+  18 input 1 io_cpu_req_bits_speculative
+  19 input 1 io_cpu_sfence_valid
+  20 input 1 io_cpu_sfence_bits_rs1
+  21 input 1 io_cpu_sfence_bits_rs2
+  22 sort bitvec 39
+  23 input 22 io_cpu_sfence_bits_addr
+  24 input 1 io_cpu_resp_ready
+  25 input 1 io_cpu_btb_update_valid
+  26 sort bitvec 5
+  27 input 26 io_cpu_btb_update_bits_prediction_entry
+  28 input 22 io_cpu_btb_update_bits_pc
+  29 input 1 io_cpu_btb_update_bits_isValid
+  30 input 22 io_cpu_btb_update_bits_br_pc
+  31 sort bitvec 2
+  32 input 31 io_cpu_btb_update_bits_cfiType
+  33 input 1 io_cpu_bht_update_valid
+  34 sort bitvec 8
+  35 input 34 io_cpu_bht_update_bits_prediction_history
+  36 input 22 io_cpu_bht_update_bits_pc
+  37 input 1 io_cpu_bht_update_bits_branch
+  38 input 1 io_cpu_bht_update_bits_taken
+  39 input 1 io_cpu_bht_update_bits_mispredict
+  40 input 1 io_cpu_flush_icache
+  41 input 1 io_cpu_progress
+  42 input 1 io_ptw_req_ready
+  43 input 1 io_ptw_resp_valid
+  44 input 1 io_ptw_resp_bits_ae_ptw
+  45 input 1 io_ptw_resp_bits_ae_final
+  46 input 1 io_ptw_resp_bits_pf
+  47 input 1 io_ptw_resp_bits_gf
+  48 input 1 io_ptw_resp_bits_hr
+  49 input 1 io_ptw_resp_bits_hw
+  50 input 1 io_ptw_resp_bits_hx
+  51 sort bitvec 44
+  52 input 51 io_ptw_resp_bits_pte_ppn
+  53 input 1 io_ptw_resp_bits_pte_d
+  54 input 1 io_ptw_resp_bits_pte_a
+  55 input 1 io_ptw_resp_bits_pte_g
+  56 input 1 io_ptw_resp_bits_pte_u
+  57 input 1 io_ptw_resp_bits_pte_x
+  58 input 1 io_ptw_resp_bits_pte_w
+  59 input 1 io_ptw_resp_bits_pte_r
+  60 input 1 io_ptw_resp_bits_pte_v
+  61 input 31 io_ptw_resp_bits_level
+  62 input 1 io_ptw_resp_bits_homogeneous
+  63 input 7 io_ptw_ptbr_mode
+  64 input 1 io_ptw_status_debug
+  65 input 31 io_ptw_status_prv
+  66 input 1 io_ptw_pmp_0_cfg_l
+  67 input 31 io_ptw_pmp_0_cfg_a
+  68 input 1 io_ptw_pmp_0_cfg_x
+  69 input 1 io_ptw_pmp_0_cfg_w
+  70 input 1 io_ptw_pmp_0_cfg_r
+  71 sort bitvec 30
+  72 input 71 io_ptw_pmp_0_addr
+  73 input 12 io_ptw_pmp_0_mask
+  74 input 1 io_ptw_pmp_1_cfg_l
+  75 input 31 io_ptw_pmp_1_cfg_a
+  76 input 1 io_ptw_pmp_1_cfg_x
+  77 input 1 io_ptw_pmp_1_cfg_w
+  78 input 1 io_ptw_pmp_1_cfg_r
+  79 input 71 io_ptw_pmp_1_addr
+  80 input 12 io_ptw_pmp_1_mask
+  81 input 1 io_ptw_pmp_2_cfg_l
+  82 input 31 io_ptw_pmp_2_cfg_a
+  83 input 1 io_ptw_pmp_2_cfg_x
+  84 input 1 io_ptw_pmp_2_cfg_w
+  85 input 1 io_ptw_pmp_2_cfg_r
+  86 input 71 io_ptw_pmp_2_addr
+  87 input 12 io_ptw_pmp_2_mask
+  88 input 1 io_ptw_pmp_3_cfg_l
+  89 input 31 io_ptw_pmp_3_cfg_a
+  90 input 1 io_ptw_pmp_3_cfg_x
+  91 input 1 io_ptw_pmp_3_cfg_w
+  92 input 1 io_ptw_pmp_3_cfg_r
+  93 input 71 io_ptw_pmp_3_addr
+  94 input 12 io_ptw_pmp_3_mask
+  95 input 1 io_ptw_pmp_4_cfg_l
+  96 input 31 io_ptw_pmp_4_cfg_a
+  97 input 1 io_ptw_pmp_4_cfg_x
+  98 input 1 io_ptw_pmp_4_cfg_w
+  99 input 1 io_ptw_pmp_4_cfg_r
+  100 input 71 io_ptw_pmp_4_addr
+  101 input 12 io_ptw_pmp_4_mask
+  102 input 1 io_ptw_pmp_5_cfg_l
+  103 input 31 io_ptw_pmp_5_cfg_a
+  104 input 1 io_ptw_pmp_5_cfg_x
+  105 input 1 io_ptw_pmp_5_cfg_w
+  106 input 1 io_ptw_pmp_5_cfg_r
+  107 input 71 io_ptw_pmp_5_addr
+  108 input 12 io_ptw_pmp_5_mask
+  109 input 1 io_ptw_pmp_6_cfg_l
+  110 input 31 io_ptw_pmp_6_cfg_a
+  111 input 1 io_ptw_pmp_6_cfg_x
+  112 input 1 io_ptw_pmp_6_cfg_w
+  113 input 1 io_ptw_pmp_6_cfg_r
+  114 input 71 io_ptw_pmp_6_addr
+  115 input 12 io_ptw_pmp_6_mask
+  116 input 1 io_ptw_pmp_7_cfg_l
+  117 input 31 io_ptw_pmp_7_cfg_a
+  118 input 1 io_ptw_pmp_7_cfg_x
+  119 input 1 io_ptw_pmp_7_cfg_w
+  120 input 1 io_ptw_pmp_7_cfg_r
+  121 input 71 io_ptw_pmp_7_addr
+  122 input 12 io_ptw_pmp_7_mask
+  123 input 9 io_ptw_customCSRs_csrs_0_value
+  124 state 1 s1_valid
+  125 state 1 s2_valid
+  126 state 16 s1_pc
+  127 state 1 s1_speculative
+  128 state 16 s2_pc
+  129 state 1 s2_btb_resp_valid
+  130 state 1 s2_btb_resp_bits_taken
+  131 state 1 s2_btb_resp_bits_bridx
+  132 state 26 s2_btb_resp_bits_entry
+  133 state 34 s2_btb_resp_bits_bht_history
+  134 state 1 taken_predict_taken
+  135 state 1 s2_tlb_resp_miss
+  136 state 1 s2_tlb_resp_pf_inst
+  137 state 1 s2_tlb_resp_ae_inst
+  138 state 1 s2_tlb_resp_cacheable
+  139 state 1 s2_speculative
+  140 state 1 s2_partial_insn_valid
+  141 sort bitvec 16
+  142 state 141 s2_partial_insn
+  143 state 1 wrong_path
+  144 state 1 s2_replay_REG
+  145 state 31 recent_progress_counter
+  146 state 1 fq_io_enq_valid_REG
+  147 inst ICache
+  148 ref ICache 2 reset
+  149 ref ICache 3 auto_master_out_a_ready
+  150 ref ICache 4 auto_master_out_d_valid
+  151 ref ICache 6 auto_master_out_d_bits_opcode
+  152 ref ICache 8 auto_master_out_d_bits_size
+  153 ref ICache 10 auto_master_out_d_bits_data
+  154 ref ICache 11 auto_master_out_d_bits_corrupt
+  155 ref ICache 12 io_req_valid
+  156 ref ICache 14 io_req_bits_addr
+  157 ref ICache 16 io_s1_paddr
+  158 ref ICache 17 io_s1_kill
+  159 ref ICache 18 io_s2_kill
+  160 ref ICache 19 io_invalidate
+  161 ref ICache 63096 auto_master_out_a_valid
+  162 ref ICache 63097 auto_master_out_a_bits_address
+  163 ref ICache 63098 io_resp_valid
+  164 ref ICache 63099 io_resp_bits_data
+  165 ref ICache 63100 io_resp_bits_ae
+  166 get 147 161 auto_master_out_a_valid
+  167 get 147 162 auto_master_out_a_bits_address
+  168 get 147 163 io_resp_valid
+  169 get 147 164 io_resp_bits_data
+  170 get 147 165 io_resp_bits_ae
+  171 inst ShiftQueue
+  172 ref ShiftQueue 2 reset
+  173 ref ShiftQueue 3 io_enq_valid
+  174 ref ShiftQueue 4 io_enq_bits_btb_taken
+  175 ref ShiftQueue 5 io_enq_bits_btb_bridx
+  176 ref ShiftQueue 7 io_enq_bits_btb_entry
+  177 ref ShiftQueue 9 io_enq_bits_btb_bht_history
+  178 ref ShiftQueue 11 io_enq_bits_pc
+  179 ref ShiftQueue 13 io_enq_bits_data
+  180 ref ShiftQueue 14 io_enq_bits_xcpt_pf_inst
+  181 ref ShiftQueue 15 io_enq_bits_xcpt_ae_inst
+  182 ref ShiftQueue 16 io_enq_bits_replay
+  183 ref ShiftQueue 17 io_deq_ready
+  184 ref ShiftQueue 216 io_enq_ready
+  185 ref ShiftQueue 217 io_deq_valid
+  186 ref ShiftQueue 218 io_deq_bits_btb_taken
+  187 ref ShiftQueue 219 io_deq_bits_btb_bridx
+  188 ref ShiftQueue 220 io_deq_bits_btb_entry
+  189 ref ShiftQueue 221 io_deq_bits_btb_bht_history
+  190 ref ShiftQueue 222 io_deq_bits_pc
+  191 ref ShiftQueue 223 io_deq_bits_data
+  192 ref ShiftQueue 224 io_deq_bits_xcpt_pf_inst
+  193 ref ShiftQueue 225 io_deq_bits_xcpt_ae_inst
+  194 ref ShiftQueue 226 io_deq_bits_replay
+  195 ref ShiftQueue 227 io_mask
+  196 get 171 184 io_enq_ready
+  197 get 171 185 io_deq_valid
+  198 get 171 186 io_deq_bits_btb_taken
+  199 get 171 187 io_deq_bits_btb_bridx
+  200 get 171 188 io_deq_bits_btb_entry
+  201 get 171 189 io_deq_bits_btb_bht_history
+  202 get 171 190 io_deq_bits_pc
+  203 get 171 191 io_deq_bits_data
+  204 get 171 192 io_deq_bits_xcpt_pf_inst
+  205 get 171 193 io_deq_bits_xcpt_ae_inst
+  206 get 171 194 io_deq_bits_replay
+  207 get 171 195 io_mask
+  208 inst ITLB
+  209 ref ITLB 2 reset
+  210 ref ITLB 3 io_req_valid
+  211 ref ITLB 5 io_req_bits_vaddr
+  212 ref ITLB 7 io_req_bits_prv
+  213 ref ITLB 8 io_sfence_valid
+  214 ref ITLB 9 io_sfence_bits_rs1
+  215 ref ITLB 10 io_sfence_bits_rs2
+  216 ref ITLB 12 io_sfence_bits_addr
+  217 ref ITLB 13 io_ptw_req_ready
+  218 ref ITLB 14 io_ptw_resp_valid
+  219 ref ITLB 15 io_ptw_resp_bits_ae_ptw
+  220 ref ITLB 16 io_ptw_resp_bits_ae_final
+  221 ref ITLB 17 io_ptw_resp_bits_pf
+  222 ref ITLB 18 io_ptw_resp_bits_gf
+  223 ref ITLB 19 io_ptw_resp_bits_hr
+  224 ref ITLB 20 io_ptw_resp_bits_hw
+  225 ref ITLB 21 io_ptw_resp_bits_hx
+  226 ref ITLB 23 io_ptw_resp_bits_pte_ppn
+  227 ref ITLB 24 io_ptw_resp_bits_pte_d
+  228 ref ITLB 25 io_ptw_resp_bits_pte_a
+  229 ref ITLB 26 io_ptw_resp_bits_pte_g
+  230 ref ITLB 27 io_ptw_resp_bits_pte_u
+  231 ref ITLB 28 io_ptw_resp_bits_pte_x
+  232 ref ITLB 29 io_ptw_resp_bits_pte_w
+  233 ref ITLB 30 io_ptw_resp_bits_pte_r
+  234 ref ITLB 31 io_ptw_resp_bits_pte_v
+  235 ref ITLB 32 io_ptw_resp_bits_level
+  236 ref ITLB 33 io_ptw_resp_bits_homogeneous
+  237 ref ITLB 35 io_ptw_ptbr_mode
+  238 ref ITLB 36 io_ptw_status_debug
+  239 ref ITLB 37 io_ptw_pmp_0_cfg_l
+  240 ref ITLB 38 io_ptw_pmp_0_cfg_a
+  241 ref ITLB 39 io_ptw_pmp_0_cfg_x
+  242 ref ITLB 40 io_ptw_pmp_0_cfg_w
+  243 ref ITLB 41 io_ptw_pmp_0_cfg_r
+  244 ref ITLB 43 io_ptw_pmp_0_addr
+  245 ref ITLB 45 io_ptw_pmp_0_mask
+  246 ref ITLB 46 io_ptw_pmp_1_cfg_l
+  247 ref ITLB 47 io_ptw_pmp_1_cfg_a
+  248 ref ITLB 48 io_ptw_pmp_1_cfg_x
+  249 ref ITLB 49 io_ptw_pmp_1_cfg_w
+  250 ref ITLB 50 io_ptw_pmp_1_cfg_r
+  251 ref ITLB 51 io_ptw_pmp_1_addr
+  252 ref ITLB 52 io_ptw_pmp_1_mask
+  253 ref ITLB 53 io_ptw_pmp_2_cfg_l
+  254 ref ITLB 54 io_ptw_pmp_2_cfg_a
+  255 ref ITLB 55 io_ptw_pmp_2_cfg_x
+  256 ref ITLB 56 io_ptw_pmp_2_cfg_w
+  257 ref ITLB 57 io_ptw_pmp_2_cfg_r
+  258 ref ITLB 58 io_ptw_pmp_2_addr
+  259 ref ITLB 59 io_ptw_pmp_2_mask
+  260 ref ITLB 60 io_ptw_pmp_3_cfg_l
+  261 ref ITLB 61 io_ptw_pmp_3_cfg_a
+  262 ref ITLB 62 io_ptw_pmp_3_cfg_x
+  263 ref ITLB 63 io_ptw_pmp_3_cfg_w
+  264 ref ITLB 64 io_ptw_pmp_3_cfg_r
+  265 ref ITLB 65 io_ptw_pmp_3_addr
+  266 ref ITLB 66 io_ptw_pmp_3_mask
+  267 ref ITLB 67 io_ptw_pmp_4_cfg_l
+  268 ref ITLB 68 io_ptw_pmp_4_cfg_a
+  269 ref ITLB 69 io_ptw_pmp_4_cfg_x
+  270 ref ITLB 70 io_ptw_pmp_4_cfg_w
+  271 ref ITLB 71 io_ptw_pmp_4_cfg_r
+  272 ref ITLB 72 io_ptw_pmp_4_addr
+  273 ref ITLB 73 io_ptw_pmp_4_mask
+  274 ref ITLB 74 io_ptw_pmp_5_cfg_l
+  275 ref ITLB 75 io_ptw_pmp_5_cfg_a
+  276 ref ITLB 76 io_ptw_pmp_5_cfg_x
+  277 ref ITLB 77 io_ptw_pmp_5_cfg_w
+  278 ref ITLB 78 io_ptw_pmp_5_cfg_r
+  279 ref ITLB 79 io_ptw_pmp_5_addr
+  280 ref ITLB 80 io_ptw_pmp_5_mask
+  281 ref ITLB 81 io_ptw_pmp_6_cfg_l
+  282 ref ITLB 82 io_ptw_pmp_6_cfg_a
+  283 ref ITLB 83 io_ptw_pmp_6_cfg_x
+  284 ref ITLB 84 io_ptw_pmp_6_cfg_w
+  285 ref ITLB 85 io_ptw_pmp_6_cfg_r
+  286 ref ITLB 86 io_ptw_pmp_6_addr
+  287 ref ITLB 87 io_ptw_pmp_6_mask
+  288 ref ITLB 88 io_ptw_pmp_7_cfg_l
+  289 ref ITLB 89 io_ptw_pmp_7_cfg_a
+  290 ref ITLB 90 io_ptw_pmp_7_cfg_x
+  291 ref ITLB 91 io_ptw_pmp_7_cfg_w
+  292 ref ITLB 92 io_ptw_pmp_7_cfg_r
+  293 ref ITLB 93 io_ptw_pmp_7_addr
+  294 ref ITLB 94 io_ptw_pmp_7_mask
+  295 ref ITLB 95 io_kill
+  296 ref ITLB 3973 io_resp_miss
+  297 ref ITLB 3974 io_resp_paddr
+  298 ref ITLB 3975 io_resp_pf_inst
+  299 ref ITLB 3976 io_resp_ae_inst
+  300 ref ITLB 3977 io_resp_cacheable
+  301 ref ITLB 3978 io_ptw_req_valid
+  302 ref ITLB 3979 io_ptw_req_bits_valid
+  303 ref ITLB 3980 io_ptw_req_bits_bits_addr
+  304 ref ITLB 3981 io_ptw_req_bits_bits_need_gpa
+  305 get 208 296 io_resp_miss
+  306 get 208 297 io_resp_paddr
+  307 get 208 298 io_resp_pf_inst
+  308 get 208 299 io_resp_ae_inst
+  309 get 208 300 io_resp_cacheable
+  310 get 208 301 io_ptw_req_valid
+  311 get 208 302 io_ptw_req_bits_valid
+  312 get 208 303 io_ptw_req_bits_bits_addr
+  313 get 208 304 io_ptw_req_bits_bits_need_gpa
+  314 inst BTB
+  315 ref BTB 2 reset
+  316 ref BTB 4 io_req_bits_addr
+  317 ref BTB 5 io_btb_update_valid
+  318 ref BTB 7 io_btb_update_bits_prediction_entry
+  319 ref BTB 8 io_btb_update_bits_pc
+  320 ref BTB 9 io_btb_update_bits_isValid
+  321 ref BTB 10 io_btb_update_bits_br_pc
+  322 ref BTB 12 io_btb_update_bits_cfiType
+  323 ref BTB 13 io_bht_update_valid
+  324 ref BTB 15 io_bht_update_bits_prediction_history
+  325 ref BTB 16 io_bht_update_bits_pc
+  326 ref BTB 17 io_bht_update_bits_branch
+  327 ref BTB 18 io_bht_update_bits_taken
+  328 ref BTB 19 io_bht_update_bits_mispredict
+  329 ref BTB 20 io_bht_advance_valid
+  330 ref BTB 21 io_bht_advance_bits_bht_value
+  331 ref BTB 22 io_ras_update_valid
+  332 ref BTB 23 io_ras_update_bits_cfiType
+  333 ref BTB 24 io_ras_update_bits_returnAddr
+  334 ref BTB 25 io_flush
+  335 ref BTB 5723 io_resp_valid
+  336 ref BTB 5724 io_resp_bits_taken
+  337 ref BTB 5725 io_resp_bits_bridx
+  338 ref BTB 5726 io_resp_bits_target
+  339 ref BTB 5727 io_resp_bits_entry
+  340 ref BTB 5728 io_resp_bits_bht_history
+  341 ref BTB 5729 io_resp_bits_bht_value
+  342 ref BTB 5730 io_ras_head_valid
+  343 ref BTB 5731 io_ras_head_bits
+  344 get 314 335 io_resp_valid
+  345 get 314 336 io_resp_bits_taken
+  346 get 314 337 io_resp_bits_bridx
+  347 get 314 338 io_resp_bits_target
+  348 get 314 339 io_resp_bits_entry
+  349 get 314 340 io_resp_bits_bht_history
+  350 get 314 341 io_resp_bits_bht_value
+  351 get 314 342 io_ras_head_valid
+  352 get 314 343 io_ras_head_bits
+  353 consth 16 FFFFFFFFFE
+  354 sort bitvec 33
+  355 consth 354 1FFFFFFFE
+  356 sort bitvec 6
+  357 consth 356 26
+  358 consth 356 22
+  359 consth 26 15
+  360 consth 26 1D
+  361 consth 26 19
+  362 consth 7 1
+  363 sort bitvec 36
+  364 consth 363 0
+  365 consth 16 4
+  366 consth 5 3
+  367 consth 1 0
+  368 consth 1 1
+  369 consth 26 0
+  370 consth 31 2
+  371 consth 31 1
+  372 sort bitvec 7
+  373 consth 372 67
+  374 consth 372 6F
+  375 consth 372 63
+  376 consth 26 1C
+  377 consth 31 3
+  378 consth 31 0
+  379 consth 34 0
+  380 or 1 2 15 
+  381 or 1 15 19 
+  382 or 1 381 40 
+  383 or 1 382 33 
+  384 or 1 383 25 
+  385 xor 1 384 368 
+  386 or 1 385 14 
+  387 xor 1 2 368 
+  388 slice 1 207 2 2 _s0_fq_has_space_T
+  389 xor 1 388 368 _s0_fq_has_space_T_1
+  390 slice 1 207 3 3 _s0_fq_has_space_T_2
+  391 xor 1 390 368 _s0_fq_has_space_T_3
+  392 xor 1 124 368 _s0_fq_has_space_T_11
+  393 xor 1 125 368 _tlb_io_kill_T
+  394 or 1 392 393 _s0_fq_has_space_T_6
+  395 and 1 391 394 _s0_fq_has_space_T_7
+  396 slice 1 207 4 4 _clock_en_reg_T_7
+  397 xor 1 396 368 _s0_fq_has_space_T_10
+  398 and 1 397 392 _s0_fq_has_space_T_14
+  399 and 1 398 393 _s0_fq_has_space_T_14
+  400 or 1 15 389 s0_valid
+  401 or 1 400 395 s0_valid
+  402 or 1 401 399 s0_valid
+  403 sort bitvec 31
+  404 slice 403 13 31 1 
+  405 concat 16 379 404 
+  406 concat 16 405 367 
+  407 and 1 129 130 s2_btb_taken
+  408 or 1 137 136 _s2_xcpt_T
+  409 sort bitvec 38
+  410 slice 409 126 39 2 
+  411 concat 16 410 378 
+  412 add 16 411 365 _ntpc_T
+  413 eq 1 145 378 _s2_kill_speculative_tlb_refill_T
+  414 and 1 139 413 s2_kill_speculative_tlb_refill
+  415 and 1 414 135 _fq_io_enq_bits_replay_T_5
+  416 xor 1 135 368 _fq_io_enq_valid_T_3
+  417 slice 1 123 3 3 _s2_can_speculatively_refill_T
+  418 xor 1 417 368 _s2_can_speculatively_refill_T_1
+  419 and 1 138 418 s2_can_speculatively_refill
+  420 xor 1 419 368 _icache_io_s2_kill_T
+  421 and 1 139 420 _icache_io_s2_kill_T_1
+  422 or 1 421 408 icache.io_s2_kill
+  423 and 1 416 422 _fq_io_enq_valid_T_4
+  424 or 1 168 415 _fq_io_enq_valid_T_5
+  425 or 1 424 423 _fq_io_enq_valid_T_5
+  426 and 1 146 125 fq.io_enq_valid
+  427 and 1 426 425 fq.io_enq_valid
+  428 and 1 196 427 _taken_T_57
+  429 xor 1 428 368 _s2_replay_T_1
+  430 and 1 125 429 _s2_replay_T_2
+  431 xor 1 402 368 _s2_replay_T_3
+  432 or 1 430 144 s2_replay
+  433 and 1 432 431 _s2_replay_T_4
+  434 slice 22 128 39 1 
+  435 slice 31 142 1 0 _taken_prevRVI_T
+  436 eq 1 435 377 _taken_prevRVI_T_2
+  437 and 1 140 436 taken_prevRVI
+  438 slice 372 142 6 0 _taken_rviJALR_T
+  439 eq 1 438 373 taken_rviJALR
+  440 eq 1 438 374 taken_rviJump
+  441 or 1 439 440 _taken_taken_T
+  442 eq 1 438 375 taken_rviBranch
+  443 and 1 442 134 _taken_taken_T_1
+  444 or 1 441 443 _taken_taken_T_2
+  445 and 1 437 444 _taken_taken_T_3
+  446 slice 1 128 1 1 _fq_io_enq_bits_mask_T
+  447 concat 5 378 446 
+  448 sll 5 366 447 _fq_io_enq_bits_mask_T_1
+  449 slice 1 448 0 0 _taken_valid_T
+  450 xor 1 437 368 _taken_valid_T_1
+  451 and 1 449 450 taken_valid
+  452 slice 5 169 15 13 
+  453 slice 31 169 1 0 
+  454 concat 26 452 453 
+  455 eq 1 454 359 taken_rvcJump
+  456 slice 7 169 15 12 
+  457 slice 31 169 1 0 
+  458 concat 356 456 457 
+  459 eq 1 458 357 _taken_rvcJALR_T_1
+  460 slice 26 169 6 2 _taken_rvcJALR_T_2
+  461 neq 1 460 369 
+  462 xor 1 461 368 _taken_rvcJALR_T_3
+  463 and 1 459 462 taken_rvcJALR
+  464 slice 7 169 15 12 
+  465 slice 31 169 1 0 
+  466 concat 356 464 465 
+  467 eq 1 466 358 _taken_rvcJR_T_1
+  468 xor 1 461 368 _taken_rvcJR_T_3
+  469 and 1 467 468 taken_rvcJR
+  470 slice 5 169 15 13 
+  471 slice 31 169 1 0 
+  472 concat 26 470 471 
+  473 eq 1 472 361 _taken_rvcBranch_T_1
+  474 slice 5 169 15 13 
+  475 slice 31 169 1 0 
+  476 concat 26 474 475 
+  477 eq 1 476 360 _taken_rvcBranch_T_3
+  478 or 1 473 477 taken_rvcBranch
+  479 and 1 478 134 _taken_taken_T_6
+  480 or 1 455 463 _taken_taken_T_7
+  481 or 1 480 469 _taken_taken_T_7
+  482 or 1 481 479 _taken_taken_T_7
+  483 and 1 451 482 _taken_taken_T_8
+  484 or 1 445 483 taken_taken
+  485 xor 1 484 368 taken_idx
+  486 xor 1 407 368 _taken_T_36
+  487 slice 31 169 1 0 _taken_prevRVI_T_3
+  488 eq 1 487 377 _taken_prevRVI_T_5
+  489 and 1 451 488 taken_prevRVI_1
+  490 slice 372 169 6 0 _taken_rviJALR_T_1
+  491 eq 1 490 373 taken_rviJALR_1
+  492 slice 1 169 7 7 taken_rviImm_hi_lo_lo_3
+  493 xor 1 492 368 _taken_rviReturn_T_7
+  494 slice 31 169 19 18 
+  495 slice 31 169 16 15 
+  496 concat 7 494 495 
+  497 eq 1 496 362 _taken_rviReturn_T_11
+  498 and 1 491 493 taken_rviReturn_1
+  499 and 1 498 497 taken_rviReturn_1
+  500 and 1 489 499 _taken_predictReturn_T_3
+  501 slice 1 448 1 1 _taken_valid_T_2
+  502 xor 1 489 368 _taken_valid_T_3
+  503 and 1 501 502 taken_valid_1
+  504 slice 7 169 31 28 
+  505 slice 31 169 17 16 
+  506 concat 356 504 505 
+  507 eq 1 506 358 _taken_rvcJR_T_5
+  508 slice 26 169 22 18 _taken_rvcJALR_T_6
+  509 neq 1 508 369 
+  510 xor 1 509 368 _taken_rvcJR_T_7
+  511 and 1 507 510 taken_rvcJR_1
+  512 slice 31 169 27 26 
+  513 slice 31 169 24 23 
+  514 concat 7 512 513 
+  515 eq 1 514 362 _taken_rvcReturn_T_5
+  516 and 1 511 515 taken_rvcReturn_1
+  517 and 1 503 516 _taken_predictReturn_T_4
+  518 or 1 500 517 _taken_predictReturn_T_5
+  519 and 1 351 518 taken_predictReturn_1
+  520 and 1 485 486 
+  521 and 1 520 125 
+  522 and 1 521 519 
+  523 xor 1 407 368 _taken_T_7
+  524 slice 1 142 7 7 taken_rviImm_hi_lo_lo_1
+  525 xor 1 524 368 _taken_rviReturn_T_1
+  526 slice 31 169 3 2 
+  527 slice 1 169 0 0 
+  528 slice 1 142 15 15 
+  529 concat 7 526 527 
+  530 concat 7 529 528 
+  531 eq 1 530 362 _taken_rviReturn_T_5
+  532 and 1 439 525 taken_rviReturn
+  533 and 1 532 531 taken_rviReturn
+  534 and 1 437 533 _taken_predictReturn_T
+  535 slice 31 169 11 10 
+  536 slice 31 169 8 7 
+  537 concat 7 535 536 
+  538 eq 1 537 362 _taken_rvcReturn_T_2
+  539 and 1 469 538 taken_rvcReturn
+  540 and 1 451 539 _taken_predictReturn_T_1
+  541 or 1 534 540 _taken_predictReturn_T_2
+  542 and 1 351 541 taken_predictReturn
+  543 and 1 523 125 
+  544 and 1 543 542 
+  545 or 1 522 544 useRAS
+  546 slice 409 352 38 1 
+  547 concat 22 367 546 
+  548 eq 1 490 375 taken_rviBranch_1
+  549 and 1 489 548 _taken_T_48
+  550 slice 5 169 31 29 
+  551 slice 31 169 17 16 
+  552 concat 26 550 551 
+  553 eq 1 552 361 _taken_rvcBranch_T_5
+  554 slice 5 169 31 29 
+  555 slice 31 169 17 16 
+  556 concat 26 554 555 
+  557 eq 1 556 360 _taken_rvcBranch_T_7
+  558 or 1 553 557 taken_rvcBranch_1
+  559 and 1 503 558 _taken_T_49
+  560 or 1 549 559 _taken_predictBranch_T_5
+  561 and 1 134 560 taken_predictBranch_1
+  562 eq 1 490 374 taken_rviJump_1
+  563 and 1 489 562 _taken_predictJump_T_2
+  564 slice 5 169 31 29 
+  565 slice 31 169 17 16 
+  566 concat 26 564 565 
+  567 eq 1 566 359 taken_rvcJump_1
+  568 and 1 503 567 _taken_predictJump_T_3
+  569 or 1 563 568 taken_predictJump_1
+  570 or 1 561 569 _taken_T_46
+  571 and 1 485 486 
+  572 and 1 571 125 
+  573 and 1 572 570 
+  574 slice 409 128 39 2 
+  575 concat 16 574 370 
+  576 add 16 575 353 _taken_npc_T_5
+  577 concat 16 574 370 taken_pc_1
+  578 ite 16 489 576 577 _taken_npc_T_7
+  579 slice 1 169 31 31 taken_rviImm_hi_hi_hi_2
+  580 sort bitvec 12
+  581 sext 580 579 11 
+  582 slice 1 169 3 3 _taken_rviImm_T_5
+  583 slice 34 169 19 12 taken_rviImm_hi_lo_hi_2
+  584 slice 1 169 20 20 taken_rviImm_hi_lo_lo_2
+  585 sort bitvec 10
+  586 slice 585 169 30 21 taken_rviImm_lo_hi_2
+  587 sort bitvec 19
+  588 concat 587 583 584 
+  589 concat 587 588 586 
+  590 sext 34 579 7 
+  591 slice 356 169 30 25 taken_rviImm_b10_5_2
+  592 slice 7 169 11 8 taken_rviImm_b4_1_3
+  593 concat 587 590 492 
+  594 concat 587 593 591 
+  595 concat 587 594 592 
+  596 ite 587 582 589 595 
+  597 concat 403 581 596 
+  598 slice 1 169 28 28 _taken_rvcImm_T_29
+  599 sort bitvec 21
+  600 sext 599 598 20 
+  601 slice 1 169 30 30 _taken_rvcImm_T_20
+  602 sext 5 598 2 
+  603 slice 31 169 22 21 _taken_rvcImm_T_23
+  604 slice 1 169 18 18 _taken_rvcImm_T_35
+  605 slice 31 169 27 26 _taken_rvcImm_T_25
+  606 slice 31 169 20 19 _taken_rvcImm_T_26
+  607 concat 585 602 603 
+  608 concat 585 607 604 
+  609 concat 585 608 605 
+  610 concat 585 609 606 
+  611 slice 1 169 24 24 _taken_rvcImm_T_31
+  612 slice 31 169 26 25 _taken_rvcImm_T_32
+  613 slice 1 169 22 22 _taken_rvcImm_T_33
+  614 slice 1 169 23 23 _taken_rvcImm_T_34
+  615 slice 1 169 27 27 _taken_rvcImm_T_36
+  616 slice 5 169 21 19 _taken_rvcImm_T_37
+  617 concat 585 611 612 
+  618 concat 585 617 613 
+  619 concat 585 618 614 
+  620 concat 585 619 604 
+  621 concat 585 620 615 
+  622 concat 585 621 616 
+  623 ite 585 601 610 622 
+  624 concat 403 600 623 
+  625 ite 403 489 597 624 
+  626 slice 1 625 30 30 
+  627 sext 34 626 7 
+  628 concat 16 627 625 
+  629 concat 16 628 367 
+  630 add 16 578 629 _taken_npc_T_10
+  631 slice 22 630 39 1 
+  632 and 1 437 442 _taken_T_19
+  633 and 1 451 478 _taken_T_20
+  634 or 1 632 633 _taken_predictBranch_T_2
+  635 and 1 134 634 taken_predictBranch
+  636 and 1 437 440 _taken_predictJump_T
+  637 and 1 451 455 _taken_predictJump_T_1
+  638 or 1 636 637 taken_predictJump
+  639 or 1 635 638 _taken_T_17
+  640 and 1 523 125 
+  641 and 1 640 639 
+  642 concat 16 574 378 
+  643 slice 1 169 15 15 taken_rviImm_hi_hi_hi
+  644 sort bitvec 13
+  645 sext 644 643 12 
+  646 slice 1 142 3 3 _taken_rviImm_T
+  647 slice 7 169 3 0 
+  648 slice 7 142 15 12 
+  649 slice 1 169 4 4 taken_rviImm_hi_lo_lo
+  650 slice 585 169 14 5 taken_rviImm_lo_hi
+  651 concat 587 647 648 
+  652 concat 587 651 649 
+  653 concat 587 652 650 
+  654 sext 34 643 7 
+  655 slice 356 169 14 9 taken_rviImm_b10_5
+  656 slice 7 142 11 8 taken_rviImm_b4_1_1
+  657 concat 587 654 524 
+  658 concat 587 657 655 
+  659 concat 587 658 656 
+  660 ite 587 646 653 659 
+  661 concat 354 645 660 
+  662 concat 354 661 367 
+  663 add 354 662 355 _taken_npc_T_1
+  664 slice 1 169 12 12 _taken_rvcImm_T_9
+  665 sort bitvec 22
+  666 sext 665 664 21 
+  667 slice 1 169 14 14 _taken_rvcImm_T
+  668 sext 5 664 2 
+  669 slice 31 169 6 5 _taken_rvcImm_T_3
+  670 slice 1 169 2 2 _taken_rvcImm_T_15
+  671 slice 31 169 11 10 _taken_rvcImm_T_5
+  672 slice 31 169 4 3 _taken_rvcImm_T_6
+  673 concat 585 668 669 
+  674 concat 585 673 670 
+  675 concat 585 674 671 
+  676 concat 585 675 672 
+  677 slice 1 169 8 8 _taken_rvcImm_T_11
+  678 slice 31 169 10 9 _taken_rvcImm_T_12
+  679 slice 1 169 6 6 _taken_rvcImm_T_13
+  680 slice 1 169 7 7 _taken_rvcImm_T_14
+  681 slice 1 169 11 11 _taken_rvcImm_T_16
+  682 slice 5 169 5 3 _taken_rvcImm_T_17
+  683 concat 585 677 678 
+  684 concat 585 683 679 
+  685 concat 585 684 680 
+  686 concat 585 685 670 
+  687 concat 585 686 681 
+  688 concat 585 687 682 
+  689 ite 585 667 676 688 
+  690 concat 354 666 689 
+  691 concat 354 690 367 
+  692 ite 354 437 663 691 _taken_npc_T_2
+  693 slice 1 692 32 32 
+  694 sext 372 693 6 
+  695 concat 16 694 692 
+  696 add 16 642 695 _taken_npc_T_3
+  697 slice 22 696 39 1 
+  698 and 1 344 345 predicted_taken
+  699 slice 1 347 38 38 _predicted_npc_T
+  700 slice 409 347 38 1 
+  701 concat 22 699 700 
+  702 slice 22 412 39 1 
+  703 ite 22 698 701 702 
+  704 ite 22 641 697 703 
+  705 ite 22 573 631 704 
+  706 ite 22 545 547 705 predicted_npc
+  707 ite 22 432 434 706 npc
+  708 xor 1 139 368 _s0_speculative_T
+  709 and 1 125 708 _s0_speculative_T_1
+  710 or 1 127 709 s0_speculative
+  711 or 1 710 698 s0_speculative
+  712 ite 1 432 139 711 _s1_speculative_T
+  713 ite 1 15 18 712 _s1_speculative_T_1
+  714 xor 1 432 368 _tlb_io_req_valid_T
+  715 xor 1 407 368 
+  716 or 1 491 562 _taken_taken_T_9
+  717 and 1 548 134 _taken_taken_T_10
+  718 or 1 716 717 _taken_taken_T_11
+  719 and 1 489 718 _taken_taken_T_12
+  720 slice 7 169 31 28 
+  721 slice 31 169 17 16 
+  722 concat 356 720 721 
+  723 eq 1 722 357 _taken_rvcJALR_T_5
+  724 xor 1 509 368 _taken_rvcJALR_T_7
+  725 and 1 723 724 taken_rvcJALR_1
+  726 and 1 558 134 _taken_taken_T_15
+  727 or 1 567 725 _taken_taken_T_16
+  728 or 1 727 511 _taken_taken_T_16
+  729 or 1 728 726 _taken_taken_T_16
+  730 and 1 503 729 _taken_taken_T_17
+  731 or 1 719 730 taken_taken_1
+  732 or 1 484 731 taken
+  733 and 1 715 732 
+  734 and 1 733 428 
+  735 or 1 734 15 s2_redirect
+  736 xor 1 735 368 _s2_valid_T
+  737 and 1 714 736 
+  738 ite 16 432 128 126 
+  739 ite 1 432 139 127 
+  740 ite 1 432 135 305 
+  741 ite 1 432 136 307 
+  742 ite 1 432 137 308 
+  743 ite 1 432 138 309 
+  744 neq 1 145 378 recent_progress
+  745 and 1 42 310 
+  746 and 1 745 744 
+  747 add 31 145 377 _recent_progress_counter_T
+  748 ite 31 746 747 145 
+  749 ite 31 41 377 748 
+  750 and 1 124 714 tlb.io_req_valid
+  751 or 1 393 414 tlb.io_kill
+  752 slice 22 17 39 1 
+  753 ite 22 15 752 707 _io_cpu_npc_T
+  754 slice 409 753 37 0 
+  755 concat 22 754 367 icache.io_req_bits_addr
+  756 or 1 735 305 icache.io_s1_kill
+  757 or 1 756 432 icache.io_s1_kill
+  758 concat 16 753 367 io_cpu_npc
+  759 xor 1 168 368 _fq_io_enq_bits_replay_T
+  760 xor 1 408 368 _fq_io_enq_bits_replay_T_2
+  761 and 1 422 759 _fq_io_enq_bits_replay_T_3
+  762 and 1 761 760 _fq_io_enq_bits_replay_T_3
+  763 xor 1 422 368 
+  764 and 1 139 417 
+  765 and 1 764 763 
+  766 xor 1 765 368 
+  767 and 1 168 170 
+  768 or 1 767 137 fq.io_enq_bits_xcpt_ae_inst
+  769 slice 22 126 38 0 btb.io_req_bits_addr
+  770 ite 1 432 129 344 
+  771 ite 1 432 130 345 
+  772 ite 1 432 131 346 
+  773 ite 26 432 132 348 
+  774 ite 34 432 133 349 
+  775 ite 1 432 134 350 
+  776 xor 1 25 368 
+  777 slice 1 207 1 1 _fetch_bubble_likely_T
+  778 xor 1 777 368 fetch_bubble_likely
+  779 xor 1 143 368 _btb_io_btb_update_valid_T_1
+  780 xor 1 129 368 _taken_T_51
+  781 or 1 561 569 _taken_T_55
+  782 or 1 781 519 _taken_T_55
+  783 and 1 485 780 
+  784 and 1 783 782 
+  785 xor 1 129 368 _taken_T_22
+  786 or 1 635 638 _taken_T_26
+  787 or 1 786 542 _taken_T_26
+  788 and 1 785 787 _taken_T_27
+  789 or 1 784 788 updateBTB
+  790 and 1 428 779 _btb_io_btb_update_valid_T_4
+  791 and 1 790 778 _btb_io_btb_update_valid_T_4
+  792 and 1 791 789 _btb_io_btb_update_valid_T_4
+  793 ite 1 25 25 792 btb.io_btb_update_valid
+  794 ite 26 25 27 376 btb.io_btb_update_bits_prediction_entry
+  795 or 1 776 29 btb.io_btb_update_bits_isValid
+  796 ite 1 437 533 539 _taken_btb_io_ras_update_bits_cfiType_T
+  797 and 1 441 524 taken_rviCall
+  798 ite 1 437 797 463 _taken_btb_io_ras_update_bits_cfiType_T_1
+  799 ite 1 437 442 478 _taken_btb_io_ras_update_bits_cfiType_T_4
+  800 xor 1 799 368 _taken_btb_io_ras_update_bits_cfiType_T_5
+  801 concat 31 367 800 
+  802 ite 31 798 370 801 _taken_btb_io_ras_update_bits_cfiType_T_6
+  803 ite 31 796 377 802 _taken_btb_io_ras_update_bits_cfiType_T_7
+  804 ite 1 489 499 516 _taken_btb_io_ras_update_bits_cfiType_T_8
+  805 and 1 716 492 taken_rviCall_1
+  806 ite 1 489 805 725 _taken_btb_io_ras_update_bits_cfiType_T_9
+  807 ite 1 489 548 558 _taken_btb_io_ras_update_bits_cfiType_T_12
+  808 xor 1 807 368 _taken_btb_io_ras_update_bits_cfiType_T_13
+  809 concat 31 367 808 
+  810 ite 31 806 370 809 _taken_btb_io_ras_update_bits_cfiType_T_14
+  811 ite 31 804 377 810 _taken_btb_io_ras_update_bits_cfiType_T_15
+  812 ite 31 484 803 811 btb.io_ras_update_bits_cfiType
+  813 ite 31 25 32 812 btb.io_btb_update_bits_cfiType
+  814 sort bitvec 37
+  815 slice 814 128 38 2 
+  816 concat 22 815 485 
+  817 concat 22 816 367 
+  818 ite 22 25 30 817 btb.io_btb_update_bits_br_pc
+  819 slice 814 128 38 2 
+  820 concat 22 819 378 
+  821 ite 22 25 28 820 btb.io_btb_update_bits_pc
+  822 slice 814 128 38 2 
+  823 concat 22 822 378 
+  824 ite 31 484 371 370 after_idx
+  825 concat 22 364 824 
+  826 concat 22 825 367 
+  827 add 22 823 826 _btb_io_ras_update_bits_returnAddr_T_1
+  828 eq 1 487 377 _taken_T_4
+  829 and 1 125 129 _taken_T_29
+  830 xor 1 131 368 _taken_T_1
+  831 and 1 829 830 _taken_T_5
+  832 and 1 831 451 _taken_T_5
+  833 and 1 832 828 _taken_T_5
+  834 or 1 833 143 
+  835 xor 1 143 368 _taken_btb_io_bht_advance_valid_T_1
+  836 or 1 797 533 _taken_btb_io_ras_update_valid_T_3
+  837 and 1 437 836 _taken_btb_io_ras_update_valid_T_4
+  838 or 1 463 539 _taken_btb_io_ras_update_valid_T_5
+  839 and 1 451 838 _taken_btb_io_ras_update_valid_T_6
+  840 or 1 837 839 _taken_btb_io_ras_update_valid_T_7
+  841 and 1 428 835 _taken_btb_io_ras_update_valid_T_8
+  842 and 1 841 840 _taken_btb_io_ras_update_valid_T_8
+  843 xor 1 635 368 _taken_T_10
+  844 xor 1 638 368 _taken_T_12
+  845 xor 1 542 368 _taken_T_14
+  846 and 1 428 484 _taken_T_15
+  847 and 1 846 843 _taken_T_15
+  848 and 1 847 844 _taken_T_15
+  849 and 1 848 845 _taken_T_15
+  850 or 1 849 833 
+  851 or 1 850 143 
+  852 ite 1 407 834 851 
+  853 or 1 632 633 _taken_T_21
+  854 and 1 853 428 
+  855 and 1 854 835 
+  856 slice 31 169 17 16 _taken_rvc_T_1
+  857 eq 1 856 377 _taken_T_60
+  858 and 1 829 131 _taken_T_34
+  859 and 1 858 503 _taken_T_34
+  860 and 1 859 857 _taken_T_34
+  861 or 1 860 833 btb.io_flush
+  862 or 1 860 833 fq.io_enq_bits_replay
+  863 or 1 862 762 fq.io_enq_bits_replay
+  864 or 1 863 415 fq.io_enq_bits_replay
+  865 or 1 860 852 
+  866 xor 1 143 368 _taken_btb_io_bht_advance_valid_T_4
+  867 or 1 805 499 _taken_btb_io_ras_update_valid_T_12
+  868 and 1 489 867 _taken_btb_io_ras_update_valid_T_13
+  869 or 1 725 516 _taken_btb_io_ras_update_valid_T_14
+  870 and 1 503 869 _taken_btb_io_ras_update_valid_T_15
+  871 or 1 868 870 _taken_btb_io_ras_update_valid_T_16
+  872 and 1 428 866 _taken_btb_io_ras_update_valid_T_17
+  873 and 1 872 871 _taken_btb_io_ras_update_valid_T_17
+  874 ite 1 484 842 873 btb.io_ras_update_valid
+  875 xor 1 561 368 _taken_T_39
+  876 xor 1 569 368 _taken_T_41
+  877 xor 1 519 368 _taken_T_43
+  878 and 1 428 731 _taken_T_44
+  879 and 1 878 875 _taken_T_44
+  880 and 1 879 876 _taken_T_44
+  881 and 1 880 877 _taken_T_44
+  882 or 1 881 860 
+  883 or 1 882 852 
+  884 or 1 484 407 
+  885 ite 1 884 865 883 
+  886 or 1 549 559 _taken_T_50
+  887 and 1 428 866 _taken_btb_io_bht_advance_valid_T_5
+  888 and 1 485 886 
+  889 ite 1 888 887 855 btb.io_bht_advance_valid
+  890 and 1 503 485 _taken_T_61
+  891 and 1 890 857 _taken_T_61
+  892 ite 1 428 891 140 
+  893 sort bitvec 14
+  894 slice 893 169 31 18 
+  895 concat 141 894 377 _taken_s2_partial_insn_T
+  896 and 1 428 891 
+  897 ite 141 896 895 142 
+  898 or 1 407 732 
+  899 and 1 428 898 
+  900 and 1 715 732 
+  901 ite 1 900 485 131 fq.io_enq_bits_btb_bridx
+  902 or 1 900 407 fq.io_enq_bits_btb_taken
+  903 ite 26 900 376 132 fq.io_enq_bits_btb_entry
+  904 xor 1 140 368 
+  905 or 1 904 449 
+  906 implies 1 387 386
+  907 not 1 906 
+  908 bad 907
+  909 implies 1 387 766
+  910 not 1 909 
+  911 bad 910
+  912 implies 1 387 905
+  913 not 1 912 
+  914 bad 913
+  915 or 1 735 899 
+  916 xor 1 915 368 
+  917 and 1 916 892 
+  918 xor 1 15 368 
+  919 and 1 918 885 
+  920 set 147 315 2 reset
+  921 set 147 316 3 auto_master_out_a_ready
+  922 set 147 317 4 auto_master_out_d_valid
+  923 set 147 318 6 auto_master_out_d_bits_opcode
+  924 set 147 319 8 auto_master_out_d_bits_size
+  925 set 147 320 10 auto_master_out_d_bits_data
+  926 set 147 321 11 auto_master_out_d_bits_corrupt
+  927 set 147 322 402 io_req_valid
+  928 set 147 323 755 io_req_bits_addr
+  929 set 147 324 306 io_s1_paddr
+  930 set 147 325 757 io_s1_kill
+  931 set 147 326 422 io_s2_kill
+  932 set 147 327 40 io_invalidate
+  933 set 171 315 380 reset
+  934 set 171 316 427 io_enq_valid
+  935 set 171 317 902 io_enq_bits_btb_taken
+  936 set 171 318 901 io_enq_bits_btb_bridx
+  937 set 171 319 903 io_enq_bits_btb_entry
+  938 set 171 320 133 io_enq_bits_btb_bht_history
+  939 set 171 321 128 io_enq_bits_pc
+  940 set 171 322 169 io_enq_bits_data
+  941 set 171 323 136 io_enq_bits_xcpt_pf_inst
+  942 set 171 324 768 io_enq_bits_xcpt_ae_inst
+  943 set 171 325 864 io_enq_bits_replay
+  944 set 171 326 24 io_deq_ready
+  945 set 208 315 2 reset
+  946 set 208 316 750 io_req_valid
+  947 set 208 317 126 io_req_bits_vaddr
+  948 set 208 318 65 io_req_bits_prv
+  949 set 208 319 19 io_sfence_valid
+  950 set 208 320 20 io_sfence_bits_rs1
+  951 set 208 321 21 io_sfence_bits_rs2
+  952 set 208 322 23 io_sfence_bits_addr
+  953 set 208 323 42 io_ptw_req_ready
+  954 set 208 324 43 io_ptw_resp_valid
+  955 set 208 325 44 io_ptw_resp_bits_ae_ptw
+  956 set 208 326 45 io_ptw_resp_bits_ae_final
+  957 set 208 327 46 io_ptw_resp_bits_pf
+  958 set 208 328 47 io_ptw_resp_bits_gf
+  959 set 208 329 48 io_ptw_resp_bits_hr
+  960 set 208 330 49 io_ptw_resp_bits_hw
+  961 set 208 331 50 io_ptw_resp_bits_hx
+  962 set 208 332 52 io_ptw_resp_bits_pte_ppn
+  963 set 208 333 53 io_ptw_resp_bits_pte_d
+  964 set 208 334 54 io_ptw_resp_bits_pte_a
+  965 set 208 229 55 io_ptw_resp_bits_pte_g
+  966 set 208 230 56 io_ptw_resp_bits_pte_u
+  967 set 208 231 57 io_ptw_resp_bits_pte_x
+  968 set 208 232 58 io_ptw_resp_bits_pte_w
+  969 set 208 233 59 io_ptw_resp_bits_pte_r
+  970 set 208 234 60 io_ptw_resp_bits_pte_v
+  971 set 208 235 61 io_ptw_resp_bits_level
+  972 set 208 236 62 io_ptw_resp_bits_homogeneous
+  973 set 208 237 63 io_ptw_ptbr_mode
+  974 set 208 238 64 io_ptw_status_debug
+  975 set 208 239 66 io_ptw_pmp_0_cfg_l
+  976 set 208 240 67 io_ptw_pmp_0_cfg_a
+  977 set 208 241 68 io_ptw_pmp_0_cfg_x
+  978 set 208 242 69 io_ptw_pmp_0_cfg_w
+  979 set 208 243 70 io_ptw_pmp_0_cfg_r
+  980 set 208 244 72 io_ptw_pmp_0_addr
+  981 set 208 245 73 io_ptw_pmp_0_mask
+  982 set 208 246 74 io_ptw_pmp_1_cfg_l
+  983 set 208 247 75 io_ptw_pmp_1_cfg_a
+  984 set 208 248 76 io_ptw_pmp_1_cfg_x
+  985 set 208 249 77 io_ptw_pmp_1_cfg_w
+  986 set 208 250 78 io_ptw_pmp_1_cfg_r
+  987 set 208 251 79 io_ptw_pmp_1_addr
+  988 set 208 252 80 io_ptw_pmp_1_mask
+  989 set 208 253 81 io_ptw_pmp_2_cfg_l
+  990 set 208 254 82 io_ptw_pmp_2_cfg_a
+  991 set 208 255 83 io_ptw_pmp_2_cfg_x
+  992 set 208 256 84 io_ptw_pmp_2_cfg_w
+  993 set 208 257 85 io_ptw_pmp_2_cfg_r
+  994 set 208 258 86 io_ptw_pmp_2_addr
+  995 set 208 259 87 io_ptw_pmp_2_mask
+  996 set 208 260 88 io_ptw_pmp_3_cfg_l
+  997 set 208 261 89 io_ptw_pmp_3_cfg_a
+  998 set 208 262 90 io_ptw_pmp_3_cfg_x
+  999 set 208 263 91 io_ptw_pmp_3_cfg_w
+  1000 set 208 264 92 io_ptw_pmp_3_cfg_r
+  1001 set 208 265 93 io_ptw_pmp_3_addr
+  1002 set 208 266 94 io_ptw_pmp_3_mask
+  1003 set 208 267 95 io_ptw_pmp_4_cfg_l
+  1004 set 208 268 96 io_ptw_pmp_4_cfg_a
+  1005 set 208 269 97 io_ptw_pmp_4_cfg_x
+  1006 set 208 270 98 io_ptw_pmp_4_cfg_w
+  1007 set 208 271 99 io_ptw_pmp_4_cfg_r
+  1008 set 208 272 100 io_ptw_pmp_4_addr
+  1009 set 208 273 101 io_ptw_pmp_4_mask
+  1010 set 208 274 102 io_ptw_pmp_5_cfg_l
+  1011 set 208 275 103 io_ptw_pmp_5_cfg_a
+  1012 set 208 276 104 io_ptw_pmp_5_cfg_x
+  1013 set 208 277 105 io_ptw_pmp_5_cfg_w
+  1014 set 208 278 106 io_ptw_pmp_5_cfg_r
+  1015 set 208 279 107 io_ptw_pmp_5_addr
+  1016 set 208 280 108 io_ptw_pmp_5_mask
+  1017 set 208 281 109 io_ptw_pmp_6_cfg_l
+  1018 set 208 282 110 io_ptw_pmp_6_cfg_a
+  1019 set 208 283 111 io_ptw_pmp_6_cfg_x
+  1020 set 208 284 112 io_ptw_pmp_6_cfg_w
+  1021 set 208 285 113 io_ptw_pmp_6_cfg_r
+  1022 set 208 286 114 io_ptw_pmp_6_addr
+  1023 set 208 287 115 io_ptw_pmp_6_mask
+  1024 set 208 288 116 io_ptw_pmp_7_cfg_l
+  1025 set 208 289 117 io_ptw_pmp_7_cfg_a
+  1026 set 208 290 118 io_ptw_pmp_7_cfg_x
+  1027 set 208 291 119 io_ptw_pmp_7_cfg_w
+  1028 set 208 292 120 io_ptw_pmp_7_cfg_r
+  1029 set 208 293 121 io_ptw_pmp_7_addr
+  1030 set 208 294 122 io_ptw_pmp_7_mask
+  1031 set 208 295 751 io_kill
+  1032 set 314 315 2 reset
+  1033 set 314 316 769 io_req_bits_addr
+  1034 set 314 317 793 io_btb_update_valid
+  1035 set 314 318 794 io_btb_update_bits_prediction_entry
+  1036 set 314 319 821 io_btb_update_bits_pc
+  1037 set 314 320 795 io_btb_update_bits_isValid
+  1038 set 314 321 818 io_btb_update_bits_br_pc
+  1039 set 314 322 813 io_btb_update_bits_cfiType
+  1040 set 314 323 33 io_bht_update_valid
+  1041 set 314 324 35 io_bht_update_bits_prediction_history
+  1042 set 314 325 36 io_bht_update_bits_pc
+  1043 set 314 326 37 io_bht_update_bits_branch
+  1044 set 314 327 38 io_bht_update_bits_taken
+  1045 set 314 328 39 io_bht_update_bits_mispredict
+  1046 set 314 329 889 io_bht_advance_valid
+  1047 set 314 330 134 io_bht_advance_bits_bht_value
+  1048 set 314 331 874 io_ras_update_valid
+  1049 set 314 332 812 io_ras_update_bits_cfiType
+  1050 set 314 333 827 io_ras_update_bits_returnAddr
+  1051 set 314 334 861 io_flush
+  1052 output 166 auto_icache_master_out_a_valid
+  1053 output 167 auto_icache_master_out_a_bits_address
+  1054 output 197 io_cpu_resp_valid
+  1055 output 198 io_cpu_resp_bits_btb_taken
+  1056 output 199 io_cpu_resp_bits_btb_bridx
+  1057 output 200 io_cpu_resp_bits_btb_entry
+  1058 output 201 io_cpu_resp_bits_btb_bht_history
+  1059 output 202 io_cpu_resp_bits_pc
+  1060 output 203 io_cpu_resp_bits_data
+  1061 output 204 io_cpu_resp_bits_xcpt_pf_inst
+  1062 output 367 io_cpu_resp_bits_xcpt_gf_inst
+  1063 output 205 io_cpu_resp_bits_xcpt_ae_inst
+  1064 output 206 io_cpu_resp_bits_replay
+  1065 output 310 io_ptw_req_valid
+  1066 output 311 io_ptw_req_bits_valid
+  1067 output 312 io_ptw_req_bits_bits_addr
+  1068 output 313 io_ptw_req_bits_bits_need_gpa
+  1069 next 1 124 402
+  1070 ite 1 2 367 737 
+  1071 next 1 125 1070
+  1072 next 16 126 758
+  1073 next 1 127 713
+  1074 ite 16 2 406 738 
+  1075 next 16 128 1074
+  1076 next 1 129 770
+  1077 next 1 130 771
+  1078 next 1 131 772
+  1079 next 26 132 773
+  1080 next 34 133 774
+  1081 next 1 134 775
+  1082 next 1 135 740
+  1083 next 1 136 741
+  1084 next 1 137 742
+  1085 next 1 138 743
+  1086 ite 1 2 367 739 
+  1087 next 1 139 1086
+  1088 ite 1 2 367 917 
+  1089 next 1 140 1088
+  1090 next 141 142 897
+  1091 ite 1 2 367 919 
+  1092 next 1 143 1091
+  1093 ite 1 2 368 433 _s2_replay_T_4
+  1094 next 1 144 1093
+  1095 ite 31 2 377 749 
+  1096 next 31 145 1095
+  1097 next 1 146 124
+}

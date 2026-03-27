@@ -1,0 +1,121 @@
+include DivSqrtRawFN_small_e8_s24.btor2pp
+
+module DivSqrtRecFMToRaw_small_e8_s24 {
+  1 sort bitvec 1
+  2 input 1 reset
+  3 input 1 io_inValid
+  4 input 1 io_sqrtOp
+  5 sort bitvec 33
+  6 input 5 io_a
+  7 input 5 io_b
+  8 sort bitvec 3
+  9 input 8 io_roundingMode
+  10 inst DivSqrtRawFN_small_e8_s24
+  11 ref DivSqrtRawFN_small_e8_s24 2 reset
+  12 ref DivSqrtRawFN_small_e8_s24 3 io_inValid
+  13 ref DivSqrtRawFN_small_e8_s24 4 io_sqrtOp
+  14 ref DivSqrtRawFN_small_e8_s24 5 io_a_isNaN
+  15 ref DivSqrtRawFN_small_e8_s24 6 io_a_isInf
+  16 ref DivSqrtRawFN_small_e8_s24 7 io_a_isZero
+  17 ref DivSqrtRawFN_small_e8_s24 8 io_a_sign
+  18 ref DivSqrtRawFN_small_e8_s24 10 io_a_sExp
+  19 ref DivSqrtRawFN_small_e8_s24 12 io_a_sig
+  20 ref DivSqrtRawFN_small_e8_s24 13 io_b_isNaN
+  21 ref DivSqrtRawFN_small_e8_s24 14 io_b_isInf
+  22 ref DivSqrtRawFN_small_e8_s24 15 io_b_isZero
+  23 ref DivSqrtRawFN_small_e8_s24 16 io_b_sign
+  24 ref DivSqrtRawFN_small_e8_s24 17 io_b_sExp
+  25 ref DivSqrtRawFN_small_e8_s24 18 io_b_sig
+  26 ref DivSqrtRawFN_small_e8_s24 20 io_roundingMode
+  27 ref DivSqrtRawFN_small_e8_s24 306 io_inReady
+  28 ref DivSqrtRawFN_small_e8_s24 307 io_rawOutValid_div
+  29 ref DivSqrtRawFN_small_e8_s24 308 io_rawOutValid_sqrt
+  30 ref DivSqrtRawFN_small_e8_s24 309 io_roundingModeOut
+  31 ref DivSqrtRawFN_small_e8_s24 310 io_invalidExc
+  32 ref DivSqrtRawFN_small_e8_s24 311 io_infiniteExc
+  33 ref DivSqrtRawFN_small_e8_s24 312 io_rawOut_isNaN
+  34 ref DivSqrtRawFN_small_e8_s24 313 io_rawOut_isInf
+  35 ref DivSqrtRawFN_small_e8_s24 314 io_rawOut_isZero
+  36 ref DivSqrtRawFN_small_e8_s24 315 io_rawOut_sign
+  37 ref DivSqrtRawFN_small_e8_s24 316 io_rawOut_sExp
+  38 ref DivSqrtRawFN_small_e8_s24 317 io_rawOut_sig
+  39 get 10 27 io_inReady
+  40 get 10 28 io_rawOutValid_div
+  41 get 10 29 io_rawOutValid_sqrt
+  42 get 10 30 io_roundingModeOut
+  43 get 10 31 io_invalidExc
+  44 get 10 32 io_infiniteExc
+  45 get 10 33 io_rawOut_isNaN
+  46 get 10 34 io_rawOut_isInf
+  47 get 10 35 io_rawOut_isZero
+  48 get 10 36 io_rawOut_sign
+  49 get 10 37 io_rawOut_sExp
+  50 get 10 38 io_rawOut_sig
+  51 sort bitvec 2
+  52 consth 51 3
+  53 consth 1 1
+  54 consth 8 0
+  55 consth 1 0
+  56 sort bitvec 9
+  57 slice 56 6 31 23 divSqrtRawFN_io_a_exp
+  58 slice 8 6 31 29 _divSqrtRawFN_io_a_isZero_T
+  59 neq 1 58 54 _divSqrtRawFN_io_a_out_sig_T
+  60 xor 1 59 53 divSqrtRawFN_io_a_isZero
+  61 slice 51 6 31 30 _divSqrtRawFN_io_a_isSpecial_T
+  62 eq 1 61 52 divSqrtRawFN_io_a_isSpecial
+  63 slice 1 6 29 29 _divSqrtRawFN_io_a_out_isInf_T
+  64 and 1 62 63 divSqrtRawFN_io_a_out_isNaN
+  65 xor 1 63 53 _divSqrtRawFN_io_a_out_isInf_T_1
+  66 and 1 62 65 divSqrtRawFN_io_a_out_isInf
+  67 slice 1 6 32 32 divSqrtRawFN_io_a_out_sign
+  68 sort bitvec 10
+  69 concat 68 55 57 divSqrtRawFN_io_a_out_sExp
+  70 sort bitvec 23
+  71 slice 70 6 22 0 _divSqrtRawFN_io_a_out_sig_T_2
+  72 sort bitvec 25
+  73 concat 72 55 59 divSqrtRawFN_io_a_out_sig
+  74 concat 72 73 71 divSqrtRawFN_io_a_out_sig
+  75 slice 56 7 31 23 divSqrtRawFN_io_b_exp
+  76 slice 8 7 31 29 _divSqrtRawFN_io_b_isZero_T
+  77 neq 1 76 54 _divSqrtRawFN_io_b_out_sig_T
+  78 xor 1 77 53 divSqrtRawFN_io_b_isZero
+  79 slice 51 7 31 30 _divSqrtRawFN_io_b_isSpecial_T
+  80 eq 1 79 52 divSqrtRawFN_io_b_isSpecial
+  81 slice 1 7 29 29 _divSqrtRawFN_io_b_out_isInf_T
+  82 and 1 80 81 divSqrtRawFN_io_b_out_isNaN
+  83 xor 1 81 53 _divSqrtRawFN_io_b_out_isInf_T_1
+  84 and 1 80 83 divSqrtRawFN_io_b_out_isInf
+  85 slice 1 7 32 32 divSqrtRawFN_io_b_out_sign
+  86 concat 68 55 75 divSqrtRawFN_io_b_out_sExp
+  87 slice 70 7 22 0 _divSqrtRawFN_io_b_out_sig_T_2
+  88 concat 72 55 77 divSqrtRawFN_io_b_out_sig
+  89 concat 72 88 87 divSqrtRawFN_io_b_out_sig
+  90 set 10 11 2 reset
+  91 set 10 12 3 io_inValid
+  92 set 10 13 4 io_sqrtOp
+  93 set 10 14 64 io_a_isNaN
+  94 set 10 15 66 io_a_isInf
+  95 set 10 16 60 io_a_isZero
+  96 set 10 17 67 io_a_sign
+  97 set 10 18 69 io_a_sExp
+  98 set 10 19 74 io_a_sig
+  99 set 10 20 82 io_b_isNaN
+  100 set 10 21 84 io_b_isInf
+  101 set 10 22 78 io_b_isZero
+  102 set 10 23 85 io_b_sign
+  103 set 10 24 86 io_b_sExp
+  104 set 10 25 89 io_b_sig
+  105 set 10 26 9 io_roundingMode
+  106 output 39 io_inReady
+  107 output 40 io_rawOutValid_div
+  108 output 41 io_rawOutValid_sqrt
+  109 output 42 io_roundingModeOut
+  110 output 43 io_invalidExc
+  111 output 44 io_infiniteExc
+  112 output 45 io_rawOut_isNaN
+  113 output 46 io_rawOut_isInf
+  114 output 47 io_rawOut_isZero
+  115 output 48 io_rawOut_sign
+  116 output 49 io_rawOut_sExp
+  117 output 50 io_rawOut_sig
+}

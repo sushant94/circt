@@ -1,0 +1,102 @@
+
+module AMOALU {
+  1 sort bitvec 8
+  2 input 1 io_mask
+  3 sort bitvec 5
+  4 input 3 io_cmd
+  5 sort bitvec 64
+  6 input 5 io_lhs
+  7 input 5 io_rhs
+  8 sort bitvec 31
+  9 consth 8 7FFFFFFF
+  10 sort bitvec 32
+  11 consth 10 FFFFFFFF
+  12 consth 3 9
+  13 consth 3 B
+  14 consth 3 A
+  15 consth 3 8
+  16 consth 3 E
+  17 consth 3 C
+  18 consth 3 F
+  19 consth 3 D
+  20 consth 5 FFFFFFFFFFFFFFFF
+  21 consth 5 0
+  22 sort bitvec 1
+  23 eq 22 4 19 _max_T
+  24 eq 22 4 18 _max_T_1
+  25 or 22 23 24 max
+  26 eq 22 4 17 _min_T
+  27 eq 22 4 16 _min_T_1
+  28 or 22 26 27 min
+  29 eq 22 4 15 add
+  30 eq 22 4 14 _logic_xor_T_1
+  31 eq 22 4 13 _logic_and_T_1
+  32 or 22 30 31 logic_and
+  33 eq 22 4 12 _logic_xor_T
+  34 or 22 33 30 logic_xor
+  35 slice 22 2 3 3 _wmask_T_3
+  36 concat 5 11 35 adder_out_mask
+  37 concat 5 36 9 adder_out_mask
+  38 and 5 6 37 _adder_out_T
+  39 and 5 7 37 _adder_out_T_1
+  40 add 5 38 39 _adder_out_T_2
+  41 slice 22 2 4 4 _wmask_T_4
+  42 slice 22 4 1 1 
+  43 slice 22 6 63 63 _less_T_15
+  44 slice 22 7 63 63 _less_T_16
+  45 eq 22 43 44 _less_T_3
+  46 slice 10 6 63 32 _less_T_7
+  47 slice 10 7 63 32 _less_T_8
+  48 ult 22 46 47 _less_T_6
+  49 eq 22 46 47 _less_T_9
+  50 slice 10 6 31 0 _less_T_23
+  51 slice 10 7 31 0 _less_T_24
+  52 ult 22 50 51 _less_T_12
+  53 and 22 49 52 _less_T_13
+  54 or 22 48 53 _less_T_14
+  55 ite 22 42 44 43 _less_T_17
+  56 ite 22 45 54 55 _less_T_18
+  57 slice 22 2 2 2 _wmask_T_2
+  58 slice 22 6 31 31 _less_T_26
+  59 slice 22 7 31 31 _less_T_27
+  60 eq 22 58 59 _less_T_22
+  61 ult 22 50 51 _less_T_25
+  62 ite 22 42 59 58 _less_T_28
+  63 ite 22 60 61 62 _less_T_29
+  64 ite 22 41 56 63 less
+  65 ite 22 64 28 25 _minmax_T
+  66 ite 5 65 6 7 minmax
+  67 and 5 6 7 _logic_T
+  68 ite 5 32 67 21 _logic_T_1
+  69 xor 5 6 7 _logic_T_2
+  70 ite 5 34 69 21 _logic_T_3
+  71 or 5 68 70 logic
+  72 or 22 32 34 _out_T
+  73 ite 5 72 71 66 _out_T_1
+  74 ite 5 29 40 73 out
+  75 slice 22 2 0 0 _wmask_T
+  76 slice 22 2 1 1 _wmask_T_1
+  77 slice 22 2 5 5 _wmask_T_5
+  78 slice 22 2 6 6 _wmask_T_6
+  79 slice 22 2 7 7 _wmask_T_7
+  80 sext 1 75 7 _wmask_T_8
+  81 sext 1 76 7 _wmask_T_9
+  82 sext 1 57 7 _wmask_T_10
+  83 sext 1 35 7 _wmask_T_11
+  84 sext 1 41 7 _wmask_T_12
+  85 sext 1 77 7 _wmask_T_13
+  86 sext 1 78 7 _wmask_T_14
+  87 sext 1 79 7 _wmask_T_15
+  88 concat 5 87 86 wmask
+  89 concat 5 88 85 wmask
+  90 concat 5 89 84 wmask
+  91 concat 5 90 83 wmask
+  92 concat 5 91 82 wmask
+  93 concat 5 92 81 wmask
+  94 concat 5 93 80 wmask
+  95 and 5 94 74 _io_out_T
+  96 xor 5 94 20 _io_out_T_1
+  97 and 5 96 6 _io_out_T_2
+  98 or 5 95 97 io_out
+  99 output 98 io_out
+}

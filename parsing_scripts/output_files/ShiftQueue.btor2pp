@@ -1,0 +1,285 @@
+
+module ShiftQueue {
+  1 sort bitvec 1
+  2 input 1 reset
+  3 input 1 io_enq_valid
+  4 input 1 io_enq_bits_btb_taken
+  5 input 1 io_enq_bits_btb_bridx
+  6 sort bitvec 5
+  7 input 6 io_enq_bits_btb_entry
+  8 sort bitvec 8
+  9 input 8 io_enq_bits_btb_bht_history
+  10 sort bitvec 40
+  11 input 10 io_enq_bits_pc
+  12 sort bitvec 32
+  13 input 12 io_enq_bits_data
+  14 input 1 io_enq_bits_xcpt_pf_inst
+  15 input 1 io_enq_bits_xcpt_ae_inst
+  16 input 1 io_enq_bits_replay
+  17 input 1 io_deq_ready
+  18 state 1 valid_0
+  19 state 1 valid_1
+  20 state 1 valid_2
+  21 state 1 valid_3
+  22 state 1 valid_4
+  23 state 1 elts_0_btb_taken
+  24 state 1 elts_0_btb_bridx
+  25 state 6 elts_0_btb_entry
+  26 state 8 elts_0_btb_bht_history
+  27 state 10 elts_0_pc
+  28 state 12 elts_0_data
+  29 state 1 elts_0_xcpt_pf_inst
+  30 state 1 elts_0_xcpt_ae_inst
+  31 state 1 elts_0_replay
+  32 state 1 elts_1_btb_taken
+  33 state 1 elts_1_btb_bridx
+  34 state 6 elts_1_btb_entry
+  35 state 8 elts_1_btb_bht_history
+  36 state 10 elts_1_pc
+  37 state 12 elts_1_data
+  38 state 1 elts_1_xcpt_pf_inst
+  39 state 1 elts_1_xcpt_ae_inst
+  40 state 1 elts_1_replay
+  41 state 1 elts_2_btb_taken
+  42 state 1 elts_2_btb_bridx
+  43 state 6 elts_2_btb_entry
+  44 state 8 elts_2_btb_bht_history
+  45 state 10 elts_2_pc
+  46 state 12 elts_2_data
+  47 state 1 elts_2_xcpt_pf_inst
+  48 state 1 elts_2_xcpt_ae_inst
+  49 state 1 elts_2_replay
+  50 state 1 elts_3_btb_taken
+  51 state 1 elts_3_btb_bridx
+  52 state 6 elts_3_btb_entry
+  53 state 8 elts_3_btb_bht_history
+  54 state 10 elts_3_pc
+  55 state 12 elts_3_data
+  56 state 1 elts_3_xcpt_pf_inst
+  57 state 1 elts_3_xcpt_ae_inst
+  58 state 1 elts_3_replay
+  59 state 1 elts_4_btb_taken
+  60 state 1 elts_4_btb_bridx
+  61 state 6 elts_4_btb_entry
+  62 state 8 elts_4_btb_bht_history
+  63 state 10 elts_4_pc
+  64 state 12 elts_4_data
+  65 state 1 elts_4_xcpt_pf_inst
+  66 state 1 elts_4_xcpt_ae_inst
+  67 state 1 elts_4_replay
+  68 consth 1 1
+  69 consth 1 0
+  70 ite 1 19 32 4 wdata_btb_taken
+  71 ite 1 19 33 5 wdata_btb_bridx
+  72 ite 6 19 34 7 wdata_btb_entry
+  73 ite 8 19 35 9 wdata_btb_bht_history
+  74 ite 10 19 36 11 wdata_pc
+  75 ite 12 19 37 13 wdata_data
+  76 ite 1 19 38 14 wdata_xcpt_pf_inst
+  77 ite 1 19 39 15 wdata_xcpt_ae_inst
+  78 ite 1 19 40 16 wdata_replay
+  79 xor 1 22 68 io_enq_ready
+  80 and 1 79 3 _valid_4_T_4
+  81 and 1 80 18 _wen_T_2
+  82 or 1 19 81 _wen_T_3
+  83 xor 1 18 68 _wen_T_6
+  84 and 1 80 83 _wen_T_7
+  85 ite 1 17 82 84 wen
+  86 ite 1 85 70 23 
+  87 ite 1 85 71 24 
+  88 ite 6 85 72 25 
+  89 ite 8 85 73 26 
+  90 ite 10 85 74 27 
+  91 ite 12 85 75 28 
+  92 ite 1 85 76 29 
+  93 ite 1 85 77 30 
+  94 ite 1 85 78 31 
+  95 and 1 80 18 _valid_0_T_2
+  96 or 1 19 95 _valid_0_T_3
+  97 or 1 80 18 _valid_0_T_6
+  98 ite 1 17 96 97 _valid_0_T_7
+  99 ite 1 20 41 4 wdata_1_btb_taken
+  100 ite 1 20 42 5 wdata_1_btb_bridx
+  101 ite 6 20 43 7 wdata_1_btb_entry
+  102 ite 8 20 44 9 wdata_1_btb_bht_history
+  103 ite 10 20 45 11 wdata_1_pc
+  104 ite 12 20 46 13 wdata_1_data
+  105 ite 1 20 47 14 wdata_1_xcpt_pf_inst
+  106 ite 1 20 48 15 wdata_1_xcpt_ae_inst
+  107 ite 1 20 49 16 wdata_1_replay
+  108 and 1 80 19 _wen_T_10
+  109 or 1 20 108 _wen_T_11
+  110 xor 1 19 68 _wen_T_14
+  111 and 1 80 18 _wen_T_15
+  112 and 1 111 110 _wen_T_15
+  113 ite 1 17 109 112 wen_1
+  114 ite 1 113 99 32 
+  115 ite 1 113 100 33 
+  116 ite 6 113 101 34 
+  117 ite 8 113 102 35 
+  118 ite 10 113 103 36 
+  119 ite 12 113 104 37 
+  120 ite 1 113 105 38 
+  121 ite 1 113 106 39 
+  122 ite 1 113 107 40 
+  123 and 1 80 19 _valid_1_T_2
+  124 or 1 20 123 _valid_1_T_3
+  125 and 1 80 18 _valid_1_T_5
+  126 or 1 125 19 _valid_1_T_6
+  127 ite 1 17 124 126 _valid_1_T_7
+  128 ite 1 21 50 4 wdata_2_btb_taken
+  129 ite 1 21 51 5 wdata_2_btb_bridx
+  130 ite 6 21 52 7 wdata_2_btb_entry
+  131 ite 8 21 53 9 wdata_2_btb_bht_history
+  132 ite 10 21 54 11 wdata_2_pc
+  133 ite 12 21 55 13 wdata_2_data
+  134 ite 1 21 56 14 wdata_2_xcpt_pf_inst
+  135 ite 1 21 57 15 wdata_2_xcpt_ae_inst
+  136 ite 1 21 58 16 wdata_2_replay
+  137 and 1 80 20 _wen_T_18
+  138 or 1 21 137 _wen_T_19
+  139 xor 1 20 68 _wen_T_22
+  140 and 1 80 19 _wen_T_23
+  141 and 1 140 139 _wen_T_23
+  142 ite 1 17 138 141 wen_2
+  143 ite 1 142 128 41 
+  144 ite 1 142 129 42 
+  145 ite 6 142 130 43 
+  146 ite 8 142 131 44 
+  147 ite 10 142 132 45 
+  148 ite 12 142 133 46 
+  149 ite 1 142 134 47 
+  150 ite 1 142 135 48 
+  151 ite 1 142 136 49 
+  152 and 1 80 20 _valid_2_T_2
+  153 or 1 21 152 _valid_2_T_3
+  154 and 1 80 19 _valid_2_T_5
+  155 or 1 154 20 _valid_2_T_6
+  156 ite 1 17 153 155 _valid_2_T_7
+  157 ite 1 22 59 4 wdata_3_btb_taken
+  158 ite 1 22 60 5 wdata_3_btb_bridx
+  159 ite 6 22 61 7 wdata_3_btb_entry
+  160 ite 8 22 62 9 wdata_3_btb_bht_history
+  161 ite 10 22 63 11 wdata_3_pc
+  162 ite 12 22 64 13 wdata_3_data
+  163 ite 1 22 65 14 wdata_3_xcpt_pf_inst
+  164 ite 1 22 66 15 wdata_3_xcpt_ae_inst
+  165 ite 1 22 67 16 wdata_3_replay
+  166 and 1 80 21 _wen_T_26
+  167 or 1 22 166 _wen_T_27
+  168 xor 1 21 68 _wen_T_30
+  169 and 1 80 20 _wen_T_31
+  170 and 1 169 168 _wen_T_31
+  171 ite 1 17 167 170 wen_3
+  172 ite 1 171 157 50 
+  173 ite 1 171 158 51 
+  174 ite 6 171 159 52 
+  175 ite 8 171 160 53 
+  176 ite 10 171 161 54 
+  177 ite 12 171 162 55 
+  178 ite 1 171 163 56 
+  179 ite 1 171 164 57 
+  180 ite 1 171 165 58 
+  181 and 1 80 21 _valid_3_T_2
+  182 or 1 22 181 _valid_3_T_3
+  183 and 1 80 20 _valid_3_T_5
+  184 or 1 183 21 _valid_3_T_6
+  185 ite 1 17 182 184 _valid_3_T_7
+  186 and 1 80 22 _wen_T_35
+  187 and 1 80 21 _wen_T_39
+  188 ite 1 17 186 187 wen_4
+  189 ite 1 188 4 59 
+  190 ite 1 188 5 60 
+  191 ite 6 188 7 61 
+  192 ite 8 188 9 62 
+  193 ite 10 188 11 63 
+  194 ite 12 188 13 64 
+  195 ite 1 188 14 65 
+  196 ite 1 188 15 66 
+  197 ite 1 188 16 67 
+  198 and 1 80 22 _valid_4_T_3
+  199 and 1 80 21 _valid_4_T_5
+  200 or 1 199 22 _valid_4_T_6
+  201 ite 1 17 198 200 _valid_4_T_7
+  202 or 1 3 18 io_deq_valid
+  203 ite 1 18 23 4 io_deq_bits_btb_taken
+  204 ite 1 18 24 5 io_deq_bits_btb_bridx
+  205 ite 6 18 25 7 io_deq_bits_btb_entry
+  206 ite 8 18 26 9 io_deq_bits_btb_bht_history
+  207 ite 10 18 27 11 io_deq_bits_pc
+  208 ite 12 18 28 13 io_deq_bits_data
+  209 ite 1 18 29 14 io_deq_bits_xcpt_pf_inst
+  210 ite 1 18 30 15 io_deq_bits_xcpt_ae_inst
+  211 ite 1 18 31 16 io_deq_bits_replay
+  212 concat 6 22 21 io_mask
+  213 concat 6 212 20 io_mask
+  214 concat 6 213 19 io_mask
+  215 concat 6 214 18 io_mask
+  216 output 79 io_enq_ready
+  217 output 202 io_deq_valid
+  218 output 203 io_deq_bits_btb_taken
+  219 output 204 io_deq_bits_btb_bridx
+  220 output 205 io_deq_bits_btb_entry
+  221 output 206 io_deq_bits_btb_bht_history
+  222 output 207 io_deq_bits_pc
+  223 output 208 io_deq_bits_data
+  224 output 209 io_deq_bits_xcpt_pf_inst
+  225 output 210 io_deq_bits_xcpt_ae_inst
+  226 output 211 io_deq_bits_replay
+  227 output 215 io_mask
+  228 ite 1 2 69 98 _valid_0_T_7
+  229 next 1 18 228
+  230 ite 1 2 69 127 _valid_1_T_7
+  231 next 1 19 230
+  232 ite 1 2 69 156 _valid_2_T_7
+  233 next 1 20 232
+  234 ite 1 2 69 185 _valid_3_T_7
+  235 next 1 21 234
+  236 ite 1 2 69 201 _valid_4_T_7
+  237 next 1 22 236
+  238 next 1 23 86
+  239 next 1 24 87
+  240 next 6 25 88
+  241 next 8 26 89
+  242 next 10 27 90
+  243 next 12 28 91
+  244 next 1 29 92
+  245 next 1 30 93
+  246 next 1 31 94
+  247 next 1 32 114
+  248 next 1 33 115
+  249 next 6 34 116
+  250 next 8 35 117
+  251 next 10 36 118
+  252 next 12 37 119
+  253 next 1 38 120
+  254 next 1 39 121
+  255 next 1 40 122
+  256 next 1 41 143
+  257 next 1 42 144
+  258 next 6 43 145
+  259 next 8 44 146
+  260 next 10 45 147
+  261 next 12 46 148
+  262 next 1 47 149
+  263 next 1 48 150
+  264 next 1 49 151
+  265 next 1 50 172
+  266 next 1 51 173
+  267 next 6 52 174
+  268 next 8 53 175
+  269 next 10 54 176
+  270 next 12 55 177
+  271 next 1 56 178
+  272 next 1 57 179
+  273 next 1 58 180
+  274 next 1 59 189
+  275 next 1 60 190
+  276 next 6 61 191
+  277 next 8 62 192
+  278 next 10 63 193
+  279 next 12 64 194
+  280 next 1 65 195
+  281 next 1 66 196
+  282 next 1 67 197
+}

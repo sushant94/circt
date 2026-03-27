@@ -1,0 +1,726 @@
+
+module PMPChecker_s3 {
+  1 sort bitvec 2
+  2 input 1 io_prv
+  3 sort bitvec 1
+  4 input 3 io_pmp_0_cfg_l
+  5 input 1 io_pmp_0_cfg_a
+  6 input 3 io_pmp_0_cfg_x
+  7 input 3 io_pmp_0_cfg_w
+  8 input 3 io_pmp_0_cfg_r
+  9 sort bitvec 30
+  10 input 9 io_pmp_0_addr
+  11 sort bitvec 32
+  12 input 11 io_pmp_0_mask
+  13 input 3 io_pmp_1_cfg_l
+  14 input 1 io_pmp_1_cfg_a
+  15 input 3 io_pmp_1_cfg_x
+  16 input 3 io_pmp_1_cfg_w
+  17 input 3 io_pmp_1_cfg_r
+  18 input 9 io_pmp_1_addr
+  19 input 11 io_pmp_1_mask
+  20 input 3 io_pmp_2_cfg_l
+  21 input 1 io_pmp_2_cfg_a
+  22 input 3 io_pmp_2_cfg_x
+  23 input 3 io_pmp_2_cfg_w
+  24 input 3 io_pmp_2_cfg_r
+  25 input 9 io_pmp_2_addr
+  26 input 11 io_pmp_2_mask
+  27 input 3 io_pmp_3_cfg_l
+  28 input 1 io_pmp_3_cfg_a
+  29 input 3 io_pmp_3_cfg_x
+  30 input 3 io_pmp_3_cfg_w
+  31 input 3 io_pmp_3_cfg_r
+  32 input 9 io_pmp_3_addr
+  33 input 11 io_pmp_3_mask
+  34 input 3 io_pmp_4_cfg_l
+  35 input 1 io_pmp_4_cfg_a
+  36 input 3 io_pmp_4_cfg_x
+  37 input 3 io_pmp_4_cfg_w
+  38 input 3 io_pmp_4_cfg_r
+  39 input 9 io_pmp_4_addr
+  40 input 11 io_pmp_4_mask
+  41 input 3 io_pmp_5_cfg_l
+  42 input 1 io_pmp_5_cfg_a
+  43 input 3 io_pmp_5_cfg_x
+  44 input 3 io_pmp_5_cfg_w
+  45 input 3 io_pmp_5_cfg_r
+  46 input 9 io_pmp_5_addr
+  47 input 11 io_pmp_5_mask
+  48 input 3 io_pmp_6_cfg_l
+  49 input 1 io_pmp_6_cfg_a
+  50 input 3 io_pmp_6_cfg_x
+  51 input 3 io_pmp_6_cfg_w
+  52 input 3 io_pmp_6_cfg_r
+  53 input 9 io_pmp_6_addr
+  54 input 11 io_pmp_6_mask
+  55 input 3 io_pmp_7_cfg_l
+  56 input 1 io_pmp_7_cfg_a
+  57 input 3 io_pmp_7_cfg_x
+  58 input 3 io_pmp_7_cfg_w
+  59 input 3 io_pmp_7_cfg_r
+  60 input 9 io_pmp_7_addr
+  61 input 11 io_pmp_7_mask
+  62 input 11 io_addr
+  63 input 1 io_size
+  64 consth 1 0
+  65 sort bitvec 6
+  66 consth 65 7
+  67 sort bitvec 29
+  68 consth 67 0
+  69 consth 67 1FFFFFFF
+  70 sort bitvec 4
+  71 consth 70 0
+  72 sort bitvec 3
+  73 consth 72 0
+  74 consth 3 1
+  75 consth 72 7
+  76 slice 3 2 1 1 default
+  77 slice 3 56 1 1 _res_aligned_T
+  78 concat 65 71 63 
+  79 sll 65 66 78 _res_aligned_lsbMask_T_14
+  80 slice 72 79 2 0 _res_hit_lsbMask_T_1
+  81 xor 72 80 75 _res_hit_lsbMask_T_2
+  82 slice 72 61 2 0 
+  83 or 72 82 81 _res_hit_lsbMatch_T_6
+  84 slice 67 62 31 3 _res_aligned_straddlesUpperBound_T_119
+  85 slice 67 60 29 1 _res_hit_msbMatch_T_5
+  86 slice 67 61 31 3 _res_hit_msbMatch_T_6
+  87 xor 67 84 85 _res_hit_msbMatch_T_7
+  88 xor 67 86 69 _res_hit_msbMatch_T_8
+  89 and 67 87 88 _res_hit_msbMatch_T_9
+  90 eq 3 89 68 res_hit_msbMatch
+  91 slice 72 62 2 0 _res_aligned_straddlesUpperBound_T_132
+  92 slice 3 60 0 0 
+  93 concat 72 92 64 _res_hit_lsbMatch_T_5
+  94 xor 72 91 93 _res_hit_lsbMatch_T_7
+  95 xor 72 83 75 _res_hit_lsbMatch_T_8
+  96 and 72 94 95 _res_hit_lsbMatch_T_9
+  97 eq 3 96 73 res_hit_lsbMatch
+  98 and 3 90 97 _res_hit_T_1
+  99 slice 3 56 0 0 _res_hit_T_2
+  100 slice 72 79 2 0 _res_hit_T_4
+  101 xor 72 100 75 _res_hit_T_5
+  102 slice 67 53 29 1 _res_hit_msbsLess_T_5
+  103 ult 3 84 102 res_hit_msbsLess
+  104 slice 67 53 29 1 _res_hit_msbsEqual_T_5
+  105 xor 67 84 104 _res_hit_msbsEqual_T_6
+  106 eq 3 105 68 res_hit_msbsEqual
+  107 or 72 91 101 _res_hit_lsbsLess_T_1
+  108 slice 3 53 0 0 
+  109 concat 72 108 64 _res_hit_lsbsLess_T_6
+  110 ult 3 107 109 res_hit_lsbsLess
+  111 and 3 106 110 _res_hit_T_6
+  112 or 3 103 111 _res_hit_T_7
+  113 xor 3 112 74 _res_hit_T_8
+  114 slice 67 60 29 1 _res_hit_msbsLess_T_11
+  115 ult 3 84 114 res_hit_msbsLess_1
+  116 slice 67 60 29 1 _res_hit_msbsEqual_T_12
+  117 xor 67 84 116 _res_hit_msbsEqual_T_13
+  118 eq 3 117 68 res_hit_msbsEqual_1
+  119 slice 3 60 0 0 
+  120 concat 72 119 64 _res_hit_lsbsLess_T_13
+  121 ult 3 91 120 res_hit_lsbsLess_1
+  122 and 3 118 121 _res_hit_T_9
+  123 or 3 115 122 _res_hit_T_10
+  124 and 3 99 113 _res_hit_T_12
+  125 and 3 124 123 _res_hit_T_12
+  126 ite 3 77 98 125 res_hit
+  127 xor 3 55 74 _res_ignore_T
+  128 and 3 76 127 res_ignore
+  129 slice 72 79 2 0 _res_aligned_lsbMask_T_1
+  130 xor 72 129 75 res_aligned_lsbMask
+  131 slice 67 53 29 1 _res_aligned_straddlesLowerBound_T_5
+  132 xor 67 84 131 _res_aligned_straddlesLowerBound_T_6
+  133 eq 3 132 68 _res_aligned_straddlesLowerBound_T_7
+  134 slice 3 53 0 0 
+  135 slice 3 62 2 2 
+  136 xor 3 135 74 _res_aligned_straddlesLowerBound_T_14
+  137 and 3 133 134 res_aligned_straddlesLowerBound
+  138 and 3 137 136 res_aligned_straddlesLowerBound
+  139 slice 67 60 29 1 _res_aligned_straddlesUpperBound_T_5
+  140 xor 67 84 139 _res_aligned_straddlesUpperBound_T_6
+  141 eq 3 140 68 _res_aligned_straddlesUpperBound_T_7
+  142 slice 3 60 0 0 
+  143 slice 3 62 2 2 
+  144 slice 3 130 2 2 
+  145 or 3 143 144 _res_aligned_straddlesUpperBound_T_14
+  146 and 3 141 142 res_aligned_straddlesUpperBound
+  147 and 3 146 145 res_aligned_straddlesUpperBound
+  148 or 3 138 147 _res_aligned_rangeAligned_T
+  149 xor 3 148 74 res_aligned_rangeAligned
+  150 slice 72 61 2 0 _res_aligned_pow2Aligned_T
+  151 xor 72 150 75 _res_aligned_pow2Aligned_T_1
+  152 and 72 130 151 _res_aligned_pow2Aligned_T_2
+  153 eq 3 152 73 res_aligned_pow2Aligned
+  154 ite 3 77 153 149 res_aligned
+  155 or 3 59 128 _res_cur_cfg_r_T
+  156 and 3 154 155 res_cur_cfg_r
+  157 or 3 58 128 _res_cur_cfg_w_T
+  158 and 3 154 157 res_cur_cfg_w
+  159 or 3 57 128 _res_cur_cfg_x_T
+  160 and 3 154 159 res_cur_cfg_x
+  161 ite 3 126 160 76 _res_T_44_cfg_x
+  162 ite 3 126 158 76 _res_T_44_cfg_w
+  163 ite 3 126 156 76 _res_T_44_cfg_r
+  164 slice 3 49 1 1 _res_aligned_T_1
+  165 slice 72 79 2 0 _res_hit_lsbMask_T_4
+  166 xor 72 165 75 _res_hit_lsbMask_T_5
+  167 slice 72 54 2 0 
+  168 or 72 167 166 _res_hit_lsbMatch_T_16
+  169 slice 67 53 29 1 _res_hit_msbMatch_T_15
+  170 slice 67 54 31 3 _res_hit_msbMatch_T_16
+  171 xor 67 84 169 _res_hit_msbMatch_T_17
+  172 xor 67 170 69 _res_hit_msbMatch_T_18
+  173 and 67 171 172 _res_hit_msbMatch_T_19
+  174 eq 3 173 68 res_hit_msbMatch_1
+  175 slice 3 53 0 0 
+  176 concat 72 175 64 _res_hit_lsbMatch_T_15
+  177 xor 72 91 176 _res_hit_lsbMatch_T_17
+  178 xor 72 168 75 _res_hit_lsbMatch_T_18
+  179 and 72 177 178 _res_hit_lsbMatch_T_19
+  180 eq 3 179 73 res_hit_lsbMatch_1
+  181 and 3 174 180 _res_hit_T_14
+  182 slice 3 49 0 0 _res_hit_T_15
+  183 slice 72 79 2 0 _res_hit_T_17
+  184 xor 72 183 75 _res_hit_T_18
+  185 slice 67 46 29 1 _res_hit_msbsLess_T_17
+  186 ult 3 84 185 res_hit_msbsLess_2
+  187 slice 67 46 29 1 _res_hit_msbsEqual_T_19
+  188 xor 67 84 187 _res_hit_msbsEqual_T_20
+  189 eq 3 188 68 res_hit_msbsEqual_2
+  190 or 72 91 184 _res_hit_lsbsLess_T_15
+  191 slice 3 46 0 0 
+  192 concat 72 191 64 _res_hit_lsbsLess_T_20
+  193 ult 3 190 192 res_hit_lsbsLess_2
+  194 and 3 189 193 _res_hit_T_19
+  195 or 3 186 194 _res_hit_T_20
+  196 xor 3 195 74 _res_hit_T_21
+  197 slice 67 53 29 1 _res_hit_msbsLess_T_23
+  198 ult 3 84 197 res_hit_msbsLess_3
+  199 slice 67 53 29 1 _res_hit_msbsEqual_T_26
+  200 xor 67 84 199 _res_hit_msbsEqual_T_27
+  201 eq 3 200 68 res_hit_msbsEqual_3
+  202 slice 3 53 0 0 
+  203 concat 72 202 64 _res_hit_lsbsLess_T_27
+  204 ult 3 91 203 res_hit_lsbsLess_3
+  205 and 3 201 204 _res_hit_T_22
+  206 or 3 198 205 _res_hit_T_23
+  207 and 3 182 196 _res_hit_T_25
+  208 and 3 207 206 _res_hit_T_25
+  209 ite 3 164 181 208 res_hit_1
+  210 xor 3 48 74 _res_ignore_T_1
+  211 and 3 76 210 res_ignore_1
+  212 slice 72 79 2 0 _res_aligned_lsbMask_T_3
+  213 xor 72 212 75 res_aligned_lsbMask_1
+  214 slice 67 46 29 1 _res_aligned_straddlesLowerBound_T_22
+  215 xor 67 84 214 _res_aligned_straddlesLowerBound_T_23
+  216 eq 3 215 68 _res_aligned_straddlesLowerBound_T_24
+  217 slice 3 46 0 0 
+  218 slice 3 62 2 2 
+  219 xor 3 218 74 _res_aligned_straddlesLowerBound_T_31
+  220 and 3 216 217 res_aligned_straddlesLowerBound_1
+  221 and 3 220 219 res_aligned_straddlesLowerBound_1
+  222 slice 67 53 29 1 _res_aligned_straddlesUpperBound_T_22
+  223 xor 67 84 222 _res_aligned_straddlesUpperBound_T_23
+  224 eq 3 223 68 _res_aligned_straddlesUpperBound_T_24
+  225 slice 3 53 0 0 
+  226 slice 3 62 2 2 
+  227 slice 3 213 2 2 
+  228 or 3 226 227 _res_aligned_straddlesUpperBound_T_31
+  229 and 3 224 225 res_aligned_straddlesUpperBound_1
+  230 and 3 229 228 res_aligned_straddlesUpperBound_1
+  231 or 3 221 230 _res_aligned_rangeAligned_T_1
+  232 xor 3 231 74 res_aligned_rangeAligned_1
+  233 slice 72 54 2 0 _res_aligned_pow2Aligned_T_3
+  234 xor 72 233 75 _res_aligned_pow2Aligned_T_4
+  235 and 72 213 234 _res_aligned_pow2Aligned_T_5
+  236 eq 3 235 73 res_aligned_pow2Aligned_1
+  237 ite 3 164 236 232 res_aligned_1
+  238 or 3 52 211 _res_cur_cfg_r_T_2
+  239 and 3 237 238 res_cur_1_cfg_r
+  240 or 3 51 211 _res_cur_cfg_w_T_2
+  241 and 3 237 240 res_cur_1_cfg_w
+  242 or 3 50 211 _res_cur_cfg_x_T_2
+  243 and 3 237 242 res_cur_1_cfg_x
+  244 ite 3 209 243 161 _res_T_89_cfg_x
+  245 ite 3 209 241 162 _res_T_89_cfg_w
+  246 ite 3 209 239 163 _res_T_89_cfg_r
+  247 slice 3 42 1 1 _res_aligned_T_2
+  248 slice 72 79 2 0 _res_hit_lsbMask_T_7
+  249 xor 72 248 75 _res_hit_lsbMask_T_8
+  250 slice 72 47 2 0 
+  251 or 72 250 249 _res_hit_lsbMatch_T_26
+  252 slice 67 46 29 1 _res_hit_msbMatch_T_25
+  253 slice 67 47 31 3 _res_hit_msbMatch_T_26
+  254 xor 67 84 252 _res_hit_msbMatch_T_27
+  255 xor 67 253 69 _res_hit_msbMatch_T_28
+  256 and 67 254 255 _res_hit_msbMatch_T_29
+  257 eq 3 256 68 res_hit_msbMatch_2
+  258 slice 3 46 0 0 
+  259 concat 72 258 64 _res_hit_lsbMatch_T_25
+  260 xor 72 91 259 _res_hit_lsbMatch_T_27
+  261 xor 72 251 75 _res_hit_lsbMatch_T_28
+  262 and 72 260 261 _res_hit_lsbMatch_T_29
+  263 eq 3 262 73 res_hit_lsbMatch_2
+  264 and 3 257 263 _res_hit_T_27
+  265 slice 3 42 0 0 _res_hit_T_28
+  266 slice 72 79 2 0 _res_hit_T_30
+  267 xor 72 266 75 _res_hit_T_31
+  268 slice 67 39 29 1 _res_hit_msbsLess_T_29
+  269 ult 3 84 268 res_hit_msbsLess_4
+  270 slice 67 39 29 1 _res_hit_msbsEqual_T_33
+  271 xor 67 84 270 _res_hit_msbsEqual_T_34
+  272 eq 3 271 68 res_hit_msbsEqual_4
+  273 or 72 91 267 _res_hit_lsbsLess_T_29
+  274 slice 3 39 0 0 
+  275 concat 72 274 64 _res_hit_lsbsLess_T_34
+  276 ult 3 273 275 res_hit_lsbsLess_4
+  277 and 3 272 276 _res_hit_T_32
+  278 or 3 269 277 _res_hit_T_33
+  279 xor 3 278 74 _res_hit_T_34
+  280 slice 67 46 29 1 _res_hit_msbsLess_T_35
+  281 ult 3 84 280 res_hit_msbsLess_5
+  282 slice 67 46 29 1 _res_hit_msbsEqual_T_40
+  283 xor 67 84 282 _res_hit_msbsEqual_T_41
+  284 eq 3 283 68 res_hit_msbsEqual_5
+  285 slice 3 46 0 0 
+  286 concat 72 285 64 _res_hit_lsbsLess_T_41
+  287 ult 3 91 286 res_hit_lsbsLess_5
+  288 and 3 284 287 _res_hit_T_35
+  289 or 3 281 288 _res_hit_T_36
+  290 and 3 265 279 _res_hit_T_38
+  291 and 3 290 289 _res_hit_T_38
+  292 ite 3 247 264 291 res_hit_2
+  293 xor 3 41 74 _res_ignore_T_2
+  294 and 3 76 293 res_ignore_2
+  295 slice 72 79 2 0 _res_aligned_lsbMask_T_5
+  296 xor 72 295 75 res_aligned_lsbMask_2
+  297 slice 67 39 29 1 _res_aligned_straddlesLowerBound_T_39
+  298 xor 67 84 297 _res_aligned_straddlesLowerBound_T_40
+  299 eq 3 298 68 _res_aligned_straddlesLowerBound_T_41
+  300 slice 3 39 0 0 
+  301 slice 3 62 2 2 
+  302 xor 3 301 74 _res_aligned_straddlesLowerBound_T_48
+  303 and 3 299 300 res_aligned_straddlesLowerBound_2
+  304 and 3 303 302 res_aligned_straddlesLowerBound_2
+  305 slice 67 46 29 1 _res_aligned_straddlesUpperBound_T_39
+  306 xor 67 84 305 _res_aligned_straddlesUpperBound_T_40
+  307 eq 3 306 68 _res_aligned_straddlesUpperBound_T_41
+  308 slice 3 46 0 0 
+  309 slice 3 62 2 2 
+  310 slice 3 296 2 2 
+  311 or 3 309 310 _res_aligned_straddlesUpperBound_T_48
+  312 and 3 307 308 res_aligned_straddlesUpperBound_2
+  313 and 3 312 311 res_aligned_straddlesUpperBound_2
+  314 or 3 304 313 _res_aligned_rangeAligned_T_2
+  315 xor 3 314 74 res_aligned_rangeAligned_2
+  316 slice 72 47 2 0 _res_aligned_pow2Aligned_T_6
+  317 xor 72 316 75 _res_aligned_pow2Aligned_T_7
+  318 and 72 296 317 _res_aligned_pow2Aligned_T_8
+  319 eq 3 318 73 res_aligned_pow2Aligned_2
+  320 ite 3 247 319 315 res_aligned_2
+  321 or 3 45 294 _res_cur_cfg_r_T_4
+  322 and 3 320 321 res_cur_2_cfg_r
+  323 or 3 44 294 _res_cur_cfg_w_T_4
+  324 and 3 320 323 res_cur_2_cfg_w
+  325 or 3 43 294 _res_cur_cfg_x_T_4
+  326 and 3 320 325 res_cur_2_cfg_x
+  327 ite 3 292 326 244 _res_T_134_cfg_x
+  328 ite 3 292 324 245 _res_T_134_cfg_w
+  329 ite 3 292 322 246 _res_T_134_cfg_r
+  330 slice 3 35 1 1 _res_aligned_T_3
+  331 slice 72 79 2 0 _res_hit_lsbMask_T_10
+  332 xor 72 331 75 _res_hit_lsbMask_T_11
+  333 slice 72 40 2 0 
+  334 or 72 333 332 _res_hit_lsbMatch_T_36
+  335 slice 67 39 29 1 _res_hit_msbMatch_T_35
+  336 slice 67 40 31 3 _res_hit_msbMatch_T_36
+  337 xor 67 84 335 _res_hit_msbMatch_T_37
+  338 xor 67 336 69 _res_hit_msbMatch_T_38
+  339 and 67 337 338 _res_hit_msbMatch_T_39
+  340 eq 3 339 68 res_hit_msbMatch_3
+  341 slice 3 39 0 0 
+  342 concat 72 341 64 _res_hit_lsbMatch_T_35
+  343 xor 72 91 342 _res_hit_lsbMatch_T_37
+  344 xor 72 334 75 _res_hit_lsbMatch_T_38
+  345 and 72 343 344 _res_hit_lsbMatch_T_39
+  346 eq 3 345 73 res_hit_lsbMatch_3
+  347 and 3 340 346 _res_hit_T_40
+  348 slice 3 35 0 0 _res_hit_T_41
+  349 slice 72 79 2 0 _res_hit_T_43
+  350 xor 72 349 75 _res_hit_T_44
+  351 slice 67 32 29 1 _res_hit_msbsLess_T_41
+  352 ult 3 84 351 res_hit_msbsLess_6
+  353 slice 67 32 29 1 _res_hit_msbsEqual_T_47
+  354 xor 67 84 353 _res_hit_msbsEqual_T_48
+  355 eq 3 354 68 res_hit_msbsEqual_6
+  356 or 72 91 350 _res_hit_lsbsLess_T_43
+  357 slice 3 32 0 0 
+  358 concat 72 357 64 _res_hit_lsbsLess_T_48
+  359 ult 3 356 358 res_hit_lsbsLess_6
+  360 and 3 355 359 _res_hit_T_45
+  361 or 3 352 360 _res_hit_T_46
+  362 xor 3 361 74 _res_hit_T_47
+  363 slice 67 39 29 1 _res_hit_msbsLess_T_47
+  364 ult 3 84 363 res_hit_msbsLess_7
+  365 slice 67 39 29 1 _res_hit_msbsEqual_T_54
+  366 xor 67 84 365 _res_hit_msbsEqual_T_55
+  367 eq 3 366 68 res_hit_msbsEqual_7
+  368 slice 3 39 0 0 
+  369 concat 72 368 64 _res_hit_lsbsLess_T_55
+  370 ult 3 91 369 res_hit_lsbsLess_7
+  371 and 3 367 370 _res_hit_T_48
+  372 or 3 364 371 _res_hit_T_49
+  373 and 3 348 362 _res_hit_T_51
+  374 and 3 373 372 _res_hit_T_51
+  375 ite 3 330 347 374 res_hit_3
+  376 xor 3 34 74 _res_ignore_T_3
+  377 and 3 76 376 res_ignore_3
+  378 slice 72 79 2 0 _res_aligned_lsbMask_T_7
+  379 xor 72 378 75 res_aligned_lsbMask_3
+  380 slice 67 32 29 1 _res_aligned_straddlesLowerBound_T_56
+  381 xor 67 84 380 _res_aligned_straddlesLowerBound_T_57
+  382 eq 3 381 68 _res_aligned_straddlesLowerBound_T_58
+  383 slice 3 32 0 0 
+  384 slice 3 62 2 2 
+  385 xor 3 384 74 _res_aligned_straddlesLowerBound_T_65
+  386 and 3 382 383 res_aligned_straddlesLowerBound_3
+  387 and 3 386 385 res_aligned_straddlesLowerBound_3
+  388 slice 67 39 29 1 _res_aligned_straddlesUpperBound_T_56
+  389 xor 67 84 388 _res_aligned_straddlesUpperBound_T_57
+  390 eq 3 389 68 _res_aligned_straddlesUpperBound_T_58
+  391 slice 3 39 0 0 
+  392 slice 3 62 2 2 
+  393 slice 3 379 2 2 
+  394 or 3 392 393 _res_aligned_straddlesUpperBound_T_65
+  395 and 3 390 391 res_aligned_straddlesUpperBound_3
+  396 and 3 395 394 res_aligned_straddlesUpperBound_3
+  397 or 3 387 396 _res_aligned_rangeAligned_T_3
+  398 xor 3 397 74 res_aligned_rangeAligned_3
+  399 slice 72 40 2 0 _res_aligned_pow2Aligned_T_9
+  400 xor 72 399 75 _res_aligned_pow2Aligned_T_10
+  401 and 72 379 400 _res_aligned_pow2Aligned_T_11
+  402 eq 3 401 73 res_aligned_pow2Aligned_3
+  403 ite 3 330 402 398 res_aligned_3
+  404 or 3 38 377 _res_cur_cfg_r_T_6
+  405 and 3 403 404 res_cur_3_cfg_r
+  406 or 3 37 377 _res_cur_cfg_w_T_6
+  407 and 3 403 406 res_cur_3_cfg_w
+  408 or 3 36 377 _res_cur_cfg_x_T_6
+  409 and 3 403 408 res_cur_3_cfg_x
+  410 ite 3 375 409 327 _res_T_179_cfg_x
+  411 ite 3 375 407 328 _res_T_179_cfg_w
+  412 ite 3 375 405 329 _res_T_179_cfg_r
+  413 slice 3 28 1 1 _res_aligned_T_4
+  414 slice 72 79 2 0 _res_hit_lsbMask_T_13
+  415 xor 72 414 75 _res_hit_lsbMask_T_14
+  416 slice 72 33 2 0 
+  417 or 72 416 415 _res_hit_lsbMatch_T_46
+  418 slice 67 32 29 1 _res_hit_msbMatch_T_45
+  419 slice 67 33 31 3 _res_hit_msbMatch_T_46
+  420 xor 67 84 418 _res_hit_msbMatch_T_47
+  421 xor 67 419 69 _res_hit_msbMatch_T_48
+  422 and 67 420 421 _res_hit_msbMatch_T_49
+  423 eq 3 422 68 res_hit_msbMatch_4
+  424 slice 3 32 0 0 
+  425 concat 72 424 64 _res_hit_lsbMatch_T_45
+  426 xor 72 91 425 _res_hit_lsbMatch_T_47
+  427 xor 72 417 75 _res_hit_lsbMatch_T_48
+  428 and 72 426 427 _res_hit_lsbMatch_T_49
+  429 eq 3 428 73 res_hit_lsbMatch_4
+  430 and 3 423 429 _res_hit_T_53
+  431 slice 3 28 0 0 _res_hit_T_54
+  432 slice 72 79 2 0 _res_hit_T_56
+  433 xor 72 432 75 _res_hit_T_57
+  434 slice 67 25 29 1 _res_hit_msbsLess_T_53
+  435 ult 3 84 434 res_hit_msbsLess_8
+  436 slice 67 25 29 1 _res_hit_msbsEqual_T_61
+  437 xor 67 84 436 _res_hit_msbsEqual_T_62
+  438 eq 3 437 68 res_hit_msbsEqual_8
+  439 or 72 91 433 _res_hit_lsbsLess_T_57
+  440 slice 3 25 0 0 
+  441 concat 72 440 64 _res_hit_lsbsLess_T_62
+  442 ult 3 439 441 res_hit_lsbsLess_8
+  443 and 3 438 442 _res_hit_T_58
+  444 or 3 435 443 _res_hit_T_59
+  445 xor 3 444 74 _res_hit_T_60
+  446 slice 67 32 29 1 _res_hit_msbsLess_T_59
+  447 ult 3 84 446 res_hit_msbsLess_9
+  448 slice 67 32 29 1 _res_hit_msbsEqual_T_68
+  449 xor 67 84 448 _res_hit_msbsEqual_T_69
+  450 eq 3 449 68 res_hit_msbsEqual_9
+  451 slice 3 32 0 0 
+  452 concat 72 451 64 _res_hit_lsbsLess_T_69
+  453 ult 3 91 452 res_hit_lsbsLess_9
+  454 and 3 450 453 _res_hit_T_61
+  455 or 3 447 454 _res_hit_T_62
+  456 and 3 431 445 _res_hit_T_64
+  457 and 3 456 455 _res_hit_T_64
+  458 ite 3 413 430 457 res_hit_4
+  459 xor 3 27 74 _res_ignore_T_4
+  460 and 3 76 459 res_ignore_4
+  461 slice 72 79 2 0 _res_aligned_lsbMask_T_9
+  462 xor 72 461 75 res_aligned_lsbMask_4
+  463 slice 67 25 29 1 _res_aligned_straddlesLowerBound_T_73
+  464 xor 67 84 463 _res_aligned_straddlesLowerBound_T_74
+  465 eq 3 464 68 _res_aligned_straddlesLowerBound_T_75
+  466 slice 3 25 0 0 
+  467 slice 3 62 2 2 
+  468 xor 3 467 74 _res_aligned_straddlesLowerBound_T_82
+  469 and 3 465 466 res_aligned_straddlesLowerBound_4
+  470 and 3 469 468 res_aligned_straddlesLowerBound_4
+  471 slice 67 32 29 1 _res_aligned_straddlesUpperBound_T_73
+  472 xor 67 84 471 _res_aligned_straddlesUpperBound_T_74
+  473 eq 3 472 68 _res_aligned_straddlesUpperBound_T_75
+  474 slice 3 32 0 0 
+  475 slice 3 62 2 2 
+  476 slice 3 462 2 2 
+  477 or 3 475 476 _res_aligned_straddlesUpperBound_T_82
+  478 and 3 473 474 res_aligned_straddlesUpperBound_4
+  479 and 3 478 477 res_aligned_straddlesUpperBound_4
+  480 or 3 470 479 _res_aligned_rangeAligned_T_4
+  481 xor 3 480 74 res_aligned_rangeAligned_4
+  482 slice 72 33 2 0 _res_aligned_pow2Aligned_T_12
+  483 xor 72 482 75 _res_aligned_pow2Aligned_T_13
+  484 and 72 462 483 _res_aligned_pow2Aligned_T_14
+  485 eq 3 484 73 res_aligned_pow2Aligned_4
+  486 ite 3 413 485 481 res_aligned_4
+  487 or 3 31 460 _res_cur_cfg_r_T_8
+  488 and 3 486 487 res_cur_4_cfg_r
+  489 or 3 30 460 _res_cur_cfg_w_T_8
+  490 and 3 486 489 res_cur_4_cfg_w
+  491 or 3 29 460 _res_cur_cfg_x_T_8
+  492 and 3 486 491 res_cur_4_cfg_x
+  493 ite 3 458 492 410 _res_T_224_cfg_x
+  494 ite 3 458 490 411 _res_T_224_cfg_w
+  495 ite 3 458 488 412 _res_T_224_cfg_r
+  496 slice 3 21 1 1 _res_aligned_T_5
+  497 slice 72 79 2 0 _res_hit_lsbMask_T_16
+  498 xor 72 497 75 _res_hit_lsbMask_T_17
+  499 slice 72 26 2 0 
+  500 or 72 499 498 _res_hit_lsbMatch_T_56
+  501 slice 67 25 29 1 _res_hit_msbMatch_T_55
+  502 slice 67 26 31 3 _res_hit_msbMatch_T_56
+  503 xor 67 84 501 _res_hit_msbMatch_T_57
+  504 xor 67 502 69 _res_hit_msbMatch_T_58
+  505 and 67 503 504 _res_hit_msbMatch_T_59
+  506 eq 3 505 68 res_hit_msbMatch_5
+  507 slice 3 25 0 0 
+  508 concat 72 507 64 _res_hit_lsbMatch_T_55
+  509 xor 72 91 508 _res_hit_lsbMatch_T_57
+  510 xor 72 500 75 _res_hit_lsbMatch_T_58
+  511 and 72 509 510 _res_hit_lsbMatch_T_59
+  512 eq 3 511 73 res_hit_lsbMatch_5
+  513 and 3 506 512 _res_hit_T_66
+  514 slice 3 21 0 0 _res_hit_T_67
+  515 slice 72 79 2 0 _res_hit_T_69
+  516 xor 72 515 75 _res_hit_T_70
+  517 slice 67 18 29 1 _res_hit_msbsLess_T_65
+  518 ult 3 84 517 res_hit_msbsLess_10
+  519 slice 67 18 29 1 _res_hit_msbsEqual_T_75
+  520 xor 67 84 519 _res_hit_msbsEqual_T_76
+  521 eq 3 520 68 res_hit_msbsEqual_10
+  522 or 72 91 516 _res_hit_lsbsLess_T_71
+  523 slice 3 18 0 0 
+  524 concat 72 523 64 _res_hit_lsbsLess_T_76
+  525 ult 3 522 524 res_hit_lsbsLess_10
+  526 and 3 521 525 _res_hit_T_71
+  527 or 3 518 526 _res_hit_T_72
+  528 xor 3 527 74 _res_hit_T_73
+  529 slice 67 25 29 1 _res_hit_msbsLess_T_71
+  530 ult 3 84 529 res_hit_msbsLess_11
+  531 slice 67 25 29 1 _res_hit_msbsEqual_T_82
+  532 xor 67 84 531 _res_hit_msbsEqual_T_83
+  533 eq 3 532 68 res_hit_msbsEqual_11
+  534 slice 3 25 0 0 
+  535 concat 72 534 64 _res_hit_lsbsLess_T_83
+  536 ult 3 91 535 res_hit_lsbsLess_11
+  537 and 3 533 536 _res_hit_T_74
+  538 or 3 530 537 _res_hit_T_75
+  539 and 3 514 528 _res_hit_T_77
+  540 and 3 539 538 _res_hit_T_77
+  541 ite 3 496 513 540 res_hit_5
+  542 xor 3 20 74 _res_ignore_T_5
+  543 and 3 76 542 res_ignore_5
+  544 slice 72 79 2 0 _res_aligned_lsbMask_T_11
+  545 xor 72 544 75 res_aligned_lsbMask_5
+  546 slice 67 18 29 1 _res_aligned_straddlesLowerBound_T_90
+  547 xor 67 84 546 _res_aligned_straddlesLowerBound_T_91
+  548 eq 3 547 68 _res_aligned_straddlesLowerBound_T_92
+  549 slice 3 18 0 0 
+  550 slice 3 62 2 2 
+  551 xor 3 550 74 _res_aligned_straddlesLowerBound_T_99
+  552 and 3 548 549 res_aligned_straddlesLowerBound_5
+  553 and 3 552 551 res_aligned_straddlesLowerBound_5
+  554 slice 67 25 29 1 _res_aligned_straddlesUpperBound_T_90
+  555 xor 67 84 554 _res_aligned_straddlesUpperBound_T_91
+  556 eq 3 555 68 _res_aligned_straddlesUpperBound_T_92
+  557 slice 3 25 0 0 
+  558 slice 3 62 2 2 
+  559 slice 3 545 2 2 
+  560 or 3 558 559 _res_aligned_straddlesUpperBound_T_99
+  561 and 3 556 557 res_aligned_straddlesUpperBound_5
+  562 and 3 561 560 res_aligned_straddlesUpperBound_5
+  563 or 3 553 562 _res_aligned_rangeAligned_T_5
+  564 xor 3 563 74 res_aligned_rangeAligned_5
+  565 slice 72 26 2 0 _res_aligned_pow2Aligned_T_15
+  566 xor 72 565 75 _res_aligned_pow2Aligned_T_16
+  567 and 72 545 566 _res_aligned_pow2Aligned_T_17
+  568 eq 3 567 73 res_aligned_pow2Aligned_5
+  569 ite 3 496 568 564 res_aligned_5
+  570 or 3 24 543 _res_cur_cfg_r_T_10
+  571 and 3 569 570 res_cur_5_cfg_r
+  572 or 3 23 543 _res_cur_cfg_w_T_10
+  573 and 3 569 572 res_cur_5_cfg_w
+  574 or 3 22 543 _res_cur_cfg_x_T_10
+  575 and 3 569 574 res_cur_5_cfg_x
+  576 ite 3 541 575 493 _res_T_269_cfg_x
+  577 ite 3 541 573 494 _res_T_269_cfg_w
+  578 ite 3 541 571 495 _res_T_269_cfg_r
+  579 slice 3 14 1 1 _res_aligned_T_6
+  580 slice 72 79 2 0 _res_hit_lsbMask_T_19
+  581 xor 72 580 75 _res_hit_lsbMask_T_20
+  582 slice 72 19 2 0 
+  583 or 72 582 581 _res_hit_lsbMatch_T_66
+  584 slice 67 18 29 1 _res_hit_msbMatch_T_65
+  585 slice 67 19 31 3 _res_hit_msbMatch_T_66
+  586 xor 67 84 584 _res_hit_msbMatch_T_67
+  587 xor 67 585 69 _res_hit_msbMatch_T_68
+  588 and 67 586 587 _res_hit_msbMatch_T_69
+  589 eq 3 588 68 res_hit_msbMatch_6
+  590 slice 3 18 0 0 
+  591 concat 72 590 64 _res_hit_lsbMatch_T_65
+  592 xor 72 91 591 _res_hit_lsbMatch_T_67
+  593 xor 72 583 75 _res_hit_lsbMatch_T_68
+  594 and 72 592 593 _res_hit_lsbMatch_T_69
+  595 eq 3 594 73 res_hit_lsbMatch_6
+  596 and 3 589 595 _res_hit_T_79
+  597 slice 3 14 0 0 _res_hit_T_80
+  598 slice 72 79 2 0 _res_hit_T_82
+  599 xor 72 598 75 _res_hit_T_83
+  600 slice 67 10 29 1 _res_hit_msbsLess_T_77
+  601 ult 3 84 600 res_hit_msbsLess_12
+  602 slice 67 10 29 1 _res_hit_msbsEqual_T_89
+  603 xor 67 84 602 _res_hit_msbsEqual_T_90
+  604 eq 3 603 68 res_hit_msbsEqual_12
+  605 or 72 91 599 _res_hit_lsbsLess_T_85
+  606 slice 3 10 0 0 
+  607 concat 72 606 64 _res_hit_lsbsLess_T_90
+  608 ult 3 605 607 res_hit_lsbsLess_12
+  609 and 3 604 608 _res_hit_T_84
+  610 or 3 601 609 _res_hit_T_85
+  611 xor 3 610 74 _res_hit_T_86
+  612 slice 67 18 29 1 _res_hit_msbsLess_T_83
+  613 ult 3 84 612 res_hit_msbsLess_13
+  614 slice 67 18 29 1 _res_hit_msbsEqual_T_96
+  615 xor 67 84 614 _res_hit_msbsEqual_T_97
+  616 eq 3 615 68 res_hit_msbsEqual_13
+  617 slice 3 18 0 0 
+  618 concat 72 617 64 _res_hit_lsbsLess_T_97
+  619 ult 3 91 618 res_hit_lsbsLess_13
+  620 and 3 616 619 _res_hit_T_87
+  621 or 3 613 620 _res_hit_T_88
+  622 and 3 597 611 _res_hit_T_90
+  623 and 3 622 621 _res_hit_T_90
+  624 ite 3 579 596 623 res_hit_6
+  625 xor 3 13 74 _res_ignore_T_6
+  626 and 3 76 625 res_ignore_6
+  627 slice 72 79 2 0 _res_aligned_lsbMask_T_13
+  628 xor 72 627 75 res_aligned_lsbMask_6
+  629 slice 67 10 29 1 _res_aligned_straddlesLowerBound_T_107
+  630 xor 67 84 629 _res_aligned_straddlesLowerBound_T_108
+  631 eq 3 630 68 _res_aligned_straddlesLowerBound_T_109
+  632 slice 3 10 0 0 
+  633 slice 3 62 2 2 
+  634 xor 3 633 74 _res_aligned_straddlesLowerBound_T_116
+  635 and 3 631 632 res_aligned_straddlesLowerBound_6
+  636 and 3 635 634 res_aligned_straddlesLowerBound_6
+  637 slice 67 18 29 1 _res_aligned_straddlesUpperBound_T_107
+  638 xor 67 84 637 _res_aligned_straddlesUpperBound_T_108
+  639 eq 3 638 68 _res_aligned_straddlesUpperBound_T_109
+  640 slice 3 18 0 0 
+  641 slice 3 62 2 2 
+  642 slice 3 628 2 2 
+  643 or 3 641 642 _res_aligned_straddlesUpperBound_T_116
+  644 and 3 639 640 res_aligned_straddlesUpperBound_6
+  645 and 3 644 643 res_aligned_straddlesUpperBound_6
+  646 or 3 636 645 _res_aligned_rangeAligned_T_6
+  647 xor 3 646 74 res_aligned_rangeAligned_6
+  648 slice 72 19 2 0 _res_aligned_pow2Aligned_T_18
+  649 xor 72 648 75 _res_aligned_pow2Aligned_T_19
+  650 and 72 628 649 _res_aligned_pow2Aligned_T_20
+  651 eq 3 650 73 res_aligned_pow2Aligned_6
+  652 ite 3 579 651 647 res_aligned_6
+  653 or 3 17 626 _res_cur_cfg_r_T_12
+  654 and 3 652 653 res_cur_6_cfg_r
+  655 or 3 16 626 _res_cur_cfg_w_T_12
+  656 and 3 652 655 res_cur_6_cfg_w
+  657 or 3 15 626 _res_cur_cfg_x_T_12
+  658 and 3 652 657 res_cur_6_cfg_x
+  659 ite 3 624 658 576 _res_T_314_cfg_x
+  660 ite 3 624 656 577 _res_T_314_cfg_w
+  661 ite 3 624 654 578 _res_T_314_cfg_r
+  662 slice 3 5 1 1 _res_aligned_T_7
+  663 slice 72 79 2 0 _res_hit_lsbMask_T_22
+  664 xor 72 663 75 _res_hit_lsbMask_T_23
+  665 slice 72 12 2 0 
+  666 or 72 665 664 _res_hit_lsbMatch_T_76
+  667 slice 67 10 29 1 _res_hit_msbMatch_T_75
+  668 slice 67 12 31 3 _res_hit_msbMatch_T_76
+  669 xor 67 84 667 _res_hit_msbMatch_T_77
+  670 xor 67 668 69 _res_hit_msbMatch_T_78
+  671 and 67 669 670 _res_hit_msbMatch_T_79
+  672 eq 3 671 68 res_hit_msbMatch_7
+  673 slice 3 10 0 0 
+  674 concat 72 673 64 _res_hit_lsbMatch_T_75
+  675 xor 72 91 674 _res_hit_lsbMatch_T_77
+  676 xor 72 666 75 _res_hit_lsbMatch_T_78
+  677 and 72 675 676 _res_hit_lsbMatch_T_79
+  678 eq 3 677 73 res_hit_lsbMatch_7
+  679 and 3 672 678 _res_hit_T_92
+  680 slice 3 5 0 0 _res_hit_T_93
+  681 slice 67 10 29 1 _res_hit_msbsLess_T_95
+  682 ult 3 84 681 res_hit_msbsLess_15
+  683 slice 67 10 29 1 _res_hit_msbsEqual_T_110
+  684 xor 67 84 683 _res_hit_msbsEqual_T_111
+  685 eq 3 684 68 res_hit_msbsEqual_15
+  686 slice 3 10 0 0 
+  687 concat 72 686 64 _res_hit_lsbsLess_T_111
+  688 ult 3 91 687 res_hit_lsbsLess_15
+  689 and 3 685 688 _res_hit_T_100
+  690 or 3 682 689 _res_hit_T_102
+  691 and 3 680 690 _res_hit_T_103
+  692 ite 3 662 679 691 res_hit_7
+  693 xor 3 4 74 _res_ignore_T_7
+  694 and 3 76 693 res_ignore_7
+  695 slice 72 79 2 0 _res_aligned_lsbMask_T_15
+  696 xor 72 695 75 res_aligned_lsbMask_7
+  697 slice 67 10 29 1 _res_aligned_straddlesUpperBound_T_124
+  698 xor 67 84 697 _res_aligned_straddlesUpperBound_T_125
+  699 eq 3 698 68 _res_aligned_straddlesUpperBound_T_126
+  700 slice 3 10 0 0 
+  701 slice 3 62 2 2 
+  702 slice 3 696 2 2 
+  703 or 3 701 702 _res_aligned_straddlesUpperBound_T_133
+  704 and 3 699 700 res_aligned_straddlesUpperBound_7
+  705 and 3 704 703 res_aligned_straddlesUpperBound_7
+  706 xor 3 705 74 res_aligned_rangeAligned_7
+  707 slice 72 12 2 0 _res_aligned_pow2Aligned_T_21
+  708 xor 72 707 75 _res_aligned_pow2Aligned_T_22
+  709 and 72 696 708 _res_aligned_pow2Aligned_T_23
+  710 eq 3 709 73 res_aligned_pow2Aligned_7
+  711 ite 3 662 710 706 res_aligned_7
+  712 or 3 8 694 _res_cur_cfg_r_T_14
+  713 and 3 711 712 res_cur_7_cfg_r
+  714 or 3 7 694 _res_cur_cfg_w_T_14
+  715 and 3 711 714 res_cur_7_cfg_w
+  716 or 3 6 694 _res_cur_cfg_x_T_14
+  717 and 3 711 716 res_cur_7_cfg_x
+  718 ite 3 692 717 659 io_x
+  719 ite 3 692 715 660 io_w
+  720 ite 3 692 713 661 io_r
+  721 output 720 io_r
+  722 output 719 io_w
+  723 output 718 io_x
+}

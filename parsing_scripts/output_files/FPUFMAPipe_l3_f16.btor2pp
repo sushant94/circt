@@ -1,0 +1,72 @@
+include MulAddRecFNPipe_l2_e5_s11.btor2pp
+
+module FPUFMAPipe_l3_f16 {
+  1 sort bitvec 1
+  2 input 1 reset
+  3 input 1 io_in_valid
+  4 input 1 io_in_bits_ren3
+  5 input 1 io_in_bits_swap23
+  6 sort bitvec 3
+  7 input 6 io_in_bits_rm
+  8 sort bitvec 2
+  9 input 8 io_in_bits_fmaCmd
+  10 sort bitvec 65
+  11 input 10 io_in_bits_in1
+  12 input 10 io_in_bits_in2
+  13 input 10 io_in_bits_in3
+  14 state 1 valid
+  15 state 6 in_rm
+  16 state 8 in_fmaCmd
+  17 state 10 in_in1
+  18 state 10 in_in2
+  19 state 10 in_in3
+  20 inst MulAddRecFNPipe_l2_e5_s11
+  21 ref MulAddRecFNPipe_l2_e5_s11 2 reset
+  22 ref MulAddRecFNPipe_l2_e5_s11 3 io_validin
+  23 ref MulAddRecFNPipe_l2_e5_s11 5 io_op
+  24 ref MulAddRecFNPipe_l2_e5_s11 7 io_a
+  25 ref MulAddRecFNPipe_l2_e5_s11 8 io_b
+  26 ref MulAddRecFNPipe_l2_e5_s11 9 io_c
+  27 ref MulAddRecFNPipe_l2_e5_s11 11 io_roundingMode
+  28 ref MulAddRecFNPipe_l2_e5_s11 203 io_out
+  29 ref MulAddRecFNPipe_l2_e5_s11 204 io_exceptionFlags
+  30 get 20 28 io_out
+  31 get 20 29 io_exceptionFlags
+  32 sort bitvec 48
+  33 consth 32 0
+  34 sort bitvec 17
+  35 consth 34 10000
+  36 consth 10 8000
+  37 slice 34 11 16 0 
+  38 slice 34 12 16 0 
+  39 xor 34 37 38 _zero_T
+  40 and 34 39 35 
+  41 concat 10 33 40 
+  42 ite 6 3 7 15 
+  43 ite 8 3 9 16 
+  44 ite 10 3 11 17 
+  45 ite 10 5 36 12 
+  46 ite 10 3 45 18 
+  47 or 1 4 5 
+  48 ite 10 47 13 41 
+  49 ite 10 3 48 19 
+  50 slice 34 17 16 0 fma.io_a
+  51 slice 34 18 16 0 fma.io_b
+  52 slice 34 19 16 0 fma.io_c
+  53 concat 10 33 30 res_data
+  54 set 20 21 2 reset
+  55 set 20 22 14 io_validin
+  56 set 20 23 16 io_op
+  57 set 20 24 50 io_a
+  58 set 20 25 51 io_b
+  59 set 20 26 52 io_c
+  60 set 20 27 15 io_roundingMode
+  61 output 53 io_out_bits_data
+  62 output 31 io_out_bits_exc
+  63 next 1 14 3
+  64 next 6 15 42
+  65 next 8 16 43
+  66 next 10 17 44
+  67 next 10 18 46
+  68 next 10 19 49
+}

@@ -1,0 +1,246 @@
+
+module MulAddRecFNToRaw_postMul_e5_s11 {
+  1 sort bitvec 1
+  2 input 1 io_fromPreMul_isSigNaNAny
+  3 input 1 io_fromPreMul_isNaNAOrB
+  4 input 1 io_fromPreMul_isInfA
+  5 input 1 io_fromPreMul_isZeroA
+  6 input 1 io_fromPreMul_isInfB
+  7 input 1 io_fromPreMul_isZeroB
+  8 input 1 io_fromPreMul_signProd
+  9 input 1 io_fromPreMul_isNaNC
+  10 input 1 io_fromPreMul_isInfC
+  11 input 1 io_fromPreMul_isZeroC
+  12 sort bitvec 7
+  13 input 12 io_fromPreMul_sExpSum
+  14 input 1 io_fromPreMul_doSubMags
+  15 input 1 io_fromPreMul_CIsDominant
+  16 sort bitvec 4
+  17 input 16 io_fromPreMul_CDom_CAlignDist
+  18 sort bitvec 13
+  19 input 18 io_fromPreMul_highAlignedSigC
+  20 input 1 io_fromPreMul_bit0AlignedSigC
+  21 sort bitvec 23
+  22 input 21 io_mulAddResult
+  23 sort bitvec 3
+  24 input 23 io_roundingMode
+  25 sort bitvec 24
+  26 consth 25 0
+  27 sort bitvec 11
+  28 consth 27 7FF
+  29 consth 18 1
+  30 sort bitvec 6
+  31 consth 30 0
+  32 consth 23 7
+  33 sort bitvec 51
+  34 consth 33 0
+  35 sort bitvec 31
+  36 consth 35 0
+  37 sort bitvec 2
+  38 consth 37 0
+  39 sort bitvec 25
+  40 consth 39 1FFFFFF
+  41 sort bitvec 5
+  42 consth 41 0
+  43 consth 37 3
+  44 consth 23 0
+  45 sort bitvec 35
+  46 consth 45 0
+  47 sort bitvec 15
+  48 consth 47 0
+  49 sort bitvec 12
+  50 consth 49 0
+  51 consth 25 FFFFFF
+  52 consth 23 2
+  53 consth 1 1
+  54 consth 1 0
+  55 consth 16 B
+  56 consth 16 C
+  57 consth 16 A
+  58 consth 16 9
+  59 consth 16 8
+  60 consth 41 10
+  61 consth 16 7
+  62 consth 16 6
+  63 consth 16 5
+  64 consth 16 4
+  65 consth 16 3
+  66 consth 16 2
+  67 consth 16 1
+  68 consth 16 0
+  69 sort bitvec 9
+  70 consth 69 100
+  71 eq 1 24 52 roundingMode_min
+  72 xor 1 8 14 opSignC
+  73 slice 1 22 22 22 _sigSum_T
+  74 add 18 19 29 _sigSum_T_1
+  75 ite 18 73 74 19 _sigSum_T_3
+  76 sort bitvec 22
+  77 slice 76 22 21 0 _sigSum_T_4
+  78 concat 12 31 14 
+  79 sub 12 13 78 _CDom_sExp_T_1
+  80 slice 27 22 21 11 
+  81 concat 25 75 80 _CDom_absSigSum_T
+  82 xor 25 81 51 _CDom_absSigSum_T_1
+  83 slice 37 19 12 11 _CDom_absSigSum_T_2
+  84 sort bitvec 10
+  85 slice 84 22 21 12 
+  86 slice 27 75 10 0 
+  87 concat 25 54 83 _CDom_absSigSum_T_5
+  88 concat 25 87 86 _CDom_absSigSum_T_5
+  89 concat 25 88 85 _CDom_absSigSum_T_5
+  90 ite 25 14 82 89 CDom_absSigSum
+  91 slice 27 22 10 0 _CDom_absSigSumExtra_T
+  92 neq 1 91 28 _CDom_absSigSumExtra_T_2
+  93 slice 49 22 11 0 _CDom_absSigSumExtra_T_3
+  94 neq 1 93 50 _CDom_absSigSumExtra_T_4
+  95 ite 1 14 92 94 CDom_absSigSumExtra
+  96 sort bitvec 39
+  97 concat 96 48 90 
+  98 concat 96 46 17 
+  99 sll 96 97 98 _CDom_mainSig_T
+  100 slice 16 90 3 0 _CDom_reduced4SigExtra_reducedVec_0_T
+  101 neq 1 100 68 CDom_reduced4SigExtra_reducedVec_0
+  102 slice 16 90 7 4 _CDom_reduced4SigExtra_reducedVec_1_T
+  103 neq 1 102 68 CDom_reduced4SigExtra_reducedVec_1
+  104 slice 37 17 3 2 _CDom_reduced4SigExtra_T_3
+  105 xor 37 104 43 _CDom_reduced4SigExtra_T_4
+  106 concat 41 44 105 
+  107 sra 41 60 106 CDom_reduced4SigExtra_shift
+  108 slice 1 107 1 1 _CDom_reduced4SigExtra_T_6
+  109 slice 1 107 2 2 _CDom_reduced4SigExtra_T_7
+  110 concat 37 108 109 _CDom_reduced4SigExtra_T_8
+  111 concat 37 103 101 
+  112 and 37 111 110 
+  113 slice 18 99 23 11 _CDom_sig_T
+  114 slice 23 99 10 8 _CDom_sig_T_1
+  115 concat 41 114 112 
+  116 neq 1 115 42 _CDom_sig_T_3
+  117 or 1 116 95 _CDom_sig_T_4
+  118 sort bitvec 14
+  119 concat 118 113 117 CDom_sig
+  120 slice 1 75 2 2 notCDom_signSigSum
+  121 slice 37 75 1 0 
+  122 concat 39 121 77 _notCDom_absSigSum_T_2
+  123 concat 39 122 20 _notCDom_absSigSum_T_2
+  124 xor 39 123 40 _notCDom_absSigSum_T_1
+  125 concat 39 121 77 
+  126 concat 39 125 20 
+  127 concat 39 26 14 
+  128 add 39 126 127 _notCDom_absSigSum_T_3
+  129 ite 39 120 124 128 notCDom_absSigSum
+  130 slice 37 129 1 0 _notCDom_reduced2AbsSigSum_reducedVec_0_T
+  131 neq 1 130 38 notCDom_reduced2AbsSigSum_reducedVec_0
+  132 slice 37 129 3 2 _notCDom_reduced2AbsSigSum_reducedVec_1_T
+  133 neq 1 132 38 notCDom_reduced2AbsSigSum_reducedVec_1
+  134 slice 37 129 5 4 _notCDom_reduced2AbsSigSum_reducedVec_2_T
+  135 neq 1 134 38 notCDom_reduced2AbsSigSum_reducedVec_2
+  136 slice 37 129 7 6 _notCDom_reduced2AbsSigSum_reducedVec_3_T
+  137 neq 1 136 38 notCDom_reduced2AbsSigSum_reducedVec_3
+  138 slice 37 129 9 8 _notCDom_reduced2AbsSigSum_reducedVec_4_T
+  139 neq 1 138 38 notCDom_reduced2AbsSigSum_reducedVec_4
+  140 slice 37 129 11 10 _notCDom_reduced2AbsSigSum_reducedVec_5_T
+  141 neq 1 140 38 notCDom_reduced2AbsSigSum_reducedVec_5
+  142 slice 37 129 13 12 _notCDom_reduced2AbsSigSum_reducedVec_6_T
+  143 neq 1 142 38 notCDom_reduced2AbsSigSum_reducedVec_6
+  144 slice 37 129 15 14 _notCDom_reduced2AbsSigSum_reducedVec_7_T
+  145 neq 1 144 38 notCDom_reduced2AbsSigSum_reducedVec_7
+  146 slice 37 129 17 16 _notCDom_reduced2AbsSigSum_reducedVec_8_T
+  147 neq 1 146 38 notCDom_reduced2AbsSigSum_reducedVec_8
+  148 slice 37 129 19 18 _notCDom_reduced2AbsSigSum_reducedVec_9_T
+  149 neq 1 148 38 notCDom_reduced2AbsSigSum_reducedVec_9
+  150 slice 37 129 21 20 _notCDom_reduced2AbsSigSum_reducedVec_10_T
+  151 neq 1 150 38 notCDom_reduced2AbsSigSum_reducedVec_10
+  152 slice 37 129 23 22 _notCDom_reduced2AbsSigSum_reducedVec_11_T
+  153 neq 1 152 38 notCDom_reduced2AbsSigSum_reducedVec_11
+  154 slice 1 129 24 24 notCDom_reduced2AbsSigSum_reducedVec_12
+  155 ite 16 133 55 56 _notCDom_normDistReduced2_T_13
+  156 ite 16 135 57 155 _notCDom_normDistReduced2_T_14
+  157 ite 16 137 58 156 _notCDom_normDistReduced2_T_15
+  158 ite 16 139 59 157 _notCDom_normDistReduced2_T_16
+  159 ite 16 141 61 158 _notCDom_normDistReduced2_T_17
+  160 ite 16 143 62 159 _notCDom_normDistReduced2_T_18
+  161 ite 16 145 63 160 _notCDom_normDistReduced2_T_19
+  162 ite 16 147 64 161 _notCDom_normDistReduced2_T_20
+  163 ite 16 149 65 162 _notCDom_normDistReduced2_T_21
+  164 ite 16 151 66 163 _notCDom_normDistReduced2_T_22
+  165 ite 16 153 67 164 _notCDom_normDistReduced2_T_23
+  166 ite 16 154 68 165 notCDom_normDistReduced2
+  167 concat 12 38 166 
+  168 concat 12 167 54 
+  169 sub 12 13 168 _notCDom_sExp_T_1
+  170 sort bitvec 56
+  171 concat 170 36 129 
+  172 concat 170 34 166 
+  173 concat 170 172 54 
+  174 sll 170 171 173 _notCDom_mainSig_T
+  175 concat 37 135 133 _notCDom_reduced4SigExtra_reducedVec_1_T
+  176 neq 1 175 38 notCDom_reduced4SigExtra_reducedVec_1
+  177 concat 37 139 137 _notCDom_reduced4SigExtra_reducedVec_2_T
+  178 neq 1 177 38 notCDom_reduced4SigExtra_reducedVec_2
+  179 slice 23 166 3 1 _notCDom_reduced4SigExtra_T_3
+  180 xor 23 179 32 _notCDom_reduced4SigExtra_T_4
+  181 concat 69 31 180 
+  182 sra 69 70 181 notCDom_reduced4SigExtra_shift
+  183 slice 1 182 1 1 _notCDom_reduced4SigExtra_T_7
+  184 slice 1 182 2 2 _notCDom_reduced4SigExtra_T_8
+  185 slice 1 182 3 3 _notCDom_reduced4SigExtra_T_10
+  186 concat 23 183 184 _notCDom_reduced4SigExtra_T_11
+  187 concat 23 186 185 _notCDom_reduced4SigExtra_T_11
+  188 concat 23 178 176 
+  189 concat 23 188 131 
+  190 and 23 189 187 
+  191 slice 18 174 25 13 _notCDom_sig_T
+  192 slice 23 174 12 10 _notCDom_sig_T_1
+  193 concat 30 192 190 
+  194 neq 1 193 31 _notCDom_sig_T_3
+  195 concat 118 191 194 notCDom_sig
+  196 slice 37 174 25 24 _notCDom_completeCancellation_T
+  197 eq 1 196 38 notCDom_completeCancellation
+  198 xor 1 8 120 _notCDom_sign_T
+  199 ite 1 197 71 198 notCDom_sign
+  200 or 1 4 6 notNaN_isInfProd
+  201 or 1 200 10 notNaN_isInfOut
+  202 or 1 5 7 _notNaN_addZeros_T
+  203 and 1 202 11 notNaN_addZeros
+  204 and 1 4 7 _io_invalidExc_T
+  205 and 1 5 6 _io_invalidExc_T_2
+  206 xor 1 3 53 _io_invalidExc_T_4
+  207 and 1 206 200 _io_invalidExc_T_8
+  208 and 1 207 10 _io_invalidExc_T_8
+  209 and 1 208 14 _io_invalidExc_T_8
+  210 or 1 2 204 io_invalidExc
+  211 or 1 210 205 io_invalidExc
+  212 or 1 211 209 io_invalidExc
+  213 or 1 3 9 io_rawOut_isNaN
+  214 xor 1 15 53 _io_rawOut_isZero_T
+  215 and 1 214 197 _io_rawOut_isZero_T_1
+  216 or 1 203 215 io_rawOut_isZero
+  217 and 1 200 8 _io_rawOut_sign_T
+  218 and 1 10 72 _io_rawOut_sign_T_1
+  219 neq 1 24 52 _io_rawOut_sign_T_3
+  220 and 1 203 219 _io_rawOut_sign_T_6
+  221 and 1 220 8 _io_rawOut_sign_T_6
+  222 and 1 221 72 _io_rawOut_sign_T_6
+  223 or 1 8 72 _io_rawOut_sign_T_9
+  224 and 1 203 71 _io_rawOut_sign_T_10
+  225 and 1 224 223 _io_rawOut_sign_T_10
+  226 xor 1 201 53 _io_rawOut_sign_T_12
+  227 xor 1 203 53 _io_rawOut_sign_T_13
+  228 ite 1 15 72 199 _io_rawOut_sign_T_15
+  229 and 1 226 227 _io_rawOut_sign_T_16
+  230 and 1 229 228 _io_rawOut_sign_T_16
+  231 or 1 217 218 io_rawOut_sign
+  232 or 1 231 222 io_rawOut_sign
+  233 or 1 232 225 io_rawOut_sign
+  234 or 1 233 230 io_rawOut_sign
+  235 ite 12 15 79 169 io_rawOut_sExp
+  236 ite 118 15 119 195 io_rawOut_sig
+  237 output 212 io_invalidExc
+  238 output 213 io_rawOut_isNaN
+  239 output 201 io_rawOut_isInf
+  240 output 216 io_rawOut_isZero
+  241 output 234 io_rawOut_sign
+  242 output 235 io_rawOut_sExp
+  243 output 236 io_rawOut_sig
+}

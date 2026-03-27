@@ -1,4 +1,5 @@
 include RecFNToRecFN.btor2pp
+include RecFNToRecFN_1.btor2pp
 
 module FPToFP {
   1 sort bitvec 1
@@ -6,158 +7,183 @@ module FPToFP {
   3 input 1 io_in_valid
   4 input 1 io_in_bits_ren2
   5 sort bitvec 2
-  6 input 5 io_in_bits_typeTagOut
-  7 input 1 io_in_bits_wflags
-  8 sort bitvec 3
-  9 input 8 io_in_bits_rm
-  10 sort bitvec 65
-  11 input 10 io_in_bits_in1
-  12 input 10 io_in_bits_in2
-  13 input 1 io_lt
-  14 state 1 in_pipe_v
-  15 state 1 in_pipe_b_ren2
-  16 state 5 in_pipe_b_typeTagOut
-  17 state 1 in_pipe_b_wflags
-  18 state 8 in_pipe_b_rm
-  19 state 10 in_pipe_b_in1
-  20 state 10 in_pipe_b_in2
-  21 state 1 io_out_pipe_v
-  22 state 10 io_out_pipe_b_data
-  23 sort bitvec 5
-  24 state 23 io_out_pipe_b_exc
-  25 state 1 io_out_pipe_pipe_v
-  26 state 10 io_out_pipe_pipe_b_data
-  27 state 23 io_out_pipe_pipe_b_exc
-  28 state 1 io_out_pipe_pipe_pipe_v
-  29 state 10 io_out_pipe_pipe_pipe_b_data
-  30 state 23 io_out_pipe_pipe_pipe_b_exc
-  31 inst RecFNToRecFN
-  32 ref RecFNToRecFN 2 io_in
-  33 ref RecFNToRecFN 4 io_roundingMode
-  34 ref RecFNToRecFN 6 io_detectTininess
-  35 ref RecFNToRecFN 57 io_out
-  36 ref RecFNToRecFN 58 io_exceptionFlags
-  37 get 31 35 io_out
-  38 get 31 36 io_exceptionFlags
-  39 consth 8 5
+  6 input 5 io_in_bits_typeTagIn
+  7 input 5 io_in_bits_typeTagOut
+  8 input 1 io_in_bits_wflags
+  9 sort bitvec 3
+  10 input 9 io_in_bits_rm
+  11 sort bitvec 65
+  12 input 11 io_in_bits_in1
+  13 input 11 io_in_bits_in2
+  14 input 1 io_lt
+  15 state 1 in_pipe_v
+  16 state 1 in_pipe_b_ren2
+  17 state 5 in_pipe_b_typeTagIn
+  18 state 5 in_pipe_b_typeTagOut
+  19 state 1 in_pipe_b_wflags
+  20 state 9 in_pipe_b_rm
+  21 state 11 in_pipe_b_in1
+  22 state 11 in_pipe_b_in2
+  23 state 11 io_out_pipe_b_data
+  24 sort bitvec 5
+  25 state 24 io_out_pipe_b_exc
+  26 inst RecFNToRecFN
+  27 ref RecFNToRecFN 2 io_in
+  28 ref RecFNToRecFN 4 io_roundingMode
+  29 ref RecFNToRecFN 54 io_out
+  30 ref RecFNToRecFN 55 io_exceptionFlags
+  31 get 26 29 io_out
+  32 get 26 30 io_exceptionFlags
+  33 inst RecFNToRecFN_1
+  34 ref RecFNToRecFN_1 2 io_in
+  35 ref RecFNToRecFN_1 4 io_roundingMode
+  36 ref RecFNToRecFN_1 54 io_out
+  37 ref RecFNToRecFN_1 55 io_exceptionFlags
+  38 get 33 36 io_out
+  39 get 33 37 io_exceptionFlags
   40 sort bitvec 9
   41 consth 40 100
-  42 consth 8 0
-  43 consth 5 0
-  44 sort bitvec 4
-  45 consth 44 0
-  46 consth 8 7
-  47 consth 10 E008000000000000
-  48 consth 1 1
-  49 consth 23 0
-  50 consth 1 0
-  51 ite 1 3 4 15 
-  52 ite 5 3 6 16 
-  53 ite 1 3 7 17 
-  54 ite 8 3 9 18 
-  55 ite 10 3 11 19 
-  56 ite 10 3 12 20 
-  57 slice 1 18 1 1 _signNum_T
-  58 slice 1 19 64 64 
-  59 slice 1 20 64 64 
-  60 xor 1 58 59 _signNum_T_1
-  61 slice 1 18 0 0 _isLHS_T
-  62 slice 1 20 64 64 
-  63 xor 1 61 62 _signNum_T_4
-  64 ite 1 57 60 63 signNum
-  65 sort bitvec 64
-  66 slice 65 19 63 0 _fsgnj_T_1
-  67 concat 10 64 66 fsgnj
-  68 slice 8 19 63 61 _isInvalid_T
-  69 eq 1 68 46 isnan1
-  70 slice 8 20 63 61 _isInvalid_T_5
-  71 eq 1 70 46 isnan2
-  72 eq 1 68 46 _isInvalid_T_1
-  73 slice 1 19 51 51 _isInvalid_T_2
-  74 xor 1 73 48 _isInvalid_T_3
-  75 and 1 72 74 _isInvalid_T_4
-  76 eq 1 70 46 _isInvalid_T_6
-  77 slice 1 20 51 51 _isInvalid_T_7
-  78 xor 1 77 48 _isInvalid_T_8
-  79 and 1 76 78 _isInvalid_T_9
-  80 or 1 75 79 isInvalid
-  81 and 1 69 71 isNaNOut
-  82 neq 1 61 13 _isLHS_T_1
-  83 xor 1 69 48 _isLHS_T_2
-  84 and 1 82 83 _isLHS_T_3
-  85 or 1 71 84 isLHS
-  86 concat 23 80 45 _fsgnjMux_exc_T
-  87 ite 23 17 86 49 
-  88 ite 10 85 19 20 _fsgnjMux_data_T
-  89 ite 10 81 47 88 _fsgnjMux_data_T_1
-  90 ite 10 17 89 67 
-  91 eq 1 16 43 
-  92 xor 1 15 48 
-  93 and 1 17 92 
-  94 slice 8 19 63 61 _fsgnjMux_exc_T_1
-  95 eq 1 94 46 _widened_T_1
-  96 ite 10 95 47 19 widened
-  97 ite 10 93 96 90 fsgnjMux_data
-  98 sort bitvec 32
-  99 slice 98 97 64 33 _mux_data_T
-  100 slice 1 97 64 64 mux_data_sign
-  101 sort bitvec 23
-  102 slice 101 97 51 29 mux_data_fractOut
-  103 slice 8 97 63 61 mux_data_expOut_expCode
-  104 slice 40 97 60 52 
-  105 add 40 104 41 _mux_data_expOut_commonCase_T
-  106 eq 1 103 42 _mux_data_expOut_T
-  107 ugt 1 103 39 _mux_data_expOut_T_1
-  108 or 1 106 107 _mux_data_expOut_T_2
-  109 sort bitvec 6
-  110 slice 109 105 5 0 _mux_data_expOut_T_3
-  111 concat 40 103 110 _mux_data_expOut_T_4
-  112 ite 40 108 111 105 mux_data_expOut
-  113 concat 10 99 100 _mux_data_T_2
-  114 concat 10 113 112 _mux_data_T_2
-  115 concat 10 114 102 _mux_data_T_2
-  116 eq 1 94 46 _fsgnjMux_exc_T_2
-  117 slice 1 19 51 51 _fsgnjMux_exc_T_3
-  118 xor 1 117 48 _fsgnjMux_exc_T_4
-  119 and 1 116 118 _fsgnjMux_exc_T_5
-  120 concat 23 119 45 _fsgnjMux_exc_T_6
-  121 ite 23 93 120 87 fsgnjMux_exc
-  122 slice 98 97 64 33 _mux_data_T_3
-  123 concat 10 122 37 _mux_data_T_4
-  124 ite 10 93 123 115 
-  125 ite 10 91 124 97 mux_data
-  126 and 1 93 91 
-  127 ite 23 126 38 121 mux_exc
-  128 ite 10 14 125 22 
-  129 ite 23 14 127 24 
-  130 ite 10 21 22 26 
-  131 ite 23 21 24 27 
-  132 ite 10 25 26 29 
-  133 ite 23 25 27 30 
-  134 set 31 32 19 io_in
-  135 set 31 33 18 io_roundingMode
-  136 set 31 34 48 io_detectTininess
-  137 output 28 io_out_valid
-  138 output 29 io_out_bits_data
-  139 output 30 io_out_bits_exc
-  140 ite 1 2 50 3 io_in_valid
-  141 next 1 14 140
-  142 next 1 15 51
-  143 next 5 16 52
-  144 next 1 17 53
-  145 next 8 18 54
-  146 next 10 19 55
-  147 next 10 20 56
-  148 ite 1 2 50 14 in_valid
-  149 next 1 21 148
-  150 next 10 22 128
-  151 next 23 24 129
-  152 ite 1 2 50 21 
-  153 next 1 25 152
-  154 next 10 26 130
-  155 next 23 27 131
-  156 ite 1 2 50 25 
-  157 next 1 28 156
-  158 next 10 29 132
-  159 next 23 30 133
+  42 consth 9 5
+  43 sort bitvec 6
+  44 consth 43 20
+  45 consth 5 1
+  46 consth 9 0
+  47 consth 5 0
+  48 sort bitvec 4
+  49 consth 48 0
+  50 consth 9 7
+  51 consth 1 0
+  52 consth 11 E008000000000000
+  53 consth 1 1
+  54 consth 24 0
+  55 sort bitvec 33
+  56 consth 55 1EF7FFFFF
+  57 ite 1 3 4 16 
+  58 ite 5 3 6 17 
+  59 ite 5 3 7 18 
+  60 ite 1 3 8 19 
+  61 ite 9 3 10 20 
+  62 ite 11 3 12 21 
+  63 ite 11 3 13 22 
+  64 slice 1 20 1 1 _signNum_T
+  65 slice 1 21 64 64 
+  66 slice 1 22 64 64 
+  67 xor 1 65 66 _signNum_T_1
+  68 slice 1 20 0 0 _isLHS_T
+  69 slice 1 22 64 64 
+  70 xor 1 68 69 _signNum_T_4
+  71 ite 1 64 67 70 signNum
+  72 sort bitvec 64
+  73 slice 72 21 63 0 _fsgnj_T_1
+  74 concat 11 71 73 fsgnj
+  75 slice 9 21 63 61 _isInvalid_T
+  76 eq 1 75 50 isnan1
+  77 slice 9 22 63 61 _isInvalid_T_5
+  78 eq 1 77 50 isnan2
+  79 eq 1 75 50 _isInvalid_T_1
+  80 slice 1 21 51 51 _isInvalid_T_2
+  81 xor 1 80 53 _isInvalid_T_3
+  82 and 1 79 81 _isInvalid_T_4
+  83 eq 1 77 50 _isInvalid_T_6
+  84 slice 1 22 51 51 _isInvalid_T_7
+  85 xor 1 84 53 _isInvalid_T_8
+  86 and 1 83 85 _isInvalid_T_9
+  87 or 1 82 86 isInvalid
+  88 and 1 76 78 isNaNOut
+  89 neq 1 68 14 _isLHS_T_1
+  90 xor 1 76 53 _isLHS_T_2
+  91 and 1 89 90 _isLHS_T_3
+  92 or 1 78 91 isLHS
+  93 concat 24 87 49 _fsgnjMux_exc_T
+  94 ite 24 19 93 54 
+  95 ite 11 92 21 22 _fsgnjMux_data_T
+  96 ite 11 88 52 95 _fsgnjMux_data_T_1
+  97 ite 11 19 96 74 
+  98 eq 1 18 47 
+  99 xor 1 16 53 
+  100 and 1 19 99 
+  101 slice 9 21 63 61 _fsgnjMux_exc_T_1
+  102 eq 1 101 50 _widened_T_1
+  103 ite 11 102 52 21 widened
+  104 ite 11 100 103 97 fsgnjMux_data
+  105 sort bitvec 48
+  106 slice 105 104 64 17 _mux_data_T
+  107 slice 1 104 64 64 mux_data_sign
+  108 sort bitvec 10
+  109 slice 108 104 51 42 mux_data_fractOut
+  110 slice 9 104 63 61 mux_data_expOut_expCode
+  111 slice 43 104 57 52 
+  112 add 43 111 44 _mux_data_expOut_commonCase_T
+  113 eq 1 110 46 _mux_data_expOut_T
+  114 ugt 1 110 42 _mux_data_expOut_T_1
+  115 or 1 113 114 _mux_data_expOut_T_2
+  116 slice 9 112 2 0 _mux_data_expOut_T_3
+  117 concat 43 110 116 _mux_data_expOut_T_4
+  118 ite 43 115 117 112 mux_data_expOut
+  119 concat 11 106 107 _mux_data_T_2
+  120 concat 11 119 118 _mux_data_T_2
+  121 concat 11 120 109 _mux_data_T_2
+  122 ite 11 98 121 104 
+  123 eq 1 18 45 
+  124 sort bitvec 32
+  125 slice 124 104 64 33 _mux_data_T_3
+  126 slice 1 104 64 64 mux_data_sign_1
+  127 sort bitvec 23
+  128 slice 127 104 51 29 mux_data_fractOut_1
+  129 slice 9 104 63 61 mux_data_expOut_expCode_1
+  130 slice 40 104 60 52 
+  131 add 40 130 41 _mux_data_expOut_commonCase_T_3
+  132 eq 1 129 46 _mux_data_expOut_T_6
+  133 ugt 1 129 42 _mux_data_expOut_T_7
+  134 or 1 132 133 _mux_data_expOut_T_8
+  135 slice 43 131 5 0 _mux_data_expOut_T_9
+  136 concat 40 129 135 _mux_data_expOut_T_10
+  137 ite 40 134 136 131 mux_data_expOut_1
+  138 concat 11 125 126 _mux_data_T_5
+  139 concat 11 138 137 _mux_data_T_5
+  140 concat 11 139 128 _mux_data_T_5
+  141 ite 11 123 140 122 
+  142 ite 11 123 140 104 
+  143 eq 1 101 50 _fsgnjMux_exc_T_2
+  144 slice 1 21 51 51 _fsgnjMux_exc_T_3
+  145 xor 1 144 53 _fsgnjMux_exc_T_4
+  146 and 1 143 145 _fsgnjMux_exc_T_5
+  147 concat 24 146 49 _fsgnjMux_exc_T_6
+  148 ite 24 100 147 94 fsgnjMux_exc
+  149 ult 1 18 17 
+  150 slice 105 104 64 17 _mux_data_T_6
+  151 concat 11 150 31 _mux_data_T_7
+  152 ite 11 98 151 142 
+  153 ite 24 98 32 148 
+  154 and 1 123 149 
+  155 slice 9 38 31 29 _narrowed_T
+  156 neq 1 155 50 
+  157 sext 55 156 32 
+  158 or 55 157 56 
+  159 and 55 158 38 narrowed
+  160 slice 124 104 64 33 _mux_data_T_8
+  161 concat 11 160 159 _mux_data_T_9
+  162 ite 11 154 161 152 
+  163 ite 11 100 162 141 mux_data
+  164 ite 24 154 39 153 
+  165 ite 24 100 164 94 mux_exc
+  166 ite 11 15 163 23 
+  167 ite 24 15 165 25 
+  168 set 26 34 21 io_in
+  169 set 26 35 20 io_roundingMode
+  170 set 33 34 21 io_in
+  171 set 33 35 20 io_roundingMode
+  172 output 23 io_out_bits_data
+  173 output 25 io_out_bits_exc
+  174 ite 1 2 51 3 io_in_valid
+  175 next 1 15 174
+  176 next 1 16 57
+  177 next 5 17 58
+  178 next 5 18 59
+  179 next 1 19 60
+  180 next 9 20 61
+  181 next 11 21 62
+  182 next 11 22 63
+  183 next 11 23 166
+  184 next 24 25 167
 }
