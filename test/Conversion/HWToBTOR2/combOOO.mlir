@@ -1,19 +1,19 @@
-// RUN: circt-opt %s --convert-hw-to-btor2pp -o %t | FileCheck %s  
+// RUN: circt-opt %s --convert-hw-to-btor2 -o %t | FileCheck %s  
 
 module {
   // CHECK:   [[NID0:[0-9]+]] sort bitvec 32
   // CHECK:   [[NID1:[0-9]+]] input [[NID0]] a  
   // CHECK:   [[NID2:[0-9]+]] sort bitvec 1  
-  // CHECK:   [[NID3:[0-9]+]] constd [[NID2]] 0
+  // CHECK:   [[NID3:[0-9]+]] consth [[NID2]] 0
   // CHECK:   [[NID4:[0-9]+]] sort bitvec 33
   // CHECK:   [[NID5:[0-9]+]] concat [[NID4]] [[NID3]] [[NID1]]
-  // CHECK:   [[NID6:[0-9]+]] constd [[NID4]] 1
+  // CHECK:   [[NID6:[0-9]+]] consth [[NID4]] 1
   // CHECK:   [[NID7:[0-9]+]] add [[NID4]] [[NID5]] [[NID6]]
   // CHECK:   [[NID8:[0-9]+]] slice [[NID0]] [[NID7]] 31 0
   // CHECK:   [[NID9:[0-9]+]] ugt [[NID2]] [[NID8]] [[NID1]]
   // CHECK:   [[NID10:[0-9]+]] not [[NID2]] [[NID9]]
   // CHECK:   [[NID11:[0-9]+]] bad [[NID10]]
-  // CHECK:   [[NID13:[0-9]+]] constd [[NID0]] 0
+  // CHECK:   [[NID13:[0-9]+]] consth [[NID0]] 0
   hw.module @inc(in %a : i32, in %clk : !seq.clock, out pred : i1) {
     %0 = seq.from_clock %clk
     sv.always posedge %0 {

@@ -22,10 +22,10 @@ circuit Counter :
 ; CHECK:  3 input 1 en
 ; CHECK:  4 sort bitvec 32
 ; CHECK:  5 state 4 count
-; CHECK:  6 constd 4 1
-; CHECK:  7 constd 4 10
-; CHECK:  8 constd 4 22
-; CHECK:  9 constd 4 0
+; CHECK:  6 consth 4 1
+; CHECK:  7 consth 4 A
+; CHECK:  8 consth 4 16
+; CHECK:  9 consth 4 0
 ; CHECK:  10 eq 1 5 8
 ; CHECK:  11 and 1 10 3
 ; CHECK:  12 ite 4 11 9 5

@@ -30,6 +30,7 @@
 #include "circt/Conversion/FIRRTLToHW.h"
 #include "circt/Conversion/FSMToSV.h"
 #include "circt/Conversion/HWArithToHW.h"
+#include "circt/Conversion/HWToBTOR2.h"
 #include "circt/Conversion/HWToBTOR2PP.h"
 #include "circt/Conversion/HWToLLVM.h"
 #include "circt/Conversion/HWToSMT.h"

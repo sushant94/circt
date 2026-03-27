@@ -1,11 +1,11 @@
-// RUN: circt-opt %s --convert-hw-to-btor2pp -o %t | FileCheck %s  
+// RUN: circt-opt %s --convert-hw-to-btor2 -o %t | FileCheck %s  
 
 module {
   //CHECK:    [[NID0:[0-9]+]] sort bitvec 1
   //CHECK:    [[NID1:[0-9]+]] input [[NID0]] reset
   hw.module @test(in %clock : !seq.clock, in %reset : i1) {
     %0 = seq.from_clock %clock 
-    //CHECK:    [[NID3:[0-9]+]] constd [[NID0]] 0
+    //CHECK:    [[NID3:[0-9]+]] consth [[NID0]] 0
     // Register states get pregenerated
     //CHECK:    [[NID2:[0-9]+]] state [[NID0]] reg
     %false = hw.constant false
@@ -14,7 +14,7 @@ module {
       %false_0 = hw.constant false
       seq.yield %false_0 : i1
     } : () -> !seq.immutable<i1>
-    //CHECK:    [[RESET:[0-9]+]] constd [[NID0]] 0
+    //CHECK:    [[RESET:[0-9]+]] consth [[NID0]] 0
     %reg = seq.compreg %false, %clock reset %reset, %false initial %init : i1
 
     //CHECK:    [[NID4:[0-9]+]] eq [[NID0]] [[NID2]] [[RESET]]

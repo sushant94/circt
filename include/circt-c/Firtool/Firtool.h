@@ -217,6 +217,10 @@ MLIR_CAPI_EXPORTED void
 circtFirtoolOptionsSetStripFirDebugInfo(CirctFirtoolFirtoolOptions options,
                                         bool value);
 
+MLIR_CAPI_EXPORTED MlirLogicalResult circtFirtoolPopulateHWToBTOR2(
+    MlirPassManager pm, CirctFirtoolFirtoolOptions options,
+    MlirStringCallback callback, void *userData);
+
 MLIR_CAPI_EXPORTED MlirLogicalResult circtFirtoolPopulateHWToBTOR2PP(
     MlirPassManager pm, CirctFirtoolFirtoolOptions options,
     MlirStringCallback callback, void *userData);

@@ -1,4 +1,4 @@
-// RUN: circt-opt %s --convert-hw-to-btor2pp -o %t | FileCheck %s  
+// RUN: circt-opt %s --convert-hw-to-btor2 -o %t | FileCheck %s  
 
 module {
   // CHECK:   [[NID0:[0-9]+]] sort bitvec 32
@@ -7,24 +7,24 @@ module {
     %0 = seq.from_clock %clk
 
     // CHECK:   [[BIGSORT:[0-9]+]] sort bitvec 100
-    // CHECK:   [[BIGCONST:[0-9]+]] constd [[BIGSORT]] 111111111111111111111111111
+    // CHECK:   [[BIGCONST:[0-9]+]] consth [[BIGSORT]] 5BE8B167172AB16F1C71C7
     %bigConst = hw.constant 111111111111111111111111111 : i100
 
-    // CHECK:   [[NID2:[0-9]+]] constd [[NID0]] 0
+    // CHECK:   [[NID2:[0-9]+]] consth [[NID0]] 0
     %c0_i32 = hw.constant 0 : i32
 
     // CHECK:   [[NID3:[0-9]+]] sort bitvec 1
-    // CHECK:   [[NID4:[0-9]+]] constd [[NID3]] 0
+    // CHECK:   [[NID4:[0-9]+]] consth [[NID3]] 0
     %false = hw.constant false
 
-    // CHECK:   [[NID5:[0-9]+]] constd [[NID3]] -1
+    // CHECK:   [[NID5:[0-9]+]] consth [[NID3]] 1
     %true = hw.constant true
 
     // CHECK:   [[NID6:[0-9]+]] sort bitvec 33
     // CHECK:   [[NID7:[0-9]+]] concat [[NID6]] [[NID4]] [[NID1]]
     %1 = comb.concat %false, %a : i1, i32
 
-    // CHECK:   [[NID8:[0-9]+]] constd [[NID6]] 1
+    // CHECK:   [[NID8:[0-9]+]] consth [[NID6]] 1
     %c1_i33 = hw.constant 1 : i33
 
     // CHECK:   [[NID9:[0-9]+]] add [[NID6]] [[NID7]] [[NID8]]

@@ -383,6 +383,16 @@ circtFirtoolPopulateFinalizeIR(MlirPassManager pm,
 }
 
 MlirLogicalResult
+circtFirtoolPopulateHWToBTOR2(MlirPassManager pm,
+                              CirctFirtoolFirtoolOptions options,
+                              MlirStringCallback callback, void *userData) {
+  auto stream =
+      std::make_unique<mlir::detail::CallbackOstream>(callback, userData);
+  return wrap(firtool::populateHWToBTOR2(*unwrap(pm), *unwrap(options),
+                                         *std::move(stream)));
+}
+
+MlirLogicalResult
 circtFirtoolPopulateHWToBTOR2PP(MlirPassManager pm,
                                 CirctFirtoolFirtoolOptions options,
                                 MlirStringCallback callback, void *userData) {

@@ -1,4 +1,4 @@
-// RUN: circt-opt %s --convert-hw-to-btor2pp -o %t | FileCheck %s  
+// RUN: circt-opt %s --convert-hw-to-btor2 -o %t | FileCheck %s  
 
 module {
   //CHECK:    [[NID0:[0-9]+]] sort bitvec 1
@@ -12,7 +12,7 @@ module {
     //CHECK:    [[NID6:[0-9]+]] state [[NID3]] reg1
     //CHECK:    [[NID7:[0-9]+]] state [[NID3]] reg2
 
-    //CHECK:    [[NID8:[0-9]+]] constd [[NID3]] 0
+    //CHECK:    [[NID8:[0-9]+]] consth [[NID3]] 0
     %c0_i32 = hw.constant 0 : i32
 
     %reg0 = seq.compreg %in, %clock reset %reset0, %c0_i32 : i32

@@ -1,4 +1,4 @@
-// RUN: circt-opt %s --convert-hw-to-btor2pp -o %t | FileCheck %s  
+// RUN: circt-opt %s --convert-hw-to-btor2 -o %t | FileCheck %s  
 
 module {
     //CHECK:    [[NID0:[0-9]+]] sort bitvec 1
@@ -11,23 +11,23 @@ module {
     //CHECK:    [[NID12:[0-9]+]] state [[NID6]] count
 
     //CHECK:    [[NID3:[0-9]+]] sort bitvec 28
-    //CHECK:    [[NID4:[0-9]+]] constd [[NID3]] 0 
+    //CHECK:    [[NID4:[0-9]+]] consth [[NID3]] 0 
     %c0_i28 = hw.constant 0 : i28
 
-    //CHECK:    [[NID5:[0-9]+]] constd [[NID0]] 0
+    //CHECK:    [[NID5:[0-9]+]] consth [[NID0]] 0
     %false = hw.constant false
     
-    //CHECK:    [[NID7:[0-9]+]] constd [[NID6]] 22
+    //CHECK:    [[NID7:[0-9]+]] consth [[NID6]] 16
     %c22_i32 = hw.constant 22 : i32
 
-    //CHECK:    [[NID8:[0-9]+]] constd [[NID0]] -1
+    //CHECK:    [[NID8:[0-9]+]] consth [[NID0]] 1
     %true = hw.constant true
 
     //CHECK:    [[NID9:[0-9]+]] sort bitvec 4
-    //CHECK:    [[NID10:[0-9]+]] constd [[NID9]] -6
+    //CHECK:    [[NID10:[0-9]+]] consth [[NID9]] A
     %c-6_i4 = hw.constant -6 : i4
 
-    //CHECK:    [[NID11:[0-9]+]] constd [[NID6]] 0
+    //CHECK:    [[NID11:[0-9]+]] consth [[NID6]] 0
     %c0_i32 = hw.constant 0 : i32
     
     %count = seq.firreg %9 clock %clock reset sync %reset, %c0_i32 {firrtl.random_init_start = 0 : ui64} : i32
@@ -51,7 +51,7 @@ module {
     //CHECK:    [[NID19:[0-9]+]] concat [[NID18]] [[NID5]] [[NID12]]
     %6 = comb.concat %false, %count : i1, i32
 
-    //CHECK:    [[NID20:[0-9]+]] constd [[NID18]] 1
+    //CHECK:    [[NID20:[0-9]+]] consth [[NID18]] 1
     %c1_i33 = hw.constant 1 : i33
 
     //CHECK:    [[NID21:[0-9]+]] add [[NID18]] [[NID19]] [[NID20]]
@@ -63,7 +63,7 @@ module {
     //CHECK:    [[NID23:[0-9]+]] ite [[NID6]] [[NID17]] [[NID22]] [[NID15]]
     %9 = comb.mux bin %5, %8, %3 : i32
 
-    //CHECK:    [[NID24:[0-9]+]] constd [[NID6]] 10
+    //CHECK:    [[NID24:[0-9]+]] consth [[NID6]] A
     %c10_i32 = hw.constant 10 : i32
 
     //CHECK:    [[NID25:[0-9]+]] neq [[NID0]] [[NID12]] [[NID24]]

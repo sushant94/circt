@@ -191,9 +191,7 @@ static cl::opt<OutputFormatKind> outputFormat(
         clEnumValN(OutputIRVerilog, "ir-verilog",
                    "Emit IR after Verilog lowering"),
         clEnumValN(OutputVerilog, "verilog", "Emit Verilog"),
-        clEnumValN(OutputBTOR2, "btor2",
-                   "Reserved for the future flat BTOR2 exporter "
-                   "(currently unavailable)"),
+        clEnumValN(OutputBTOR2, "btor2", "Emit BTOR2"),
         clEnumValN(OutputBTOR2PP, "btor2pp",
                    "Emit modular BTOR2++"),
         clEnumValN(OutputSplitVerilog, "split-verilog",
@@ -443,13 +441,6 @@ static LogicalResult processBuffer(
   if (!module)
     return failure();
 
-  if (outputFormat == OutputBTOR2) {
-    module->emitError()
-        << "the flat --btor2 exporter is not yet restored; use --btor2pp "
-           "for the current modular BTOR2++ flow";
-    return failure();
-  }
-
   if (verbosePassExecutions) {
     auto elapsed = std::chrono::duration<double>(
                        llvm::sys::TimePoint<>::clock::now() - parseStartTime) /
@@ -496,6 +487,8 @@ static LogicalResult processBuffer(
   // Lower if we are going to verilog or if lowering was specifically
   // requested.
   if (outputFormat != OutputIRFir) {
+    if (outputFormat == OutputBTOR2)
+      pm.nest<firrtl::CircuitOp>().addPass(firrtl::createBTOR2LowerPlusArgsPass());
     if (outputFormat == OutputBTOR2PP)
       pm.nest<firrtl::CircuitOp>().addPass(
           firrtl::createBTOR2PPLowerPlusArgsPass());
@@ -504,6 +497,11 @@ static LogicalResult processBuffer(
       return failure();
     if (!hwPassPlugin.empty())
       if (failed(parsePassPipeline(StringRef(hwPassPlugin), pm)))
+        return failure();
+    // Add passes specific to BTOR2 emission.
+    if (outputFormat == OutputBTOR2)
+      if (failed(firtool::populateHWToBTOR2(pm, firtoolOptions,
+                                            (*outputFile)->os())))
         return failure();
     // Add passes specific to BTOR2++ emission.
     if (outputFormat == OutputBTOR2PP)
@@ -811,6 +809,7 @@ int main(int argc, char **argv) {
     registerLowerSimToSVPass();
     registerLowerVerifToSVPass();
     registerLowerLTLToCorePass();
+    registerConvertHWToBTOR2Pass();
     registerConvertHWToBTOR2PPPass();
   }
 
