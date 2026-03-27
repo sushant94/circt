@@ -686,6 +686,26 @@ def LowerIntmodules : Pass<"firrtl-lower-intmodules", "firrtl::CircuitOp"> {
   ];
 }
 
+def BTOR2LowerPlusArgs : Pass<"firrtl-btor2-lower-plusargs", "firrtl::CircuitOp"> {
+  let summary = "Replace plusarg_reader extmodules with DEFAULT constants";
+  let description = [{
+    This pass rewrites FIRRTL extmodules with `defname = plusarg_reader` into
+    constants derived from the extmodule `DEFAULT` parameter. It is intended
+    for flat BTOR2 generation, where runtime plusargs are not representable.
+  }];
+  let constructor = "circt::firrtl::createBTOR2LowerPlusArgsPass()";
+}
+
+def BTOR2PPLowerPlusArgs : Pass<"firrtl-btor2pp-lower-plusargs", "firrtl::CircuitOp"> {
+  let summary = "Replace plusarg_reader extmodules with DEFAULT constants";
+  let description = [{
+    This pass rewrites FIRRTL extmodules with `defname = plusarg_reader` into
+    constants derived from the extmodule `DEFAULT` parameter. It is intended
+    for modular BTOR2++ generation, where runtime plusargs are not representable.
+  }];
+  let constructor = "circt::firrtl::createBTOR2PPLowerPlusArgsPass()";
+}
+
 def LowerIntrinsics : Pass<"firrtl-lower-intrinsics", "firrtl::FModuleOp"> {
   let summary = "Lower intrinsics";
   let description = [{

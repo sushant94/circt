@@ -456,9 +456,9 @@ LogicalResult populateExportSplitVerilog(mlir::PassManager &pm,
 LogicalResult populateFinalizeIR(mlir::PassManager &pm,
                                  const FirtoolOptions &opt);
 
-LogicalResult populateHWToBTOR2(mlir::PassManager &pm,
-                                const FirtoolOptions &opt,
-                                llvm::raw_ostream &os);
+LogicalResult populateHWToBTOR2PP(mlir::PassManager &pm,
+                                  const FirtoolOptions &opt,
+                                  llvm::raw_ostream &os);
 
 } // namespace firtool
 } // namespace circt

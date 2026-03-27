@@ -95,6 +95,9 @@ std::unique_ptr<mlir::Pass> createLowerCHIRRTLPass();
 std::unique_ptr<mlir::Pass>
 createLowerIntmodulesPass(bool fixupEICGWrapper = false);
 
+std::unique_ptr<mlir::Pass> createBTOR2LowerPlusArgsPass();
+std::unique_ptr<mlir::Pass> createBTOR2PPLowerPlusArgsPass();
+
 std::unique_ptr<mlir::Pass> createLowerIntrinsicsPass();
 
 std::unique_ptr<mlir::Pass> createIMConstPropPass();

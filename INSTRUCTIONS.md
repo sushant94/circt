@@ -18,7 +18,7 @@
 
 - The place to make it not flatten: `lib/Firtool/Firtool/cpp:441`
   - When you do this, try and output MLIR versions (try and get the one after each pass)
-- The place to handle modules: `lib/Conversion/HWToBTOR2/HWToBTOR2.cpp:runOnOperation` (end of file)
+- The place to handle modules: `lib/Conversion/HWToBTOR2PP/HWToBTOR2PP.cpp:runOnOperation` (end of file)
   - You want something that walks over modules, and then for each individual
 
 ```

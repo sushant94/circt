@@ -22,7 +22,7 @@ add_circt_public_c_api_library(CIRCTCAPIConversion
   CIRCTHandshakeToHW
   CIRCTHWArithToHW
   CIRCTHWToLLVM
-  CIRCTHWToBTOR2
+  CIRCTHWToBTOR2PP
   CIRCTHWToSMT
   CIRCTHWToSV
   CIRCTHWToSystemC

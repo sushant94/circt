@@ -1,5 +1,5 @@
-add_circt_conversion_library(CIRCTHWToBTOR2
-  HWToBTOR2.cpp
+add_circt_conversion_library(CIRCTHWToBTOR2PP
+  HWToBTOR2PP.cpp
 
   DEPENDS
   CIRCTConversionPassIncGen

@@ -3,6 +3,7 @@ add_circt_dialect_library(CIRCTFIRRTLTransforms
   AdvancedLayerSink.cpp
   AssignOutputDirs.cpp
   BlackBoxReader.cpp
+  BTOR2PPLowerPlusArgs.cpp
   CheckCombLoops.cpp
   CheckLayers.cpp
   CheckRecursiveInstantiation.cpp

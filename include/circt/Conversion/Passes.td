@@ -591,16 +591,17 @@ def LowerHWToSV : Pass<"lower-hw-to-sv", "hw::HWModuleOp"> {
 }
 
 //===----------------------------------------------------------------------===//
-// HWToBTOR2
+// HWToBTOR2PP
 //===----------------------------------------------------------------------===//
 
-def ConvertHWToBTOR2 : Pass<"convert-hw-to-btor2", "mlir::ModuleOp"> {
-  let summary = "Convert HW to BTOR2";
+def ConvertHWToBTOR2PP : Pass<"convert-hw-to-btor2pp", "mlir::ModuleOp"> {
+  let summary = "Convert HW to modular BTOR2++";
   let description = [{
     This pass converts a HW module into a state transition system that is then
-    directly used to emit btor2. The output of this pass is thus a btor2 string.
+    directly used to emit hierarchical/modular BTOR2++ output. The output of
+    this pass is thus a BTOR2++ string.
   }];
-  let constructor = "circt::createConvertHWToBTOR2Pass()";
+  let constructor = "circt::createConvertHWToBTOR2PPPass()";
   let dependentDialects = ["hw::HWDialect", "sv::SVDialect", "comb::CombDialect",
                            "seq::SeqDialect"];
 }

@@ -1,4 +1,4 @@
-// RUN: circt-opt %s --convert-hw-to-btor2 -o %t | FileCheck %s  
+// RUN: circt-opt %s --convert-hw-to-btor2pp -o %t | FileCheck %s  
 
 module {
   // CHECK:   [[NID0:[0-9]+]] sort bitvec 32
@@ -29,4 +29,3 @@ module {
     hw.output %4 : i1
   }
 }
-

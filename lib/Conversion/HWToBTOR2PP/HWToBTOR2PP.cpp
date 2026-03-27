@@ -1,15 +1,15 @@
 //
-//===- HWToBTOR2.cpp - HW to BTOR2 translation ------------------*- C++ -*-===//
+//===- HWToBTOR2PP.cpp - HW to BTOR2++ translation --------------*- C++ -*-===//
 // Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
 // See https://llvm.org/LICENSE.txt for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //===----------------------------------------------------------------------===//
 //
-// Converts a hw module to a btor2 format and prints it out
+// Converts a hw module to a BTOR2++ format and prints it out
 //
 //===----------------------------------------------------------------------===//
 
-#include "circt/Conversion/HWToBTOR2.h"
+#include "circt/Conversion/HWToBTOR2PP.h"
 #include "circt/Dialect/Comb/CombDialect.h"
 #include "circt/Dialect/Comb/CombOps.h"
 #include "circt/Dialect/Comb/CombVisitors.h"
@@ -46,7 +46,7 @@
 #include <string_view>
 
 namespace circt {
-#define GEN_PASS_DEF_CONVERTHWTOBTOR2
+#define GEN_PASS_DEF_CONVERTHWTOBTOR2PP
 #include "circt/Conversion/Passes.h.inc"
 } // namespace circt
 
@@ -56,16 +56,16 @@ using namespace hw;
 namespace {
 // The goal here is to traverse the operations in order and convert them one by
 // one into btor2
-struct ConvertHWToBTOR2Pass
-    : public circt::impl::ConvertHWToBTOR2Base<ConvertHWToBTOR2Pass>,
-      public comb::CombinationalVisitor<ConvertHWToBTOR2Pass>,
-      public sv::Visitor<ConvertHWToBTOR2Pass>,
-      public hw::TypeOpVisitor<ConvertHWToBTOR2Pass>,
-      public verif::Visitor<ConvertHWToBTOR2Pass> {
+struct ConvertHWToBTOR2PPPass
+    : public circt::impl::ConvertHWToBTOR2PPBase<ConvertHWToBTOR2PPPass>,
+      public comb::CombinationalVisitor<ConvertHWToBTOR2PPPass>,
+      public sv::Visitor<ConvertHWToBTOR2PPPass>,
+      public hw::TypeOpVisitor<ConvertHWToBTOR2PPPass>,
+      public verif::Visitor<ConvertHWToBTOR2PPPass> {
 public:
-  using verif::Visitor<ConvertHWToBTOR2Pass>::visitVerif;
+  using verif::Visitor<ConvertHWToBTOR2PPPass>::visitVerif;
 
-  ConvertHWToBTOR2Pass(raw_ostream &os) : os(os) {}
+  ConvertHWToBTOR2PPPass(raw_ostream &os) : os(os) {}
   // Executes the pass
   void runOnOperation() override;
 
@@ -1153,7 +1153,7 @@ public:
 };
 } // end anonymous namespace
 
-void ConvertHWToBTOR2Pass::runOnOperation() {
+void ConvertHWToBTOR2PPPass::runOnOperation() {
   // Btor2 does not have the concept of modules or module
   // hierarchies, so we assume that no nested modules exist at this point.
   // This greatly simplifies translation.
@@ -1488,11 +1488,11 @@ void ConvertHWToBTOR2Pass::runOnOperation() {
 
 // Constructor with a custom ostream
 std::unique_ptr<mlir::Pass>
-circt::createConvertHWToBTOR2Pass(llvm::raw_ostream &os) {
-  return std::make_unique<ConvertHWToBTOR2Pass>(os);
+circt::createConvertHWToBTOR2PPPass(llvm::raw_ostream &os) {
+  return std::make_unique<ConvertHWToBTOR2PPPass>(os);
 }
 
 // Basic default constructor
-std::unique_ptr<mlir::Pass> circt::createConvertHWToBTOR2Pass() {
-  return std::make_unique<ConvertHWToBTOR2Pass>(llvm::outs());
+std::unique_ptr<mlir::Pass> circt::createConvertHWToBTOR2PPPass() {
+  return std::make_unique<ConvertHWToBTOR2PPPass>(llvm::outs());
 }
