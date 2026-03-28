@@ -235,6 +235,64 @@ firrtl.circuit "MemTap" attributes {annotations = [
 
 }
 
+firrtl.circuit "ScalarWideMask" attributes {annotations = [
+  {class = "sifive.enterprise.firrtl.ConvertMemToRegOfVecAnnotation$"}
+]} {
+  firrtl.module public @ScalarWideMask() attributes {annotations = [
+    {class = "sifive.enterprise.firrtl.MarkDUTAnnotation"}
+  ]} {
+    %mem_read, %mem_write = firrtl.mem Undefined {
+      depth = 4 : i64,
+      name = "mem",
+      portNames = ["read", "write"],
+      readLatency = 0 : i32,
+      writeLatency = 1 : i32
+    } : !firrtl.bundle<addr: uint<2>, en: uint<1>, clk: clock, data flip: uint<8>>,
+        !firrtl.bundle<addr: uint<2>, en: uint<1>, clk: clock, data: uint<8>, mask: uint<8>>
+    // CHECK-LABEL: firrtl.module public @ScalarWideMask()
+    // CHECK:         %mem = firrtl.reg
+    // CHECK:         %[[WDATA:.+]] = firrtl.subfield %mem_write[data]
+    // CHECK:         %[[MASK:.+]] = firrtl.subfield %mem_write[mask]
+    // CHECK:         %[[SUB:.+]] = firrtl.subaccess %mem
+    // CHECK:         firrtl.when %[[EN:.+]] : !firrtl.uint<1> {
+    // CHECK:           %[[NOTMASK:.+]] = firrtl.not %[[MASK]]
+    // CHECK:           %[[KEEP:.+]] = firrtl.and %[[SUB]], %[[NOTMASK]]
+    // CHECK:           %[[NEW:.+]] = firrtl.and %[[WDATA]], %[[MASK]]
+    // CHECK:           %[[MERGED:.+]] = firrtl.or %[[KEEP]], %[[NEW]]
+    // CHECK:           firrtl.matchingconnect %[[SUB]], %[[MERGED]] : !firrtl.uint<8>
+    // CHECK:         }
+  }
+}
+
+firrtl.circuit "ScalarChunkMask" attributes {annotations = [
+  {class = "sifive.enterprise.firrtl.ConvertMemToRegOfVecAnnotation$"}
+]} {
+  firrtl.module public @ScalarChunkMask() attributes {annotations = [
+    {class = "sifive.enterprise.firrtl.MarkDUTAnnotation"}
+  ]} {
+    %mem_read, %mem_write = firrtl.mem Undefined {
+      depth = 4 : i64,
+      name = "mem",
+      portNames = ["read", "write"],
+      readLatency = 0 : i32,
+      writeLatency = 1 : i32
+    } : !firrtl.bundle<addr: uint<2>, en: uint<1>, clk: clock, data flip: uint<8>>,
+        !firrtl.bundle<addr: uint<2>, en: uint<1>, clk: clock, data: uint<8>, mask: uint<2>>
+    // CHECK-LABEL: firrtl.module public @ScalarChunkMask()
+    // CHECK:         %[[MASK:.+]] = firrtl.subfield %mem_write[mask]
+    // CHECK:         %[[BIT0:.+]] = firrtl.bits %[[MASK]] 0 to 0 : (!firrtl.uint<2>) -> !firrtl.uint<1>
+    // CHECK:         %[[CHUNK0:.+]] = firrtl.mux(%[[BIT0]], %{{.+}}, %{{.+}}) : (!firrtl.uint<1>, !firrtl.uint<4>, !firrtl.uint<4>) -> !firrtl.uint<4>
+    // CHECK:         %[[BIT1:.+]] = firrtl.bits %[[MASK]] 1 to 1 : (!firrtl.uint<2>) -> !firrtl.uint<1>
+    // CHECK:         %[[CHUNK1:.+]] = firrtl.mux(%[[BIT1]], %{{.+}}, %{{.+}}) : (!firrtl.uint<1>, !firrtl.uint<4>, !firrtl.uint<4>) -> !firrtl.uint<4>
+    // CHECK:         %[[EXPANDED:.+]] = firrtl.cat %[[CHUNK1]], %[[CHUNK0]] : (!firrtl.uint<4>, !firrtl.uint<4>) -> !firrtl.uint<8>
+    // CHECK:         %[[NOTMASK:.+]] = firrtl.not %[[EXPANDED]]
+    // CHECK:         %[[KEEP:.+]] = firrtl.and %{{.+}}, %[[NOTMASK]]
+    // CHECK:         %[[NEW:.+]] = firrtl.and %{{.+}}, %[[EXPANDED]]
+    // CHECK:         %[[MERGED:.+]] = firrtl.or %[[KEEP]], %[[NEW]]
+    // CHECK:         firrtl.matchingconnect %{{.+}}, %[[MERGED]] : !firrtl.uint<8>
+  }
+}
+
 // Test the behavior of non-local annotations using either the old or new
 // format work correctly.
 //

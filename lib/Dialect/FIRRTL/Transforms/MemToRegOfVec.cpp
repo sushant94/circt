@@ -19,12 +19,14 @@
 #include "mlir/IR/Threading.h"
 #include "mlir/Pass/Pass.h"
 #include "llvm/Support/Debug.h"
+#include <atomic>
 
 #define DEBUG_TYPE "mem-to-reg-of-vec"
 
 namespace circt {
 namespace firrtl {
 #define GEN_PASS_DEF_MEMTOREGOFVEC
+#define GEN_PASS_DEF_MEMTOREGOFVECFALLBACK
 #include "circt/Dialect/FIRRTL/Passes.h.inc"
 } // namespace firrtl
 } // namespace circt
@@ -33,19 +35,35 @@ using namespace circt;
 using namespace firrtl;
 
 namespace {
-struct MemToRegOfVecPass
-    : public circt::firrtl::impl::MemToRegOfVecBase<MemToRegOfVecPass> {
-  MemToRegOfVecPass(bool replSeqMem, bool ignoreReadEnable)
-      : replSeqMem(replSeqMem), ignoreReadEnable(ignoreReadEnable){};
+struct MemToRegOfVecRewriter {
+  MemToRegOfVecRewriter(bool replSeqMem, bool ignoreReadEnable,
+                        bool honorCircuitAnnotation,
+                        bool skipIfHHoudiniSplitMems,
+                        bool honorExcludeAnnotation)
+      : replSeqMem(replSeqMem), ignoreReadEnable(ignoreReadEnable),
+        honorCircuitAnnotation(honorCircuitAnnotation),
+        skipIfHHoudiniSplitMems(skipIfHHoudiniSplitMems),
+        honorExcludeAnnotation(honorExcludeAnnotation) {}
 
-  void runOnOperation() override {
-    auto circtOp = getOperation();
-    auto &instanceInfo = getAnalysis<InstanceInfo>();
+  bool preprocessCircuit(CircuitOp circtOp, bool &changed) {
+    changed = false;
+    if (skipIfHHoudiniSplitMems &&
+        AnnotationSet::hasAnnotation(circtOp, hHoudiniSplitMemsAnnoClass)) {
+      changed =
+          AnnotationSet::removeAnnotations(circtOp, convertMemToRegOfVecAnnoClass);
+      return false;
+    }
 
-    if (!AnnotationSet::removeAnnotations(circtOp,
-                                          convertMemToRegOfVecAnnoClass))
-      return markAllAnalysesPreserved();
+    if (honorCircuitAnnotation) {
+      changed =
+          AnnotationSet::removeAnnotations(circtOp, convertMemToRegOfVecAnnoClass);
+      return changed;
+    }
 
+    return AnnotationSet::hasAnnotation(circtOp, hHoudiniSplitMemsAnnoClass);
+  }
+
+  void runOnCircuit(CircuitOp circtOp, InstanceInfo &instanceInfo) {
     DenseSet<Operation *> dutModuleSet;
     for (auto moduleOp : circtOp.getOps<FModuleOp>())
       if (instanceInfo.anyInstanceInEffectiveDesign(moduleOp))
@@ -58,11 +76,13 @@ struct MemToRegOfVecPass
                           });
   }
 
-  void runOnModule(FModuleOp mod) {
+  unsigned getNumConvertedMems() const { return numConvertedMems.load(); }
 
+  void runOnModule(FModuleOp mod) {
     mod.getBodyBlock()->walk([&](MemOp memOp) {
       LLVM_DEBUG(llvm::dbgs() << "\n Memory op:" << memOp);
-      if (AnnotationSet::removeAnnotations(memOp, excludeMemToRegAnnoClass))
+      if (honorExcludeAnnotation &&
+          AnnotationSet::removeAnnotations(memOp, excludeMemToRegAnnoClass))
         return;
 
       auto firMem = memOp.getSummary();
@@ -79,10 +99,11 @@ struct MemToRegOfVecPass
         return;
 
       generateMemory(memOp, firMem);
-      ++numConvertedMems;
+      numConvertedMems.fetch_add(1);
       memOp.erase();
     });
   }
+
   Value addPipelineStages(ImplicitLocOpBuilder &b, size_t stages, Value clock,
                           Value pipeInput, StringRef name, Value gate = {}) {
     if (!stages)
@@ -134,6 +155,69 @@ struct MemToRegOfVecPass
     if (bType.getElement("rdata") && !getWdata)
       return builder.create<SubfieldOp>(bundle, "rdata");
     return builder.create<SubfieldOp>(bundle, "wdata");
+  }
+
+  void emitMaskedFieldUpdate(ImplicitLocOpBuilder &builder, Value regField,
+                             Value dataField, Value maskField) {
+    auto maskType = type_cast<IntType>(maskField.getType());
+    if (maskType.getWidth() == 1) {
+      builder.create<WhenOp>(maskField, /*withElseRegion*/ false, [&]() {
+        builder.create<MatchingConnectOp>(regField, dataField);
+      });
+      return;
+    }
+
+    auto regType = type_cast<IntType>(regField.getType());
+    auto dataType = type_cast<IntType>(dataField.getType());
+    if (!regType.getWidth() || !dataType.getWidth() || !maskType.getWidth() ||
+        *regType.getWidth() != *dataType.getWidth()) {
+      if (auto *op = dataField.getDefiningOp())
+        op->emitOpError("Cannot convert memory to bank of registers");
+      return;
+    }
+
+    auto toUInt = [&](Value value) -> Value {
+      if (type_isa<UIntType>(value.getType()))
+        return value;
+      return builder.create<AsUIntPrimOp>(value);
+    };
+
+    auto regUInt = toUInt(regField);
+    auto dataUInt = toUInt(dataField);
+    Value maskUInt = toUInt(maskField);
+    if (*regType.getWidth() != *maskType.getWidth()) {
+      if (*regType.getWidth() % *maskType.getWidth() != 0) {
+        if (auto *op = dataField.getDefiningOp())
+          op->emitOpError("Cannot convert memory to bank of registers");
+        return;
+      }
+
+      auto *context = builder.getContext();
+      auto chunkWidth = *regType.getWidth() / *maskType.getWidth();
+      auto chunkType = UIntType::get(context, chunkWidth);
+      auto zero = builder.create<ConstantOp>(chunkType, APInt(chunkWidth, 0));
+      auto ones = builder.create<ConstantOp>(chunkType, APInt::getAllOnes(chunkWidth));
+
+      Value expandedMask;
+      for (unsigned i = 0, e = *maskType.getWidth(); i != e; ++i) {
+        auto maskBit = builder.create<BitsPrimOp>(maskUInt, i, i);
+        auto chunkMask =
+            builder.create<MuxPrimOp>(maskBit, ones, zero);
+        if (!expandedMask)
+          expandedMask = chunkMask;
+        else
+          expandedMask = builder.create<CatPrimOp>(chunkMask, expandedMask);
+      }
+      maskUInt = expandedMask;
+    }
+
+    auto preserved = builder.create<AndPrimOp>(
+        regUInt, builder.create<NotPrimOp>(maskUInt));
+    auto updated = builder.create<AndPrimOp>(dataUInt, maskUInt);
+    Value merged = builder.create<OrPrimOp>(preserved, updated);
+    if (type_isa<SIntType>(regField.getType()))
+      merged = builder.create<AsSIntPrimOp>(merged);
+    builder.create<MatchingConnectOp>(regField, merged);
   }
 
   void generateRead(const FirMemory &firMem, Value clock, Value addr,
@@ -220,10 +304,7 @@ struct MemToRegOfVecPass
         auto regField = std::get<0>(regDataMask);
         auto dataField = std::get<1>(regDataMask);
         auto maskField = std::get<2>(regDataMask);
-        // If mask, then update the register field.
-        builder.create<WhenOp>(maskField, /*withElseRegion*/ false, [&]() {
-          builder.create<MatchingConnectOp>(regField, dataField);
-        });
+        emitMaskedFieldUpdate(builder, regField, dataField, maskField);
       }
     });
   }
@@ -266,11 +347,7 @@ struct MemToRegOfVecPass
               auto regField = std::get<0>(regDataMask);
               auto dataField = std::get<1>(regDataMask);
               auto maskField = std::get<2>(regDataMask);
-              // If mask true, then set the field.
-              builder.create<WhenOp>(
-                  maskField, /*withElseRegion*/ false, [&]() {
-                    builder.create<MatchingConnectOp>(regField, dataField);
-                  });
+              emitMaskedFieldUpdate(builder, regField, dataField, maskField);
             }
           },
           // Read block:
@@ -434,13 +511,83 @@ struct MemToRegOfVecPass
         r.replaceAllUsesWith(builder.create<RefSendOp>(regOfVec.getResult()));
   }
 
+  bool replSeqMem;
+  bool ignoreReadEnable;
+  bool honorCircuitAnnotation;
+  bool skipIfHHoudiniSplitMems;
+  bool honorExcludeAnnotation;
+  std::atomic<unsigned> numConvertedMems{0};
+};
+
+struct MemToRegOfVecPass
+    : public circt::firrtl::impl::MemToRegOfVecBase<MemToRegOfVecPass> {
+  MemToRegOfVecPass(bool replSeqMem, bool ignoreReadEnable,
+                    bool skipIfHHoudiniSplitMems)
+      : replSeqMem(replSeqMem), ignoreReadEnable(ignoreReadEnable),
+        skipIfHHoudiniSplitMems(skipIfHHoudiniSplitMems) {}
+
+  void runOnOperation() override {
+    auto circtOp = getOperation();
+    bool changed = false;
+    MemToRegOfVecRewriter rewriter(
+        replSeqMem, ignoreReadEnable,
+        /*honorCircuitAnnotation=*/true, skipIfHHoudiniSplitMems,
+        /*honorExcludeAnnotation=*/true);
+    if (!rewriter.preprocessCircuit(circtOp, changed)) {
+      if (!changed)
+        markAllAnalysesPreserved();
+      return;
+    }
+
+    auto &instanceInfo = getAnalysis<InstanceInfo>();
+    rewriter.runOnCircuit(circtOp, instanceInfo);
+    numConvertedMems += rewriter.getNumConvertedMems();
+  }
+
 private:
   bool replSeqMem;
+  bool ignoreReadEnable;
+  bool skipIfHHoudiniSplitMems;
+};
+
+struct MemToRegOfVecFallbackPass
+    : public circt::firrtl::impl::MemToRegOfVecFallbackBase<
+          MemToRegOfVecFallbackPass> {
+  explicit MemToRegOfVecFallbackPass(bool ignoreReadEnable)
+      : ignoreReadEnable(ignoreReadEnable) {}
+
+  void runOnOperation() override {
+    auto circtOp = getOperation();
+    bool changed = false;
+    MemToRegOfVecRewriter rewriter(
+        /*replSeqMem=*/false, ignoreReadEnable,
+        /*honorCircuitAnnotation=*/false,
+        /*skipIfHHoudiniSplitMems=*/false,
+        /*honorExcludeAnnotation=*/false);
+    if (!rewriter.preprocessCircuit(circtOp, changed)) {
+      markAllAnalysesPreserved();
+      return;
+    }
+
+    auto &instanceInfo = getAnalysis<InstanceInfo>();
+    rewriter.runOnCircuit(circtOp, instanceInfo);
+    numConvertedMems += rewriter.getNumConvertedMems();
+  }
+
+private:
   bool ignoreReadEnable;
 };
 } // end anonymous namespace
 
 std::unique_ptr<mlir::Pass>
-circt::firrtl::createMemToRegOfVecPass(bool replSeqMem, bool ignoreReadEnable) {
-  return std::make_unique<MemToRegOfVecPass>(replSeqMem, ignoreReadEnable);
+circt::firrtl::createMemToRegOfVecPass(bool replSeqMem,
+                                       bool ignoreReadEnable,
+                                       bool skipIfHHoudiniSplitMems) {
+  return std::make_unique<MemToRegOfVecPass>(
+      replSeqMem, ignoreReadEnable, skipIfHHoudiniSplitMems);
+}
+
+std::unique_ptr<mlir::Pass>
+circt::firrtl::createMemToRegOfVecFallbackPass(bool ignoreReadEnable) {
+  return std::make_unique<MemToRegOfVecFallbackPass>(ignoreReadEnable);
 }

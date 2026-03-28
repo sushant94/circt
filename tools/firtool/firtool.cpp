@@ -476,6 +476,9 @@ static LogicalResult processBuffer(
     if (failed(parsePassPipeline(StringRef(highFIRRTLPassPlugin), pm)))
       return failure();
 
+  firtoolOptions.setEnableModularBTOR2PPMemorySplitting(outputFormat ==
+                                                        OutputBTOR2PP);
+
   if (failed(firtool::populateCHIRRTLToLowFIRRTL(pm, firtoolOptions,
                                                  inputFilename)))
     return failure();

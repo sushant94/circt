@@ -90,7 +90,8 @@ LogicalResult firtool::populateCHIRRTLToLowFIRRTL(mlir::PassManager &pm,
 
   pm.nest<firrtl::CircuitOp>().addPass(
       firrtl::createMemToRegOfVecPass(opt.shouldReplaceSequentialMemories(),
-                                      opt.shouldIgnoreReadEnableMemories()));
+                                      opt.shouldIgnoreReadEnableMemories(),
+                                      opt.shouldEnableModularBTOR2PPMemorySplitting()));
 
   pm.nest<firrtl::CircuitOp>().addPass(firrtl::createInferResetsPass());
 
@@ -119,7 +120,15 @@ LogicalResult firtool::populateCHIRRTLToLowFIRRTL(mlir::PassManager &pm,
 
   if (!opt.shouldLowerMemories())
     pm.nest<firrtl::CircuitOp>().nest<firrtl::FModuleOp>().addPass(
-        firrtl::createFlattenMemoryPass());
+      firrtl::createFlattenMemoryPass());
+
+  if (opt.shouldEnableModularBTOR2PPMemorySplitting())
+    pm.nest<firrtl::CircuitOp>().addPass(firrtl::createHHoudiniSplitMemsPass());
+
+  if (opt.shouldEnableModularBTOR2PPMemorySplitting())
+    pm.nest<firrtl::CircuitOp>().addPass(
+        firrtl::createMemToRegOfVecFallbackPass(
+            opt.shouldIgnoreReadEnableMemories()));
 
   // The input mlir file could be firrtl dialect so we might need to clean
   // things up.
@@ -801,7 +810,8 @@ circt::firtool::FirtoolOptions::FirtoolOptions()
       ckgEnableName("en"), ckgTestEnableName("test_en"), ckgInstName("ckg"),
       exportModuleHierarchy(false), stripFirDebugInfo(true),
       stripDebugInfo(false), fixupEICGWrapper(false), addCompanionAssume(false),
-      disableCSEinClasses(false), selectDefaultInstanceChoice(false) {
+      disableCSEinClasses(false), selectDefaultInstanceChoice(false),
+      enableModularBTOR2PPMemorySplitting(false) {
   if (!clOptions.isConstructed())
     return;
   outputFilename = clOptions->outputFilename;

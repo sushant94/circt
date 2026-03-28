@@ -137,8 +137,14 @@ std::unique_ptr<mlir::Pass> createInferResetsPass();
 
 std::unique_ptr<mlir::Pass> createLowerMemoryPass();
 
+std::unique_ptr<mlir::Pass> createHHoudiniSplitMemsPass();
+
 std::unique_ptr<mlir::Pass>
-createMemToRegOfVecPass(bool replSeqMem = false, bool ignoreReadEnable = false);
+createMemToRegOfVecPass(bool replSeqMem = false, bool ignoreReadEnable = false,
+                        bool skipIfHHoudiniSplitMems = false);
+
+std::unique_ptr<mlir::Pass>
+createMemToRegOfVecFallbackPass(bool ignoreReadEnable = false);
 
 std::unique_ptr<mlir::Pass> createFIRRTLFieldSourcePass();
 

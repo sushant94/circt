@@ -253,6 +253,22 @@ def LowerMemory : Pass<"firrtl-lower-memory", "firrtl::CircuitOp"> {
   ];
 }
 
+def HHoudiniSplitMems : Pass<"firrtl-hhoudini-split-mems",
+                             "firrtl::CircuitOp"> {
+  let summary = "Split supported FIRRTL memories into wrapper and row modules";
+  let description = [{
+    This pass rewrites supported FIRRTL memories into wrapper modules
+    containing one row-storage instance per memory entry. It is intended for
+    modular BTOR2++ flows where repeated row-module structure should be
+    preserved for downstream reasoning.
+  }];
+  let constructor = "circt::firrtl::createHHoudiniSplitMemsPass()";
+  let statistics = [
+    Statistic<"numSplitMems", "num-split-mems",
+      "Number of memories rewritten into wrapper/row modules">,
+  ];
+}
+
 def Dedup : Pass<"firrtl-dedup", "firrtl::CircuitOp"> {
   let summary = "Deduplicate modules which are structurally equivalent";
   let description = [{
@@ -585,6 +601,21 @@ def MemToRegOfVec : Pass<"firrtl-mem-to-reg-of-vec", "firrtl::CircuitOp"> {
     "ignore the read enable signal, instead of assigning X on read disable">
    ];
   let constructor = "circt::firrtl::createMemToRegOfVecPass()";
+  let statistics = [
+    Statistic<"numConvertedMems", "num-converted-mems",
+      "Number of memories converted to registers">,
+  ];
+}
+
+def MemToRegOfVecFallback
+    : Pass<"firrtl-mem-to-reg-of-vec-fallback", "firrtl::CircuitOp"> {
+  let summary = "Lower remaining memories for the HHoudini modular flow";
+  let description = [{
+    This pass reuses MemToRegOfVec lowering semantics to lower any remaining
+    FIRRTL memories after firrtl-hhoudini-split-mems has rewritten the
+    supported subset. It is intended only for the modular BTOR2++ flow.
+  }];
+  let constructor = "circt::firrtl::createMemToRegOfVecFallbackPass()";
   let statistics = [
     Statistic<"numConvertedMems", "num-converted-mems",
       "Number of memories converted to registers">,
