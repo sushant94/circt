@@ -164,6 +164,11 @@ private:
     return "";
   }
 
+  void emitOptionalName(StringRef name) {
+    if (!name.empty())
+      os << " " << name;
+  }
+
   // Checks if a sort was declared with the given width
   // If so, its lid will be returned
   // Otherwise -1 will be returned
@@ -308,8 +313,9 @@ private:
     size_t op2LID = getOpLID(op2);
 
     // Build and return the string
-    os << opLID << " " << inst << " " << sid << " " << op1LID << " " << op2LID
-       << " " << getOpName(binop) << "\n";
+    os << opLID << " " << inst << " " << sid << " " << op1LID << " " << op2LID;
+    emitOptionalName(getOpName(binop));
+    os << "\n";
 
     // Handle variadic operand case where there may be more than to operads to a binop
     unsigned num_operands = binop->getNumOperands();
@@ -318,11 +324,39 @@ private:
       Value operand = binop->getOperand(current_op);
       size_t operandLID = getOpLID(operand);
       size_t new_op_lid = setOpLID(binop);
-      os << new_op_lid << " " << inst << " " << sid << " " << opLID << " " << operandLID
-         << " " << getOpName(binop)
-         << "\n";
+      os << new_op_lid << " " << inst << " " << sid << " " << opLID << " "
+         << operandLID;
+      emitOptionalName(getOpName(binop));
+      os << "\n";
       opLID = new_op_lid;
       current_op++;
+    }
+  }
+
+  void genConcat(Operation *op, ValueRange operands) {
+    assert(operands.size() >= 2 && "concat requires at least two operands");
+
+    size_t accLID = getOpLID(operands.front());
+    int64_t accWidth = hw::getBitWidth(operands.front().getType());
+    StringRef opName = getOpName(op);
+
+    for (size_t i = 1, e = operands.size(); i != e; ++i) {
+      Value operand = operands[i];
+      size_t operandLID = getOpLID(operand);
+      int64_t operandWidth = hw::getBitWidth(operand.getType());
+      int64_t newWidth = accWidth + operandWidth;
+      genSort("bitvec", newWidth);
+      size_t sid = sortToLIDMap.at(newWidth);
+      bool isLast = i + 1 == e;
+      size_t resultLID = isLast ? getOpLID(op) : lid++;
+
+      os << resultLID << " concat " << sid << " " << accLID << " " << operandLID;
+      if (isLast)
+        emitOptionalName(opName);
+      os << "\n";
+
+      accLID = resultLID;
+      accWidth = newWidth;
     }
   }
 
@@ -341,8 +375,9 @@ private:
     os << opLID << " "
        << "slice"
        << " " << sid << " " << op0LID << " " << (lowbit + width - 1) << " "
-       << lowbit << " " << getOpName(srcop)
-       << "\n";
+       << lowbit;
+    emitOptionalName(getOpName(srcop));
+    os << "\n";
   }
 
   // Generates a constant declaration given a value, a width and a name
@@ -358,7 +393,9 @@ private:
     // Find the LID associated to the operand
     size_t op0LID = getOpLID(op0);
 
-    os << opLID << " " << inst << " " << sid << " " << op0LID << " " << getOpName(srcop) << "\n";
+    os << opLID << " " << inst << " " << sid << " " << op0LID;
+    emitOptionalName(getOpName(srcop));
+    os << "\n";
   }
 
   // Generates a constant declaration given a value, a width and a name and
@@ -453,7 +490,9 @@ private:
     // Build and return the ite instruction
     os << opLID << " "
        << "ite"
-       << " " << sid << " " << condLID << " " << tLID << " " << fLID << " " << getOpName(srcop) << "\n";
+       << " " << sid << " " << condLID << " " << tLID << " " << fLID;
+    emitOptionalName(getOpName(srcop));
+    os << "\n";
   }
 
   // Generate an anonymous ite instruction when there is no defining op we can
@@ -770,7 +809,10 @@ public:
   void visitComb(comb::AndOp op) { visitBinOp(op, "and"); }
   void visitComb(comb::OrOp op) { visitBinOp(op, "or"); }
   void visitComb(comb::XorOp op) { visitBinOp(op, "xor"); }
-  void visitComb(comb::ConcatOp op) { visitBinOp(op, "concat"); }
+  void visitComb(comb::ConcatOp op) {
+    requireSort(op.getType());
+    genConcat(op, op.getOperands());
+  }
 
   // Extract ops translate to a slice operation in btor2 in a one-to-one
   // manner
@@ -848,30 +890,43 @@ public:
     int64_t w = current_width * multiple;
     genSort("bitvec", w);
 
-    size_t curLID = getOpLID((Operation* ) op);
+    size_t curLID = getOpLID((Operation *)op);
     size_t op0LID = getOpLID(op0);
     size_t wLID = getSortLID(w);
+    StringRef opName = getOpName((Operation *)op);
 
     if (current_width == 1) {
       // NOTE: BTOR takes as the third argument, the integer, the amount to extend by. 
       // Not the final width after extension, therefore, we need to subtract the current width.
       os << curLID << " "
-        << "sext"
-        << " " << wLID << " " << op0LID << " " << w - current_width << " " << getOpName((Operation*) op) << "\n";
+         << "sext"
+         << " " << wLID << " " << op0LID << " " << w - current_width;
+      emitOptionalName(opName);
+      os << "\n";
     } else {
-      size_t prevLID = op0LID;
-      for (size_t i = 0; i < multiple; i++) {
-        w = current_width * (i + 1);
-        wLID = getSortLID(w);
-        
-        os << curLID << " "
-          << "concat"
-          << " " << wLID << " " << prevLID << " " << op0LID << " ; Check me!\n";
-        
-        prevLID = curLID;
-        curLID = lid++;
+      if (multiple == 1) {
+        opLIDMap[(Operation *)op] = op0LID;
+        return;
       }
-      lid--;
+      size_t prevLID = op0LID;
+      int64_t prevWidth = current_width;
+      for (size_t i = 1; i < multiple; ++i) {
+        int64_t newWidth = prevWidth + current_width;
+        genSort("bitvec", newWidth);
+        size_t newSortLID = getSortLID(newWidth);
+        bool isLast = i + 1 == multiple;
+        size_t resultLID = isLast ? curLID : lid++;
+
+        os << resultLID << " "
+           << "concat"
+           << " " << newSortLID << " " << prevLID << " " << op0LID;
+        if (isLast)
+          emitOptionalName(opName);
+        os << "\n";
+
+        prevLID = resultLID;
+        prevWidth = newWidth;
+      }
     }
   }
 

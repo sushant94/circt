@@ -1,9 +1,11 @@
 /build*
+/bin*
 /install*
 /docker_build
 tags
 TAGS
 .vscode
+.codex
 .idea
 compile_commands.json
 .cache/
@@ -20,3 +22,13 @@ lit.site.cfg.py
 
 # External software
 /ext
+
+# Generated BTOR equivalence artifacts
+/rocket_gold.btor2
+/rocket_gate.btor2
+/rocket_btormc_fix_gold.btor2
+/rocket_btormc_fix_gate.btor2
+/rocket_*_equiv.btor2
+/rocket_*_equiv.json
+/rocket_split_report.json
+/rocket_split_report_current.json
