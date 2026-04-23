@@ -603,6 +603,12 @@ def ConvertHWToBTOR2 : Pass<"convert-hw-to-btor2", "mlir::ModuleOp"> {
   let constructor = "circt::createConvertHWToBTOR2Pass()";
   let dependentDialects = ["hw::HWDialect", "sv::SVDialect", "comb::CombDialect",
                            "seq::SeqDialect"];
+  let options = [
+    Option<"formalNormalizeRegs", "btor2-formal-normalize-regs", "bool",
+           "false",
+           "Use constrained shadow states to break enabled register self-hold "
+           "dependencies for formal consumers">
+  ];
 }
 
 //===----------------------------------------------------------------------===//
@@ -619,6 +625,12 @@ def ConvertHWToBTOR2PP : Pass<"convert-hw-to-btor2pp", "mlir::ModuleOp"> {
   let constructor = "circt::createConvertHWToBTOR2PPPass()";
   let dependentDialects = ["hw::HWDialect", "sv::SVDialect", "comb::CombDialect",
                            "seq::SeqDialect"];
+  let options = [
+    Option<"formalNormalizeRegs", "btor2-formal-normalize-regs", "bool",
+           "false",
+           "Use constrained shadow states to break enabled register self-hold "
+           "dependencies for formal consumers">
+  ];
 }
 
 //===----------------------------------------------------------------------===//

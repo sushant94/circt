@@ -5,6 +5,11 @@ The CIRCT change that introduced `--btor2-formal-normalize-regs` is intentionall
 compiler-local: it emits cleaner BTOR2/BTOR2++ for formal consumers, but it does
 not run synthesis experiments and does not change the synthesis algorithm.
 
+When that flag is enabled, CIRCT may emit constrained internal shadow states
+whose names start with `__btor2_formal_shadow__`. The synthesis miner should
+filter those states from pairmap mining, `EqPred` generation, `EqPredConst`
+generation, and invariant reporting.
+
 ## Recommended Algorithm Work
 
 Synthesis should detect `EqPredConst` sub-task failures where the state cone of

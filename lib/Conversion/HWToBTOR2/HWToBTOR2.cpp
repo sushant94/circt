@@ -31,8 +31,11 @@
 #include "circt/Dialect/Verif/VerifVisitors.h"
 #include "mlir/Pass/Pass.h"
 #include "llvm/ADT/MapVector.h"
+#include "llvm/ADT/Twine.h"
 #include "llvm/ADT/TypeSwitch.h"
 #include "llvm/Support/raw_ostream.h"
+#include <optional>
+#include <string>
 
 namespace circt {
 #define GEN_PASS_DEF_CONVERTHWTOBTOR2
@@ -54,7 +57,28 @@ struct ConvertHWToBTOR2Pass
 public:
   using verif::Visitor<ConvertHWToBTOR2Pass>::visitVerif;
 
-  ConvertHWToBTOR2Pass(raw_ostream &os) : os(os) {}
+  ConvertHWToBTOR2Pass(raw_ostream &os, bool formalNormalizeRegs = false)
+      : os(os) {
+    this->formalNormalizeRegs = formalNormalizeRegs;
+  }
+  ConvertHWToBTOR2Pass(const ConvertHWToBTOR2Pass &other)
+      : ConvertHWToBTOR2Pass(other.os, other.formalNormalizeRegs) {}
+
+  Statistic numShadowStatesEmitted{
+      this, "num-shadow-states-emitted",
+      "Number of constrained shadow states emitted for self-hold registers"};
+  Statistic numResetShadowEncodingsEmitted{
+      this, "num-reset-shadow-encodings-emitted",
+      "Number of reset-wrapped shadow-state encodings emitted"};
+  Statistic numProtectedShadowSkips{
+      this, "num-protected-shadow-skips",
+      "Number of self-hold registers skipped due to symbols or attributes"};
+  Statistic numUnsupportedMuxShadowSkips{
+      this, "num-unsupported-mux-shadow-skips",
+      "Number of registers skipped due to unsupported self-hold mux shape"};
+  Statistic numUnsupportedTypeShadowSkips{
+      this, "num-unsupported-type-shadow-skips",
+      "Number of registers skipped due to unsupported state type"};
   // Executes the pass
   void runOnOperation() override;
 
@@ -107,6 +131,14 @@ private:
   // Constants used during the conversion
   static constexpr size_t noLID = -1UL;
   [[maybe_unused]] static constexpr int64_t noWidth = -1L;
+  static constexpr StringLiteral shadowStatePrefix =
+      "__btor2_formal_shadow__";
+
+  struct SelfHoldMuxInfo {
+    Value cond;
+    Value update;
+    bool holdOnTrue = false;
+  };
 
   /// Field helper functions
 public:
@@ -167,6 +199,56 @@ private:
   void emitOptionalName(StringRef name) {
     if (!name.empty())
       os << " " << name;
+  }
+
+  bool hasOnlyAllowedAttrs(Operation *op, ArrayRef<StringRef> allowedAttrs) {
+    for (auto attr : op->getAttrs())
+      if (!llvm::is_contained(allowedAttrs, attr.getName().strref()))
+        return false;
+    return true;
+  }
+
+  bool canShadowEncode(seq::FirRegOp reg) {
+    return !reg.getInnerSymAttr() &&
+           hasOnlyAllowedAttrs(reg, {"name", "preset",
+                                     "firrtl.random_init_start"});
+  }
+
+  bool canShadowEncode(seq::CompRegOp reg) {
+    return !reg.getInnerSymAttr() && hasOnlyAllowedAttrs(reg, {"name"});
+  }
+
+  std::optional<SelfHoldMuxInfo> getSelfHoldMux(Value next, Value regValue) {
+    auto mux = next.getDefiningOp<comb::MuxOp>();
+    if (!mux)
+      return std::nullopt;
+
+    bool trueIsReg = mux.getTrueValue() == regValue;
+    bool falseIsReg = mux.getFalseValue() == regValue;
+    if (trueIsReg == falseIsReg)
+      return std::nullopt;
+
+    SelfHoldMuxInfo info;
+    info.cond = mux.getCond();
+    info.holdOnTrue = trueIsReg;
+    info.update = trueIsReg ? mux.getFalseValue() : mux.getTrueValue();
+    return info;
+  }
+
+  std::string getShadowStateName(Operation *reg) {
+    StringRef regName = getOpName(reg);
+    if (auto firReg = dyn_cast<seq::FirRegOp>(reg))
+      regName = firReg.getName();
+    else if (auto compReg = dyn_cast<seq::CompRegOp>(reg))
+      if (auto name = compReg.getName())
+        regName = *name;
+
+    std::string shadowName = shadowStatePrefix.str();
+    if (!regName.empty())
+      shadowName += regName.str();
+    else
+      shadowName += ("lid" + Twine(getOpLID(reg))).str();
+    return shadowName;
   }
 
   // Checks if a sort was declared with the given width
@@ -538,12 +620,21 @@ private:
   void genState(Operation *srcop, int64_t width, StringRef name) {
     // Register the source operation with the current line id
     size_t opLID = getOpLID(srcop);
+    genState(opLID, width, name);
+  }
 
+  size_t genState(int64_t width, StringRef name) {
+    size_t stateLID = lid++;
+    genState(stateLID, width, name);
+    return stateLID;
+  }
+
+  void genState(size_t stateLID, int64_t width, StringRef name) {
     // Retrieve the lid associated with the sort (sid)
     size_t sid = sortToLIDMap.at(width);
 
     // Build and return the state instruction
-    os << opLID << " "
+    os << stateLID << " "
        << "state"
        << " " << sid << " " << name << "\n";
   }
@@ -557,17 +648,32 @@ private:
   // Generates a next instruction, given a width, a state LID, and a next
   // value LID
   void genNext(size_t nextLID, Operation *reg, int64_t width) {
+    genNext(nextLID, getOpLID(reg), width);
+  }
+
+  void genNext(size_t nextLID, size_t regLID, int64_t width) {
     // Retrieve the lid associated with the sort (sid)
     size_t sid = sortToLIDMap.at(width);
-
-    // Retrieve the LIDs associated to reg and next
-    size_t regLID = getOpLID(reg);
 
     // Build and return the next instruction
     // Also update the lid as this instruction is not associated to an mlir op
     os << lid++ << " "
        << "next"
        << " " << sid << " " << regLID << " " << nextLID << "\n";
+  }
+
+  size_t genEq(size_t lhsLID, size_t rhsLID, int64_t width) {
+    genSort("bitvec", 1);
+    size_t eqLID = lid++;
+    size_t sid = sortToLIDMap.at(1);
+    os << eqLID << " eq " << sid << " " << lhsLID << " " << rhsLID << "\n";
+    return eqLID;
+  }
+
+  void genInit(size_t regLID, size_t initValLID, int64_t width) {
+    size_t sid = sortToLIDMap.at(width);
+    os << lid++ << " init " << sid << " " << regLID << " " << initValLID
+       << "\n";
   }
 
   // Verifies that the sort required for the given operation's btor2 emission
@@ -585,6 +691,100 @@ private:
     // if the sort already exists)
     genSort("bitvec", width);
     return width;
+  }
+
+  size_t getValueLID(Value value) {
+    if (auto barg = dyn_cast<BlockArgument>(value))
+      return inputLIDs[barg.getArgNumber()];
+    return getOpLID(value);
+  }
+
+  std::optional<size_t> getInitialValueLID(Operation *op) {
+    auto reg = dyn_cast<seq::CompRegOp>(op);
+    if (!reg)
+      return std::nullopt;
+
+    auto init = reg.getInitialValue();
+    if (!init)
+      return std::nullopt;
+
+    auto initialConstant =
+        circt::seq::unwrapImmutableValue(init).getDefiningOp<hw::ConstantOp>();
+    if (!initialConstant)
+      return std::nullopt;
+    return getOpLID(initialConstant.getOperation());
+  }
+
+  bool tryEmitShadowEncodedSelfHold(Operation *op, Value next, Value reset,
+                                    Value resetVal, int64_t width) {
+    if (!formalNormalizeRegs)
+      return false;
+
+    if (width == noWidth) {
+      ++numUnsupportedTypeShadowSkips;
+      return false;
+    }
+
+    Value regValue;
+    if (auto reg = dyn_cast<seq::FirRegOp>(op)) {
+      regValue = reg.getResult();
+      if (!canShadowEncode(reg)) {
+        ++numProtectedShadowSkips;
+        return false;
+      }
+    } else if (auto reg = dyn_cast<seq::CompRegOp>(op)) {
+      regValue = reg.getResult();
+      if (!canShadowEncode(reg)) {
+        ++numProtectedShadowSkips;
+        return false;
+      }
+    } else {
+      return false;
+    }
+
+    auto selfHold = getSelfHoldMux(next, regValue);
+    if (!selfHold) {
+      ++numUnsupportedMuxShadowSkips;
+      return false;
+    }
+
+    size_t regLID = getOpLID(op);
+    std::string shadowName = getShadowStateName(op);
+    size_t shadowLID = genState(width, shadowName);
+
+    if (auto initLID = getInitialValueLID(op))
+      genInit(shadowLID, *initLID, width);
+
+    size_t equalityLID = genEq(regLID, shadowLID, width);
+    genConstraint(equalityLID);
+
+    size_t condLID = getValueLID(selfHold->cond);
+    size_t updateLID = getValueLID(selfHold->update);
+    size_t originalBaseNextLID;
+    size_t shadowBaseNextLID;
+    if (selfHold->holdOnTrue) {
+      originalBaseNextLID = genIte(condLID, shadowLID, updateLID, width);
+      shadowBaseNextLID = genIte(condLID, regLID, updateLID, width);
+    } else {
+      originalBaseNextLID = genIte(condLID, updateLID, shadowLID, width);
+      shadowBaseNextLID = genIte(condLID, updateLID, regLID, width);
+    }
+
+    size_t originalNextLID = originalBaseNextLID;
+    size_t shadowNextLID = shadowBaseNextLID;
+    if (reset) {
+      size_t resetLID = getValueLID(reset);
+      size_t resetValLID = resetVal ? getValueLID(resetVal) : genZero(width);
+      originalNextLID =
+          genIte(resetLID, resetValLID, originalBaseNextLID, width);
+      shadowNextLID = genIte(resetLID, resetValLID, shadowBaseNextLID, width);
+      ++numResetShadowEncodingsEmitted;
+    }
+
+    genNext(originalNextLID, regLID, width);
+    genNext(shadowNextLID, shadowLID, width);
+    ++numShadowStatesEmitted;
+    return true;
   }
 
   // Generates the transitions required to finalize the register to state
@@ -610,6 +810,9 @@ private:
     }
 
     genSort("bitvec", width);
+
+    if (tryEmitShadowEncodedSelfHold(op, next, reset, resetVal, width))
+      return;
 
     // Next should already be associated to an LID at this point
     // As we are going to override it, we need to keep track of the original
@@ -1232,8 +1435,9 @@ void ConvertHWToBTOR2Pass::runOnOperation() {
 
 // Constructor with a custom ostream
 std::unique_ptr<mlir::Pass>
-circt::createConvertHWToBTOR2Pass(llvm::raw_ostream &os) {
-  return std::make_unique<ConvertHWToBTOR2Pass>(os);
+circt::createConvertHWToBTOR2Pass(llvm::raw_ostream &os,
+                                  bool formalNormalizeRegs) {
+  return std::make_unique<ConvertHWToBTOR2Pass>(os, formalNormalizeRegs);
 }
 
 // Basic default constructor

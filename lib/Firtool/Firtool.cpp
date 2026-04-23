@@ -666,7 +666,9 @@ LogicalResult firtool::populateHWToBTOR2(mlir::PassManager &pm,
   pm.addNestedPass<hw::HWModuleOp>(circt::verif::createPrepareForFormalPass());
   pm.addNestedPass<hw::HWModuleOp>(circt::hw::createHWAggregateToCombPass());
   pm.addPass(circt::hw::createFlattenModulesPass());
-  pm.addPass(circt::createConvertHWToBTOR2Pass(os));
+  pm.addPass(
+      circt::createConvertHWToBTOR2Pass(os,
+                                        opt.shouldFormalNormalizeBTOR2Regs()));
   return success();
 }
 
@@ -679,7 +681,9 @@ LogicalResult firtool::populateHWToBTOR2PP(mlir::PassManager &pm,
   pm.addNestedPass<hw::HWModuleOp>(circt::verif::createPrepareForFormalPass());
   pm.addNestedPass<hw::HWModuleOp>(circt::hw::createHWAggregateToCombPass());
 //   pm.addPass(circt::hw::createFlattenModulesPass());
-  pm.addPass(circt::createConvertHWToBTOR2PPPass(os));
+  pm.addPass(
+      circt::createConvertHWToBTOR2PPPass(
+          os, opt.shouldFormalNormalizeBTOR2Regs()));
   return success();
 }
 
