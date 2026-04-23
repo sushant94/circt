@@ -269,6 +269,22 @@ def HHoudiniSplitMems : Pass<"firrtl-hhoudini-split-mems",
   ];
 }
 
+def HHoudiniSplitRegVecs : Pass<"firrtl-hhoudini-split-reg-vecs",
+                                "firrtl::CircuitOp"> {
+  let summary = "Split vector registers into wrapper and row modules";
+  let description = [{
+    This pass rewrites supported top-level vector FIRRTL registers into wrapper
+    modules containing one row-storage instance per vector entry. It is
+    intended for modular BTOR2++ flows where repeated row-module structure
+    should be preserved for downstream reasoning.
+  }];
+  let constructor = "circt::firrtl::createHHoudiniSplitRegVecsPass()";
+  let statistics = [
+    Statistic<"numSplitRegVecs", "num-split-reg-vecs",
+      "Number of vector registers rewritten into wrapper/row modules">,
+  ];
+}
+
 def Dedup : Pass<"firrtl-dedup", "firrtl::CircuitOp"> {
   let summary = "Deduplicate modules which are structurally equivalent";
   let description = [{

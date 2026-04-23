@@ -139,6 +139,8 @@ std::unique_ptr<mlir::Pass> createLowerMemoryPass();
 
 std::unique_ptr<mlir::Pass> createHHoudiniSplitMemsPass();
 
+std::unique_ptr<mlir::Pass> createHHoudiniSplitRegVecsPass();
+
 std::unique_ptr<mlir::Pass>
 createMemToRegOfVecPass(bool replSeqMem = false, bool ignoreReadEnable = false,
                         bool skipIfHHoudiniSplitMems = false);

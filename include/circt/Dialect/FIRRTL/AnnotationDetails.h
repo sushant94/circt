@@ -170,6 +170,8 @@ constexpr const char *excludeMemToRegAnnoClass =
     "sifive.enterprise.firrtl.ExcludeMemFromMemToRegOfVec";
 constexpr const char *hHoudiniSplitMemsAnnoClass =
     "circt.HHoudiniSplitMemsAnnotation";
+constexpr const char *hHoudiniSplitRegVecsAnnoClass =
+    "circt.HHoudiniSplitRegVecsAnnotation";
 
 // Instance Extraction
 constexpr const char *extractBlackBoxAnnoClass =

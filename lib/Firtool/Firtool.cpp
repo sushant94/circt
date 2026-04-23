@@ -8,21 +8,232 @@
 
 #include "circt/Firtool/Firtool.h"
 #include "circt/Conversion/Passes.h"
+#include "circt/Dialect/Comb/CombOps.h"
 #include "circt/Dialect/FIRRTL/FIRRTLOps.h"
 #include "circt/Dialect/FIRRTL/Passes.h"
 #include "circt/Dialect/HW/HWPasses.h"
+#include "circt/Dialect/HW/HWOps.h"
 #include "circt/Dialect/OM/OMPasses.h"
 #include "circt/Dialect/SV/SVPasses.h"
+#include "circt/Dialect/Seq/SeqOps.h"
 #include "circt/Dialect/Seq/SeqPasses.h"
 #include "circt/Dialect/Verif/VerifPasses.h"
 #include "circt/Support/Passes.h"
 #include "circt/Transforms/Passes.h"
+#include "mlir/IR/PatternMatch.h"
 #include "mlir/Transforms/Passes.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/Path.h"
 
 using namespace llvm;
 using namespace circt;
+
+namespace {
+
+/// A conservative BTOR2/formal-oriented cleanup for register patterns that are
+/// otherwise awkward for syntactic COI-based consumers. This pass must remain
+/// semantics preserving: it only folds registers whose value is fixed by
+/// explicit state semantics, and otherwise only canonicalizes mux shape.
+struct BTOR2FormalNormalizeRegsPass
+    : public mlir::PassWrapper<BTOR2FormalNormalizeRegsPass,
+                               mlir::OperationPass<hw::HWModuleOp>> {
+  MLIR_DEFINE_EXPLICIT_INTERNAL_INLINE_TYPE_ID(BTOR2FormalNormalizeRegsPass)
+
+  BTOR2FormalNormalizeRegsPass() = default;
+  BTOR2FormalNormalizeRegsPass(const BTOR2FormalNormalizeRegsPass &)
+      : BTOR2FormalNormalizeRegsPass() {}
+
+  StringRef getArgument() const override {
+    return "btor2-formal-normalize-regs";
+  }
+  StringRef getDescription() const override {
+    return "Normalize simple register self-feedback patterns before BTOR2 "
+           "emission";
+  }
+
+  Statistic numSelfLoopRegsFolded{
+      this, "num-self-loop-regs-folded",
+      "Number of trivially self-looping registers folded to constants"};
+  Statistic numConstSelfLoopRegsFolded{
+      this, "num-const-self-loop-regs-folded",
+      "Number of initialized constant/self-loop registers folded"};
+  Statistic numSelfHoldMuxesCanonicalized{
+      this, "num-self-hold-muxes-canonicalized",
+      "Number of self-hold muxes canonicalized to hold on the false branch"};
+  Statistic numSelfHoldMuxesRecognized{
+      this, "num-self-hold-muxes-recognized",
+      "Number of self-hold muxes already in canonical form"};
+
+  void runOnOperation() override;
+
+private:
+  template <typename RegOp>
+  void normalizeSelfHoldMux(RegOp reg, mlir::IRRewriter &rewriter);
+};
+
+static void replaceRegWithConstant(mlir::Operation *reg, mlir::Type type,
+                                   const APInt &value,
+                                   mlir::IRRewriter &rewriter) {
+  rewriter.setInsertionPoint(reg);
+  auto constant = rewriter.create<hw::ConstantOp>(reg->getLoc(), value);
+  rewriter.replaceOpWithNewOp<hw::BitcastOp>(reg, type, constant);
+}
+
+static std::optional<APInt> getConstantValue(mlir::Value value) {
+  if (!value)
+    return std::nullopt;
+  if (auto constant = value.getDefiningOp<hw::ConstantOp>())
+    return constant.getValue();
+  return std::nullopt;
+}
+
+static std::optional<APInt> getImmutableConstantValue(mlir::Value value) {
+  if (!value)
+    return std::nullopt;
+  auto immutable = dyn_cast<mlir::TypedValue<seq::ImmutableType>>(value);
+  if (!immutable)
+    return std::nullopt;
+  auto constant =
+      seq::unwrapImmutableValue(immutable).getDefiningOp<hw::ConstantOp>();
+  if (!constant)
+    return std::nullopt;
+  return constant.getValue();
+}
+
+static bool hasOnlyAllowedAttrs(mlir::Operation *op,
+                                ArrayRef<StringRef> allowedAttrs) {
+  for (auto attr : op->getAttrs()) {
+    if (!llvm::is_contained(allowedAttrs, attr.getName().strref()))
+      return false;
+  }
+  return true;
+}
+
+static bool canRewriteFirReg(seq::FirRegOp reg) {
+  return !reg.getInnerSymAttr() &&
+         hasOnlyAllowedAttrs(reg, {"name", "preset",
+                                   "firrtl.random_init_start"});
+}
+
+static bool canRewriteCompReg(seq::CompRegOp reg) {
+  return !reg.getInnerSymAttr() && hasOnlyAllowedAttrs(reg, {"name"});
+}
+
+template <typename RegOp>
+void BTOR2FormalNormalizeRegsPass::normalizeSelfHoldMux(
+    RegOp reg, mlir::IRRewriter &rewriter) {
+  auto mux = reg.getInput().template getDefiningOp<comb::MuxOp>();
+  if (!mux)
+    return;
+
+  auto regValue = reg.getResult();
+  if (mux.getFalseValue() == regValue) {
+    ++numSelfHoldMuxesRecognized;
+    return;
+  }
+  if (mux.getTrueValue() != regValue)
+    return;
+
+  rewriter.setInsertionPoint(mux);
+  auto notCond =
+      comb::createOrFoldNot(mux.getLoc(), mux.getCond(), rewriter,
+                            /*twoState=*/mux.getTwoState());
+  rewriter.replaceOpWithNewOp<comb::MuxOp>(
+      mux, notCond, mux.getFalseValue(), mux.getTrueValue(),
+      mux.getTwoState());
+  ++numSelfHoldMuxesCanonicalized;
+}
+
+template <>
+void BTOR2FormalNormalizeRegsPass::normalizeSelfHoldMux<seq::FirRegOp>(
+    seq::FirRegOp reg, mlir::IRRewriter &rewriter) {
+  auto mux = reg.getNext().getDefiningOp<comb::MuxOp>();
+  if (!mux)
+    return;
+
+  auto regValue = reg.getResult();
+  if (mux.getFalseValue() == regValue) {
+    ++numSelfHoldMuxesRecognized;
+    return;
+  }
+  if (mux.getTrueValue() != regValue)
+    return;
+
+  rewriter.setInsertionPoint(mux);
+  auto notCond =
+      comb::createOrFoldNot(mux.getLoc(), mux.getCond(), rewriter,
+                            /*twoState=*/mux.getTwoState());
+  rewriter.replaceOpWithNewOp<comb::MuxOp>(
+      mux, notCond, mux.getFalseValue(), mux.getTrueValue(),
+      mux.getTwoState());
+  ++numSelfHoldMuxesCanonicalized;
+}
+
+void BTOR2FormalNormalizeRegsPass::runOnOperation() {
+  mlir::IRRewriter rewriter(&getContext());
+  SmallVector<seq::FirRegOp> firRegs;
+  SmallVector<seq::CompRegOp> compRegs;
+
+  getOperation().walk([&](mlir::Operation *op) {
+    if (auto reg = dyn_cast<seq::FirRegOp>(op))
+      firRegs.push_back(reg);
+    else if (auto reg = dyn_cast<seq::CompRegOp>(op))
+      compRegs.push_back(reg);
+  });
+
+  for (auto reg : firRegs) {
+    if (!canRewriteFirReg(reg))
+      continue;
+
+    normalizeSelfHoldMux(reg, rewriter);
+
+    // Match the existing seq.firreg canonicalization, but keep this pass
+    // opt-in for formal BTOR2 users.
+    if (reg.getResetValue() || reg.getNext() != reg.getResult())
+      continue;
+    if (auto preset = reg.getPresetAttr())
+      if (!preset.getValue().isZero())
+        continue;
+
+    auto width = hw::getBitWidth(reg.getType());
+    if (width < 0)
+      continue;
+    replaceRegWithConstant(reg, reg.getType(), APInt::getZero(width),
+                           rewriter);
+    ++numSelfLoopRegsFolded;
+  }
+
+  for (auto reg : compRegs) {
+    if (!canRewriteCompReg(reg))
+      continue;
+
+    normalizeSelfHoldMux(reg, rewriter);
+
+    if (reg.getInput() != reg.getResult())
+      continue;
+
+    auto initValue = getImmutableConstantValue(reg.getInitialValue());
+    if (!initValue)
+      continue;
+
+    if (auto resetValue = reg.getResetValue()) {
+      auto resetConstant = getConstantValue(resetValue);
+      if (!resetConstant || *resetConstant != *initValue)
+        continue;
+    }
+
+    if (hw::getBitWidth(reg.getType()) < 0)
+      continue;
+    replaceRegWithConstant(reg, reg.getType(), *initValue, rewriter);
+    ++numConstSelfLoopRegsFolded;
+  }
+}
+
+std::unique_ptr<mlir::Pass> createBTOR2FormalNormalizeRegsPass() {
+  return std::make_unique<BTOR2FormalNormalizeRegsPass>();
+}
+
+} // namespace
 
 LogicalResult firtool::populatePreprocessTransforms(mlir::PassManager &pm,
                                                     const FirtoolOptions &opt) {
@@ -129,6 +340,10 @@ LogicalResult firtool::populateCHIRRTLToLowFIRRTL(mlir::PassManager &pm,
     pm.nest<firrtl::CircuitOp>().addPass(
         firrtl::createMemToRegOfVecFallbackPass(
             opt.shouldIgnoreReadEnableMemories()));
+
+  if (opt.shouldEnableModularBTOR2PPMemorySplitting())
+    pm.nest<firrtl::CircuitOp>().addPass(
+        firrtl::createHHoudiniSplitRegVecsPass());
 
   // The input mlir file could be firrtl dialect so we might need to clean
   // things up.
@@ -446,6 +661,8 @@ LogicalResult firtool::populateHWToBTOR2(mlir::PassManager &pm,
                                          const FirtoolOptions &opt,
                                          llvm::raw_ostream &os) {
   pm.addNestedPass<hw::HWModuleOp>(circt::createLowerLTLToCorePass());
+  if (opt.shouldFormalNormalizeBTOR2Regs())
+    pm.addNestedPass<hw::HWModuleOp>(createBTOR2FormalNormalizeRegsPass());
   pm.addNestedPass<hw::HWModuleOp>(circt::verif::createPrepareForFormalPass());
   pm.addNestedPass<hw::HWModuleOp>(circt::hw::createHWAggregateToCombPass());
   pm.addPass(circt::hw::createFlattenModulesPass());
@@ -457,6 +674,8 @@ LogicalResult firtool::populateHWToBTOR2PP(mlir::PassManager &pm,
                                            const FirtoolOptions &opt,
                                            llvm::raw_ostream &os) {
   pm.addNestedPass<hw::HWModuleOp>(circt::createLowerLTLToCorePass());
+  if (opt.shouldFormalNormalizeBTOR2Regs())
+    pm.addNestedPass<hw::HWModuleOp>(createBTOR2FormalNormalizeRegsPass());
   pm.addNestedPass<hw::HWModuleOp>(circt::verif::createPrepareForFormalPass());
   pm.addNestedPass<hw::HWModuleOp>(circt::hw::createHWAggregateToCombPass());
 //   pm.addPass(circt::hw::createFlattenModulesPass());
@@ -773,6 +992,12 @@ struct FirtoolCmdOptions {
       llvm::cl::desc(
           "Specialize instance choice to default, if no option selected"),
       llvm::cl::init(false)};
+
+  llvm::cl::opt<bool> formalNormalizeBTOR2Regs{
+      "btor2-formal-normalize-regs",
+      llvm::cl::desc("Run conservative formal-oriented register normalization "
+                     "before BTOR2/BTOR2++ emission"),
+      llvm::cl::init(false)};
 };
 } // namespace
 
@@ -811,7 +1036,8 @@ circt::firtool::FirtoolOptions::FirtoolOptions()
       exportModuleHierarchy(false), stripFirDebugInfo(true),
       stripDebugInfo(false), fixupEICGWrapper(false), addCompanionAssume(false),
       disableCSEinClasses(false), selectDefaultInstanceChoice(false),
-      enableModularBTOR2PPMemorySplitting(false) {
+      enableModularBTOR2PPMemorySplitting(false),
+      formalNormalizeBTOR2Regs(false) {
   if (!clOptions.isConstructed())
     return;
   outputFilename = clOptions->outputFilename;
@@ -862,4 +1088,5 @@ circt::firtool::FirtoolOptions::FirtoolOptions()
   fixupEICGWrapper = clOptions->fixupEICGWrapper;
   addCompanionAssume = clOptions->addCompanionAssume;
   selectDefaultInstanceChoice = clOptions->selectDefaultInstanceChoice;
+  formalNormalizeBTOR2Regs = clOptions->formalNormalizeBTOR2Regs;
 }

@@ -1,7 +1,7 @@
 import os
 import re
 
-INPUT_FILE = os.path.join(os.path.dirname(__file__), '..', 'dualrocket.btor2pp')
+INPUT_FILE = os.path.join(os.path.dirname(__file__), '..', '..', 'rocket_memory.btor2pp')
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'output_files')
 
 # Ensure output directory exists

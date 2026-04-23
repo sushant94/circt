@@ -1,6 +1,0 @@
-
-module OptimizationBarrier_UInt {
-  1 sort bitvec 3
-  2 input 1 io_x
-  3 output 2 io_y
-}

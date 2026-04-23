@@ -1,6 +1,0 @@
-
-module BundleBridgeNexus_UInt32 {
-  1 sort bitvec 32
-  2 input 1 auto_in
-  3 output 2 auto_out_1
-}

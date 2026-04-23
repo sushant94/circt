@@ -630,6 +630,7 @@ static llvm::StringMap<AnnoRecord> annotationRecords{{
     {injectDUTHierarchyAnnoClass, NoTargetAnnotation},
     {convertMemToRegOfVecAnnoClass, NoTargetAnnotation},
     {hHoudiniSplitMemsAnnoClass, NoTargetAnnotation},
+    {hHoudiniSplitRegVecsAnnoClass, NoTargetAnnotation},
     {excludeMemToRegAnnoClass,
      {stdResolve, applyWithoutTarget<true, MemOp, CombMemOp>}},
     {sitestBlackBoxAnnoClass, NoTargetAnnotation},

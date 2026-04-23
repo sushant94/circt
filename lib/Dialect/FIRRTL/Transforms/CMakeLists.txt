@@ -19,6 +19,7 @@ add_circt_dialect_library(CIRCTFIRRTLTransforms
   FlattenMemory.cpp
   GrandCentral.cpp
   HHoudiniSplitMems.cpp
+  HHoudiniSplitRegVecs.cpp
   IMConstProp.cpp
   IMDeadCodeElim.cpp
   InferReadWrite.cpp

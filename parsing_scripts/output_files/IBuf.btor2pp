@@ -4,245 +4,281 @@ module IBuf {
   1 sort bitvec 1
   2 input 1 reset
   3 input 1 io_imem_valid
-  4 input 1 io_imem_bits_btb_taken
-  5 input 1 io_imem_bits_btb_bridx
-  6 sort bitvec 5
-  7 input 6 io_imem_bits_btb_entry
-  8 sort bitvec 8
-  9 input 8 io_imem_bits_btb_bht_history
-  10 sort bitvec 40
-  11 input 10 io_imem_bits_pc
-  12 sort bitvec 32
-  13 input 12 io_imem_bits_data
-  14 input 1 io_imem_bits_xcpt_pf_inst
-  15 input 1 io_imem_bits_xcpt_gf_inst
-  16 input 1 io_imem_bits_xcpt_ae_inst
-  17 input 1 io_imem_bits_replay
-  18 input 1 io_kill
-  19 input 1 io_inst_0_ready
-  20 state 1 nBufValid
-  21 state 10 buf_pc
-  22 state 12 buf_data
-  23 state 1 buf_xcpt_pf_inst
-  24 state 1 buf_xcpt_gf_inst
-  25 state 1 buf_xcpt_ae_inst
-  26 state 1 buf_replay
-  27 state 6 ibufBTBResp_entry
-  28 state 8 ibufBTBResp_bht_history
-  29 inst RVCExpander
-  30 ref RVCExpander 2 io_in
-  31 ref RVCExpander 715 io_out_bits
-  32 ref RVCExpander 716 io_out_rd
-  33 ref RVCExpander 717 io_out_rs1
-  34 ref RVCExpander 718 io_out_rs2
-  35 ref RVCExpander 719 io_out_rs3
-  36 ref RVCExpander 720 io_rvc
-  37 get 29 31 io_out_bits
-  38 get 29 32 io_out_rd
-  39 get 29 33 io_out_rs1
-  40 get 29 34 io_out_rs2
-  41 get 29 35 io_out_rs3
-  42 get 29 36 io_rvc
-  43 sort bitvec 37
-  44 consth 43 0
-  45 sort bitvec 4
-  46 consth 45 1
-  47 sort bitvec 63
-  48 consth 47 FFFFFFFF
-  49 sort bitvec 2
-  50 consth 49 1
-  51 sort bitvec 3
-  52 consth 51 0
-  53 consth 12 FFFFFFFF
-  54 consth 10 FFFFFFFFFC
-  55 consth 10 3
-  56 consth 49 2
-  57 consth 1 1
-  58 consth 49 0
-  59 consth 1 0
-  60 consth 45 0
-  61 sort bitvec 58
-  62 consth 61 0
-  63 sort bitvec 16
-  64 consth 63 0
-  65 consth 47 0
-  66 sort bitvec 185
-  67 consth 66 0
-  68 consth 49 3
-  69 slice 1 11 1 1 pcWordBits
-  70 concat 49 59 5 
-  71 add 49 70 50 _nIC_T
-  72 ite 49 4 71 56 _nIC_T_1
-  73 concat 49 59 69 
-  74 sub 49 72 73 _nIC_T_2
-  75 concat 49 59 20 
-  76 ite 49 3 74 58 _nValid_T
-  77 concat 49 59 20 
-  78 add 49 76 77 _nValid_T_1
-  79 concat 45 58 78 
-  80 sll 45 46 79 _valid_T
-  81 slice 49 80 1 0 
-  82 add 49 81 68 _valid_T_1
-  83 slice 1 82 1 1 _full_insn_T_3
-  84 concat 49 59 20 
-  85 sll 49 50 84 _bufMask_T
-  86 add 49 85 68 _bufMask_T_1
-  87 ite 49 26 86 58 buf_replay
-  88 slice 1 87 0 0 _full_insn_T_6
-  89 or 1 42 83 full_insn
-  90 or 1 89 88 full_insn
-  91 ite 49 42 50 56 _nReady_T_4
-  92 ite 49 90 91 58 nReady
-  93 sub 49 92 75 _nICReady_T
-  94 ugte 1 92 84 _nBufValid_T
-  95 ugte 1 93 74 _io_imem_ready_T_2
-  96 sub 49 74 93 _nBufValid_T_6
-  97 slice 1 96 1 1 
-  98 xor 1 97 57 _io_imem_ready_T_5
-  99 or 1 95 98 _io_imem_ready_T_6
-  100 and 1 19 94 io_imem_ready
-  101 and 1 100 99 io_imem_ready
-  102 xor 1 20 57 _nBufValid_T_1
-  103 or 1 94 102 _nBufValid_T_2
-  104 slice 1 92 0 0 
-  105 sub 1 20 104 _nBufValid_T_3
-  106 xor 1 103 57 
-  107 and 1 106 105 _nBufValid_T_5
-  108 ult 1 93 74 
-  109 slice 1 96 1 1 
-  110 xor 1 109 57 
-  111 and 1 3 94 
-  112 and 1 111 108 
-  113 and 1 112 110 
-  114 concat 49 59 69 
-  115 add 49 114 93 _shamt_T
-  116 slice 1 96 0 0 
-  117 ite 1 113 116 107 
-  118 ite 1 19 117 20 
-  119 and 1 19 113 
-  120 ite 1 119 14 23 
-  121 ite 1 119 15 24 
-  122 ite 1 119 16 25 
-  123 ite 1 119 17 26 
-  124 slice 63 13 31 16 _buf_data_data_T
-  125 concat 63 124 124 ; Check me!
-  126 concat 12 125 124 ; Check me!
-  127 sort bitvec 64
-  128 concat 127 125 13 buf_data_data
-  129 concat 127 62 115 
-  130 concat 127 129 60 
-  131 srl 127 128 130 _buf_data_T_1
-  132 slice 63 131 15 0 _buf_data_T_2
-  133 concat 12 64 132 
-  134 ite 12 119 133 22 
-  135 and 10 11 54 _buf_pc_T_1
-  136 concat 10 44 93 
-  137 concat 10 136 59 
-  138 add 10 11 137 _buf_pc_T_3
-  139 and 10 138 55 _buf_pc_T_5
-  140 or 10 135 139 _buf_pc_T_6
-  141 ite 10 119 140 21 
-  142 ite 6 119 7 27 
-  143 ite 8 119 9 28 
-  144 xor 1 18 57 
-  145 and 1 144 118 
-  146 concat 49 59 20 
-  147 add 49 146 56 _icShiftAmt_T
-  148 concat 49 59 69 
-  149 sub 49 147 148 _icShiftAmt_T_2
-  150 slice 63 13 15 0 _icData_T
-  151 concat 63 150 150 ; Check me!
-  152 concat 12 151 150 ; Check me!
-  153 slice 63 13 31 16 _icData_data_T
-  154 concat 63 153 153 ; Check me!
-  155 concat 12 154 153 ; Check me!
-  156 concat 12 154 154 ; Check me!
-  157 concat 127 156 154 ; Check me!
-  158 sort bitvec 191
-  159 concat 158 65 156 
-  160 concat 158 159 13 
-  161 concat 158 160 151 
-  162 concat 158 67 149 
-  163 concat 158 162 60 
-  164 sll 158 161 163 _icData_T_4
-  165 slice 12 164 95 64 icData
-  166 concat 47 62 20 
-  167 concat 47 166 60 
-  168 sll 47 48 167 _icMask_T_2
-  169 slice 12 168 31 0 icMask
-  170 and 12 165 169 _inst_T
-  171 xor 12 169 53 _inst_T_1
-  172 and 12 22 171 _inst_T_2
-  173 or 12 170 172 inst
-  174 slice 1 86 0 0 _xcpt_T
-  175 ite 1 174 23 14 xcpt_0_pf_inst
-  176 ite 1 174 24 15 xcpt_0_gf_inst
-  177 ite 1 174 25 16 xcpt_0_ae_inst
-  178 slice 1 86 1 1 _xcpt_T_1
-  179 ite 1 178 23 14 xcpt_1_pf_inst
-  180 ite 1 178 24 15 xcpt_1_gf_inst
-  181 ite 1 178 25 16 xcpt_1_ae_inst
-  182 xor 49 86 68 _ic_replay_T
-  183 and 49 82 182 _ic_replay_T_1
-  184 ite 49 17 183 58 _ic_replay_T_2
-  185 or 49 87 184 ic_replay
-  186 xor 1 3 57 
-  187 xor 1 4 57 
-  188 ugte 1 5 69 
-  189 or 1 186 187 
-  190 or 1 189 188 
-  191 xor 1 2 57 
-  192 implies 1 191 190
-  193 not 1 192 
-  194 bad 193
-  195 ite 10 20 21 11 io_pc
-  196 slice 1 185 0 0 _replay_T_1
-  197 xor 1 42 57 _replay_T_2
-  198 slice 1 185 1 1 _replay_T_6
-  199 and 1 197 198 _replay_T_7
-  200 or 1 196 199 replay
-  201 slice 1 82 0 0 _io_inst_0_valid_T_1
-  202 and 1 201 90 io_inst_0_valid
-  203 concat 51 179 180 _io_inst_0_bits_xcpt1_T_4
-  204 concat 51 203 181 _io_inst_0_bits_xcpt1_T_4
-  205 ite 51 42 52 204 _io_inst_0_bits_xcpt1_T_5
-  206 slice 1 205 0 0 _io_inst_0_bits_xcpt1_T_6
-  207 slice 1 205 1 1 _io_inst_0_bits_xcpt1_T_7
-  208 slice 1 205 2 2 _io_inst_0_bits_xcpt1_T_8
-  209 slice 1 86 0 0 
-  210 and 1 209 42 
-  211 slice 1 86 1 1 
-  212 or 1 210 211 
-  213 ite 6 212 27 7 io_btb_resp_entry
-  214 ite 8 212 28 9 io_btb_resp_bht_history
-  215 set 29 30 173 io_in
-  216 output 101 io_imem_ready
-  217 output 195 io_pc
-  218 output 213 io_btb_resp_entry
-  219 output 214 io_btb_resp_bht_history
-  220 output 202 io_inst_0_valid
-  221 output 175 io_inst_0_bits_xcpt0_pf_inst
-  222 output 176 io_inst_0_bits_xcpt0_gf_inst
-  223 output 177 io_inst_0_bits_xcpt0_ae_inst
-  224 output 208 io_inst_0_bits_xcpt1_pf_inst
-  225 output 207 io_inst_0_bits_xcpt1_gf_inst
-  226 output 206 io_inst_0_bits_xcpt1_ae_inst
-  227 output 200 io_inst_0_bits_replay
-  228 output 42 io_inst_0_bits_rvc
-  229 output 37 io_inst_0_bits_inst_bits
-  230 output 38 io_inst_0_bits_inst_rd
-  231 output 39 io_inst_0_bits_inst_rs1
-  232 output 40 io_inst_0_bits_inst_rs2
-  233 output 41 io_inst_0_bits_inst_rs3
-  234 output 173 io_inst_0_bits_raw
-  235 ite 1 2 59 145 
-  236 next 1 20 235
-  237 next 10 21 141
-  238 next 12 22 134
-  239 next 1 23 120
-  240 next 1 24 121
-  241 next 1 25 122
-  242 next 1 26 123
-  243 next 6 27 142
-  244 next 8 28 143
+  4 sort bitvec 2
+  5 input 4 io_imem_bits_btb_cfiType
+  6 input 1 io_imem_bits_btb_taken
+  7 input 4 io_imem_bits_btb_mask
+  8 input 1 io_imem_bits_btb_bridx
+  9 sort bitvec 39
+  10 input 9 io_imem_bits_btb_target
+  11 sort bitvec 5
+  12 input 11 io_imem_bits_btb_entry
+  13 sort bitvec 8
+  14 input 13 io_imem_bits_btb_bht_history
+  15 input 1 io_imem_bits_btb_bht_value
+  16 sort bitvec 40
+  17 input 16 io_imem_bits_pc
+  18 sort bitvec 32
+  19 input 18 io_imem_bits_data
+  20 input 1 io_imem_bits_xcpt_pf_inst
+  21 input 1 io_imem_bits_xcpt_gf_inst
+  22 input 1 io_imem_bits_xcpt_ae_inst
+  23 input 1 io_imem_bits_replay
+  24 input 1 io_kill
+  25 input 1 io_inst_0_ready
+  26 state 1 nBufValid
+  27 state 16 buf_pc
+  28 state 18 buf_data
+  29 state 1 buf_xcpt_pf_inst
+  30 state 1 buf_xcpt_gf_inst
+  31 state 1 buf_xcpt_ae_inst
+  32 state 1 buf_replay
+  33 state 4 ibufBTBResp_cfiType
+  34 state 1 ibufBTBResp_taken
+  35 state 4 ibufBTBResp_mask
+  36 state 1 ibufBTBResp_bridx
+  37 state 9 ibufBTBResp_target
+  38 state 11 ibufBTBResp_entry
+  39 state 13 ibufBTBResp_bht_history
+  40 state 1 ibufBTBResp_bht_value
+  41 inst RVCExpander
+  42 ref RVCExpander 2 io_in
+  43 ref RVCExpander 751 io_out_bits
+  44 ref RVCExpander 752 io_out_rd
+  45 ref RVCExpander 753 io_out_rs1
+  46 ref RVCExpander 754 io_out_rs2
+  47 ref RVCExpander 755 io_out_rs3
+  48 ref RVCExpander 756 io_rvc
+  49 get 41 43 io_out_bits
+  50 get 41 44 io_out_rd
+  51 get 41 45 io_out_rs1
+  52 get 41 46 io_out_rs2
+  53 get 41 47 io_out_rs3
+  54 get 41 48 io_rvc
+  55 sort bitvec 37
+  56 consth 55 0
+  57 sort bitvec 4
+  58 consth 57 1
+  59 sort bitvec 63
+  60 consth 59 FFFFFFFF
+  61 consth 4 1
+  62 sort bitvec 3
+  63 consth 62 0
+  64 consth 18 FFFFFFFF
+  65 consth 16 FFFFFFFFFC
+  66 consth 16 3
+  67 consth 4 2
+  68 consth 1 1
+  69 consth 4 0
+  70 consth 1 0
+  71 consth 57 0
+  72 sort bitvec 58
+  73 consth 72 0
+  74 sort bitvec 16
+  75 consth 74 0
+  76 consth 59 0
+  77 sort bitvec 185
+  78 consth 77 0
+  79 consth 4 3
+  80 slice 1 17 1 1 pcWordBits
+  81 concat 4 70 8
+  82 add 4 81 61 _nIC_T
+  83 ite 4 6 82 67 _nIC_T_1
+  84 concat 4 70 80
+  85 sub 4 83 84 _nIC_T_2
+  86 concat 4 70 26
+  87 ite 4 3 85 69 _nValid_T
+  88 concat 4 70 26
+  89 add 4 87 88 _nValid_T_1
+  90 concat 57 69 89
+  91 sll 57 58 90 _valid_T
+  92 slice 4 91 1 0
+  93 add 4 92 79 _valid_T_1
+  94 slice 1 93 1 1 _full_insn_T_3
+  95 concat 4 70 26
+  96 sll 4 61 95 _bufMask_T
+  97 add 4 96 79 _bufMask_T_1
+  98 ite 4 32 97 69 buf_replay
+  99 slice 1 98 0 0 _full_insn_T_6
+  100 or 1 54 94 full_insn
+  101 or 1 100 99 full_insn
+  102 ite 4 54 61 67 _nReady_T_4
+  103 ite 4 101 102 69 nReady
+  104 sub 4 103 86 _nICReady_T
+  105 ugte 1 103 95 _nBufValid_T
+  106 ugte 1 104 85 _io_imem_ready_T_2
+  107 sub 4 85 104 _nBufValid_T_6
+  108 slice 1 107 1 1
+  109 xor 1 108 68 _io_imem_ready_T_5
+  110 or 1 106 109 _io_imem_ready_T_6
+  111 and 1 25 105 io_imem_ready
+  112 and 1 111 110 io_imem_ready
+  113 xor 1 26 68 _nBufValid_T_1
+  114 or 1 105 113 _nBufValid_T_2
+  115 slice 1 103 0 0
+  116 sub 1 26 115 _nBufValid_T_3
+  117 xor 1 114 68
+  118 and 1 117 116 _nBufValid_T_5
+  119 ult 1 104 85
+  120 slice 1 107 1 1
+  121 xor 1 120 68
+  122 and 1 3 105
+  123 and 1 122 119
+  124 and 1 123 121
+  125 concat 4 70 80
+  126 add 4 125 104 _shamt_T
+  127 slice 1 107 0 0
+  128 ite 1 124 127 118
+  129 ite 1 25 128 26
+  130 and 1 25 124
+  131 ite 1 130 20 29
+  132 ite 1 130 21 30
+  133 ite 1 130 22 31
+  134 ite 1 130 23 32
+  135 slice 74 19 31 16 _buf_data_data_T
+  136 concat 18 135 135 _buf_data_data_T_1
+  137 sort bitvec 64
+  138 concat 137 136 19 buf_data_data
+  139 sort bitvec 60
+  140 concat 139 73 126
+  141 concat 137 140 71
+  142 srl 137 138 141 _buf_data_T_1
+  143 slice 74 142 15 0 _buf_data_T_2
+  144 concat 18 75 143
+  145 ite 18 130 144 28
+  146 and 16 17 65 _buf_pc_T_1
+  147 concat 9 56 104
+  148 concat 16 147 70
+  149 add 16 17 148 _buf_pc_T_3
+  150 and 16 149 66 _buf_pc_T_5
+  151 or 16 146 150 _buf_pc_T_6
+  152 ite 16 130 151 27
+  153 ite 4 130 5 33
+  154 ite 1 130 6 34
+  155 ite 4 130 7 35
+  156 ite 1 130 8 36
+  157 ite 9 130 10 37
+  158 ite 11 130 12 38
+  159 ite 13 130 14 39
+  160 ite 1 130 15 40
+  161 xor 1 24 68
+  162 and 1 161 129
+  163 concat 4 70 26
+  164 add 4 163 67 _icShiftAmt_T
+  165 concat 4 70 80
+  166 sub 4 164 165 _icShiftAmt_T_2
+  167 slice 74 19 15 0 _icData_T
+  168 concat 18 167 167 _icData_T_1
+  169 slice 74 19 31 16 _icData_data_T
+  170 concat 18 169 169 _icData_data_T_1
+  171 concat 137 170 170 _icData_data_T_2
+  172 sort bitvec 191
+  173 sort bitvec 127
+  174 concat 173 76 171
+  175 sort bitvec 159
+  176 concat 175 174 19
+  177 concat 172 176 168
+  178 sort bitvec 187
+  179 concat 178 78 166
+  180 concat 172 179 71
+  181 sll 172 177 180 _icData_T_4
+  182 slice 18 181 95 64 icData
+  183 sort bitvec 59
+  184 concat 183 73 26
+  185 concat 59 184 71
+  186 sll 59 60 185 _icMask_T_2
+  187 slice 18 186 31 0 icMask
+  188 and 18 182 187 _inst_T
+  189 xor 18 187 64 _inst_T_1
+  190 and 18 28 189 _inst_T_2
+  191 or 18 188 190 inst
+  192 slice 1 97 0 0 _xcpt_T
+  193 ite 1 192 29 20 xcpt_0_pf_inst
+  194 ite 1 192 30 21 xcpt_0_gf_inst
+  195 ite 1 192 31 22 xcpt_0_ae_inst
+  196 slice 1 97 1 1 _xcpt_T_1
+  197 ite 1 196 29 20 xcpt_1_pf_inst
+  198 ite 1 196 30 21 xcpt_1_gf_inst
+  199 ite 1 196 31 22 xcpt_1_ae_inst
+  200 xor 4 97 79 _ic_replay_T
+  201 and 4 93 200 _ic_replay_T_1
+  202 ite 4 23 201 69 _ic_replay_T_2
+  203 or 4 98 202 ic_replay
+  204 xor 1 3 68
+  205 xor 1 6 68
+  206 ugte 1 8 80
+  207 or 1 204 205
+  208 or 1 207 206
+  209 xor 1 2 68
+  210 implies 1 209 208
+  211 not 1 210
+  212 bad 211
+  213 ite 16 26 27 17 io_pc
+  214 slice 1 203 0 0 _replay_T_1
+  215 xor 1 54 68 _replay_T_2
+  216 slice 1 203 1 1 _replay_T_6
+  217 and 1 215 216 _replay_T_7
+  218 or 1 214 217 replay
+  219 slice 1 93 0 0 _io_inst_0_valid_T_1
+  220 and 1 219 101 io_inst_0_valid
+  221 concat 4 197 198
+  222 concat 62 221 199 _io_inst_0_bits_xcpt1_T_4
+  223 ite 62 54 63 222 _io_inst_0_bits_xcpt1_T_5
+  224 slice 1 223 0 0 _io_inst_0_bits_xcpt1_T_6
+  225 slice 1 223 1 1 _io_inst_0_bits_xcpt1_T_7
+  226 slice 1 223 2 2 _io_inst_0_bits_xcpt1_T_8
+  227 slice 1 97 0 0
+  228 and 1 227 54
+  229 slice 1 97 1 1
+  230 or 1 228 229
+  231 ite 4 230 33 5 io_btb_resp_cfiType
+  232 ite 1 230 34 6 io_btb_resp_taken
+  233 ite 4 230 35 7 io_btb_resp_mask
+  234 ite 1 230 36 8 io_btb_resp_bridx
+  235 ite 9 230 37 10 io_btb_resp_target
+  236 ite 11 230 38 12 io_btb_resp_entry
+  237 ite 13 230 39 14 io_btb_resp_bht_history
+  238 ite 1 230 40 15 io_btb_resp_bht_value
+  239 set 41 42 191 io_in
+  240 output 112 io_imem_ready
+  241 output 213 io_pc
+  242 output 231 io_btb_resp_cfiType
+  243 output 232 io_btb_resp_taken
+  244 output 233 io_btb_resp_mask
+  245 output 234 io_btb_resp_bridx
+  246 output 235 io_btb_resp_target
+  247 output 236 io_btb_resp_entry
+  248 output 237 io_btb_resp_bht_history
+  249 output 238 io_btb_resp_bht_value
+  250 output 220 io_inst_0_valid
+  251 output 193 io_inst_0_bits_xcpt0_pf_inst
+  252 output 194 io_inst_0_bits_xcpt0_gf_inst
+  253 output 195 io_inst_0_bits_xcpt0_ae_inst
+  254 output 226 io_inst_0_bits_xcpt1_pf_inst
+  255 output 225 io_inst_0_bits_xcpt1_gf_inst
+  256 output 224 io_inst_0_bits_xcpt1_ae_inst
+  257 output 218 io_inst_0_bits_replay
+  258 output 54 io_inst_0_bits_rvc
+  259 output 49 io_inst_0_bits_inst_bits
+  260 output 50 io_inst_0_bits_inst_rd
+  261 output 51 io_inst_0_bits_inst_rs1
+  262 output 52 io_inst_0_bits_inst_rs2
+  263 output 53 io_inst_0_bits_inst_rs3
+  264 output 191 io_inst_0_bits_raw
+  265 ite 1 2 70 162
+  266 next 1 26 265
+  267 next 16 27 152
+  268 next 18 28 145
+  269 next 1 29 131
+  270 next 1 30 132
+  271 next 1 31 133
+  272 next 1 32 134
+  273 next 4 33 153
+  274 next 1 34 154
+  275 next 4 35 155
+  276 next 1 36 156
+  277 next 9 37 157
+  278 next 11 38 158
+  279 next 13 39 159
+  280 next 1 40 160
 }

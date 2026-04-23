@@ -139,6 +139,9 @@ public:
   bool shouldEnableModularBTOR2PPMemorySplitting() const {
     return enableModularBTOR2PPMemorySplitting;
   }
+  bool shouldFormalNormalizeBTOR2Regs() const {
+    return formalNormalizeBTOR2Regs;
+  }
 
   // Setters, used by the CAPI
   FirtoolOptions &setOutputFilename(StringRef name) {
@@ -384,6 +387,11 @@ public:
     return *this;
   }
 
+  FirtoolOptions &setFormalNormalizeBTOR2Regs(bool value) {
+    formalNormalizeBTOR2Regs = value;
+    return *this;
+  }
+
 private:
   std::string outputFilename;
   bool disableAnnotationsUnknown;
@@ -434,6 +442,7 @@ private:
   bool disableCSEinClasses;
   bool selectDefaultInstanceChoice;
   bool enableModularBTOR2PPMemorySplitting;
+  bool formalNormalizeBTOR2Regs;
 };
 
 void registerFirtoolCLOptions();

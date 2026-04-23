@@ -1,0 +1,219 @@
+include reg_pmp_hhoudini_row.btor2pp
+
+module reg_pmp_hhoudini_wrap {
+  1 sort bitvec 1
+  2 input 1 d_0_cfg_l
+  3 sort bitvec 2
+  4 input 3 d_0_cfg_a
+  5 input 1 d_0_cfg_x
+  6 input 1 d_0_cfg_w
+  7 input 1 d_0_cfg_r
+  8 sort bitvec 30
+  9 input 8 d_0_addr
+  10 input 1 d_1_cfg_l
+  11 input 3 d_1_cfg_a
+  12 input 1 d_1_cfg_x
+  13 input 1 d_1_cfg_w
+  14 input 1 d_1_cfg_r
+  15 input 8 d_1_addr
+  16 input 1 d_2_cfg_l
+  17 input 3 d_2_cfg_a
+  18 input 1 d_2_cfg_x
+  19 input 1 d_2_cfg_w
+  20 input 1 d_2_cfg_r
+  21 input 8 d_2_addr
+  22 input 1 d_3_cfg_l
+  23 input 3 d_3_cfg_a
+  24 input 1 d_3_cfg_x
+  25 input 1 d_3_cfg_w
+  26 input 1 d_3_cfg_r
+  27 input 8 d_3_addr
+  28 input 1 d_4_cfg_l
+  29 input 3 d_4_cfg_a
+  30 input 1 d_4_cfg_x
+  31 input 1 d_4_cfg_w
+  32 input 1 d_4_cfg_r
+  33 input 8 d_4_addr
+  34 input 1 d_5_cfg_l
+  35 input 3 d_5_cfg_a
+  36 input 1 d_5_cfg_x
+  37 input 1 d_5_cfg_w
+  38 input 1 d_5_cfg_r
+  39 input 8 d_5_addr
+  40 input 1 d_6_cfg_l
+  41 input 3 d_6_cfg_a
+  42 input 1 d_6_cfg_x
+  43 input 1 d_6_cfg_w
+  44 input 1 d_6_cfg_r
+  45 input 8 d_6_addr
+  46 input 1 d_7_cfg_l
+  47 input 3 d_7_cfg_a
+  48 input 1 d_7_cfg_x
+  49 input 1 d_7_cfg_w
+  50 input 1 d_7_cfg_r
+  51 input 8 d_7_addr
+  52 inst reg_pmp_hhoudini_row
+  53 ref reg_pmp_hhoudini_row 2 d_cfg_l
+  54 ref reg_pmp_hhoudini_row 4 d_cfg_a
+  55 ref reg_pmp_hhoudini_row 5 d_cfg_x
+  56 ref reg_pmp_hhoudini_row 6 d_cfg_w
+  57 ref reg_pmp_hhoudini_row 7 d_cfg_r
+  58 ref reg_pmp_hhoudini_row 9 d_addr
+  59 ref reg_pmp_hhoudini_row 16 q_cfg_l
+  60 ref reg_pmp_hhoudini_row 17 q_cfg_a
+  61 ref reg_pmp_hhoudini_row 18 q_cfg_x
+  62 ref reg_pmp_hhoudini_row 19 q_cfg_w
+  63 ref reg_pmp_hhoudini_row 20 q_cfg_r
+  64 ref reg_pmp_hhoudini_row 21 q_addr
+  65 get 52 59 q_cfg_l
+  66 get 52 60 q_cfg_a
+  67 get 52 61 q_cfg_x
+  68 get 52 62 q_cfg_w
+  69 get 52 63 q_cfg_r
+  70 get 52 64 q_addr
+  71 inst reg_pmp_hhoudini_row
+  72 get 71 59 q_cfg_l
+  73 get 71 60 q_cfg_a
+  74 get 71 61 q_cfg_x
+  75 get 71 62 q_cfg_w
+  76 get 71 63 q_cfg_r
+  77 get 71 64 q_addr
+  78 inst reg_pmp_hhoudini_row
+  79 get 78 59 q_cfg_l
+  80 get 78 60 q_cfg_a
+  81 get 78 61 q_cfg_x
+  82 get 78 62 q_cfg_w
+  83 get 78 63 q_cfg_r
+  84 get 78 64 q_addr
+  85 inst reg_pmp_hhoudini_row
+  86 get 85 59 q_cfg_l
+  87 get 85 60 q_cfg_a
+  88 get 85 61 q_cfg_x
+  89 get 85 62 q_cfg_w
+  90 get 85 63 q_cfg_r
+  91 get 85 64 q_addr
+  92 inst reg_pmp_hhoudini_row
+  93 get 92 59 q_cfg_l
+  94 get 92 60 q_cfg_a
+  95 get 92 61 q_cfg_x
+  96 get 92 62 q_cfg_w
+  97 get 92 63 q_cfg_r
+  98 get 92 64 q_addr
+  99 inst reg_pmp_hhoudini_row
+  100 get 99 59 q_cfg_l
+  101 get 99 60 q_cfg_a
+  102 get 99 61 q_cfg_x
+  103 get 99 62 q_cfg_w
+  104 get 99 63 q_cfg_r
+  105 get 99 64 q_addr
+  106 inst reg_pmp_hhoudini_row
+  107 get 106 59 q_cfg_l
+  108 get 106 60 q_cfg_a
+  109 get 106 61 q_cfg_x
+  110 get 106 62 q_cfg_w
+  111 get 106 63 q_cfg_r
+  112 get 106 64 q_addr
+  113 inst reg_pmp_hhoudini_row
+  114 get 113 59 q_cfg_l
+  115 get 113 60 q_cfg_a
+  116 get 113 61 q_cfg_x
+  117 get 113 62 q_cfg_w
+  118 get 113 63 q_cfg_r
+  119 get 113 64 q_addr
+  120 set 52 53 2 d_cfg_l
+  121 set 52 54 4 d_cfg_a
+  122 set 52 55 5 d_cfg_x
+  123 set 52 56 6 d_cfg_w
+  124 set 52 57 7 d_cfg_r
+  125 set 52 58 9 d_addr
+  126 set 71 53 10 d_cfg_l
+  127 set 71 54 11 d_cfg_a
+  128 set 71 55 12 d_cfg_x
+  129 set 71 56 13 d_cfg_w
+  130 set 71 57 14 d_cfg_r
+  131 set 71 58 15 d_addr
+  132 set 78 53 16 d_cfg_l
+  133 set 78 54 17 d_cfg_a
+  134 set 78 55 18 d_cfg_x
+  135 set 78 56 19 d_cfg_w
+  136 set 78 57 20 d_cfg_r
+  137 set 78 58 21 d_addr
+  138 set 85 53 22 d_cfg_l
+  139 set 85 54 23 d_cfg_a
+  140 set 85 55 24 d_cfg_x
+  141 set 85 56 25 d_cfg_w
+  142 set 85 57 26 d_cfg_r
+  143 set 85 58 27 d_addr
+  144 set 92 53 28 d_cfg_l
+  145 set 92 54 29 d_cfg_a
+  146 set 92 55 30 d_cfg_x
+  147 set 92 56 31 d_cfg_w
+  148 set 92 57 32 d_cfg_r
+  149 set 92 58 33 d_addr
+  150 set 99 53 34 d_cfg_l
+  151 set 99 54 35 d_cfg_a
+  152 set 99 55 36 d_cfg_x
+  153 set 99 56 37 d_cfg_w
+  154 set 99 57 38 d_cfg_r
+  155 set 99 58 39 d_addr
+  156 set 106 53 40 d_cfg_l
+  157 set 106 54 41 d_cfg_a
+  158 set 106 55 42 d_cfg_x
+  159 set 106 56 43 d_cfg_w
+  160 set 106 57 44 d_cfg_r
+  161 set 106 58 45 d_addr
+  162 set 113 53 46 d_cfg_l
+  163 set 113 54 47 d_cfg_a
+  164 set 113 55 48 d_cfg_x
+  165 set 113 56 49 d_cfg_w
+  166 set 113 57 50 d_cfg_r
+  167 set 113 58 51 d_addr
+  168 output 65 q_0_cfg_l
+  169 output 66 q_0_cfg_a
+  170 output 67 q_0_cfg_x
+  171 output 68 q_0_cfg_w
+  172 output 69 q_0_cfg_r
+  173 output 70 q_0_addr
+  174 output 72 q_1_cfg_l
+  175 output 73 q_1_cfg_a
+  176 output 74 q_1_cfg_x
+  177 output 75 q_1_cfg_w
+  178 output 76 q_1_cfg_r
+  179 output 77 q_1_addr
+  180 output 79 q_2_cfg_l
+  181 output 80 q_2_cfg_a
+  182 output 81 q_2_cfg_x
+  183 output 82 q_2_cfg_w
+  184 output 83 q_2_cfg_r
+  185 output 84 q_2_addr
+  186 output 86 q_3_cfg_l
+  187 output 87 q_3_cfg_a
+  188 output 88 q_3_cfg_x
+  189 output 89 q_3_cfg_w
+  190 output 90 q_3_cfg_r
+  191 output 91 q_3_addr
+  192 output 93 q_4_cfg_l
+  193 output 94 q_4_cfg_a
+  194 output 95 q_4_cfg_x
+  195 output 96 q_4_cfg_w
+  196 output 97 q_4_cfg_r
+  197 output 98 q_4_addr
+  198 output 100 q_5_cfg_l
+  199 output 101 q_5_cfg_a
+  200 output 102 q_5_cfg_x
+  201 output 103 q_5_cfg_w
+  202 output 104 q_5_cfg_r
+  203 output 105 q_5_addr
+  204 output 107 q_6_cfg_l
+  205 output 108 q_6_cfg_a
+  206 output 109 q_6_cfg_x
+  207 output 110 q_6_cfg_w
+  208 output 111 q_6_cfg_r
+  209 output 112 q_6_addr
+  210 output 114 q_7_cfg_l
+  211 output 115 q_7_cfg_a
+  212 output 116 q_7_cfg_x
+  213 output 117 q_7_cfg_w
+  214 output 118 q_7_cfg_r
+  215 output 119 q_7_addr
+}
