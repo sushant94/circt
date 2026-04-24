@@ -26,9 +26,7 @@ namespace circt {
 #define GEN_PASS_DECL_CONVERTHWTOBTOR2PP
 #include "circt/Conversion/Passes.h.inc"
 
-std::unique_ptr<mlir::Pass>
-createConvertHWToBTOR2PPPass(llvm::raw_ostream &os,
-                             bool formalNormalizeRegs = false);
+std::unique_ptr<mlir::Pass> createConvertHWToBTOR2PPPass(llvm::raw_ostream &os);
 std::unique_ptr<mlir::Pass> createConvertHWToBTOR2PPPass();
 
 } // namespace circt
