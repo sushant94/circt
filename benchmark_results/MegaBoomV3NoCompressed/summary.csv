@@ -1,0 +1,5 @@
+test_name,input_file,test_args,variant_name,runs_requested,runs_succeeded,avg_seconds,min_seconds,max_seconds,stdev_seconds
+MegaBoomV3NoCompressed,/home/antoniok/anto/fir_sources/MegaBoomV3NoCompressed.fir,,btor2,10,10,24.773617643,24.052085489,25.507111154,0.473995438
+MegaBoomV3NoCompressed,/home/antoniok/anto/fir_sources/MegaBoomV3NoCompressed.fir,,btor2pp,10,10,22.016411356,21.548190594,22.626907080,0.344185457
+MegaBoomV3NoCompressed,/home/antoniok/anto/fir_sources/MegaBoomV3NoCompressed.fir,,btor2pp-split-mems,10,10,21.214412258,20.837331749,21.698849551,0.270032334
+MegaBoomV3NoCompressed,/home/antoniok/anto/fir_sources/MegaBoomV3NoCompressed.fir,,btor2pp-split-reg-vecs,10,10,25.787810399,24.918005422,26.169627167,0.327952098

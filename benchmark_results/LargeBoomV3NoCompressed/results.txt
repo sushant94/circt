@@ -1,0 +1,73 @@
+Benchmark started: 2026-04-25T19:09:01.310500
+firtool: /home/antoniok/anto/circt_modular_release/build/bin/firtool
+runs: 10
+warmup_runs: 0
+common_args: --format=fir
+
+[1/4] LargeBoomV3NoCompressed :: btor2
+input: /home/antoniok/anto/fir_sources/LargeBoomV3NoCompressed.fir
+test_args: (none)
+command: /home/antoniok/anto/circt_modular_release/build/bin/firtool /home/antoniok/anto/fir_sources/LargeBoomV3NoCompressed.fir --format=fir --btor2 --annotation-file /home/antoniok/anto/circt_modular_release/benchmark_results/LargeBoomV3NoCompressed/generated_annotations/btor2.anno.json
+run 1: 23.955774866 s
+run 2: 23.745989747 s
+run 3: 23.731267668 s
+run 4: 23.989750355 s
+run 5: 22.712427892 s
+run 6: 23.550913848 s
+run 7: 24.055122532 s
+run 8: 24.248567916 s
+run 9: 24.376132511 s
+run 10: 24.040176339 s
+summary: avg=23.840612368 s, min=22.712427892 s, max=24.376132511 s, stdev=0.465735933 s, success=10/10
+
+[2/4] LargeBoomV3NoCompressed :: btor2pp
+input: /home/antoniok/anto/fir_sources/LargeBoomV3NoCompressed.fir
+test_args: (none)
+command: /home/antoniok/anto/circt_modular_release/build/bin/firtool /home/antoniok/anto/fir_sources/LargeBoomV3NoCompressed.fir --format=fir --btor2pp --annotation-file /home/antoniok/anto/circt_modular_release/benchmark_results/LargeBoomV3NoCompressed/generated_annotations/btor2pp.anno.json
+run 1: 22.078859679 s
+run 2: 22.250422858 s
+run 3: 22.346290350 s
+run 4: 21.863583103 s
+run 5: 21.987418294 s
+run 6: 20.936155878 s
+run 7: 20.945541888 s
+run 8: 21.053834893 s
+run 9: 21.678853884 s
+run 10: 20.890061058 s
+summary: avg=21.603102189 s, min=20.890061058 s, max=22.346290350 s, stdev=0.587490948 s, success=10/10
+
+[3/4] LargeBoomV3NoCompressed :: btor2pp-split-mems
+input: /home/antoniok/anto/fir_sources/LargeBoomV3NoCompressed.fir
+test_args: (none)
+command: /home/antoniok/anto/circt_modular_release/build/bin/firtool /home/antoniok/anto/fir_sources/LargeBoomV3NoCompressed.fir --format=fir --btor2pp --annotation-file /home/antoniok/anto/circt_modular_release/benchmark_results/LargeBoomV3NoCompressed/generated_annotations/btor2pp-split-mems.anno.json
+run 1: 20.186217725 s
+run 2: 19.355397671 s
+run 3: 19.481711917 s
+run 4: 19.001740448 s
+run 5: 19.000674389 s
+run 6: 18.790834390 s
+run 7: 18.818979360 s
+run 8: 18.120260976 s
+run 9: 18.298861645 s
+run 10: 18.927450344 s
+summary: avg=18.998212887 s, min=18.120260976 s, max=20.186217725 s, stdev=0.588100127 s, success=10/10
+
+[4/4] LargeBoomV3NoCompressed :: btor2pp-split-reg-vecs
+input: /home/antoniok/anto/fir_sources/LargeBoomV3NoCompressed.fir
+test_args: (none)
+command: /home/antoniok/anto/circt_modular_release/build/bin/firtool /home/antoniok/anto/fir_sources/LargeBoomV3NoCompressed.fir --format=fir --btor2pp --annotation-file /home/antoniok/anto/circt_modular_release/benchmark_results/LargeBoomV3NoCompressed/generated_annotations/btor2pp-split-reg-vecs.anno.json
+run 1: 22.977834038 s
+run 2: 22.234748259 s
+run 3: 22.748290323 s
+run 4: 22.306822732 s
+run 5: 22.692846261 s
+run 6: 22.673474520 s
+run 7: 21.102062725 s
+run 8: 21.336257845 s
+run 9: 21.020304576 s
+run 10: 21.354491681 s
+summary: avg=22.044713296 s, min=21.020304576 s, max=22.977834038 s, stdev=0.760283934 s, success=10/10
+
+Completed successfully.
+Raw results: /home/antoniok/anto/circt_modular_release/benchmark_results/LargeBoomV3NoCompressed/raw_results.csv
+Summary: /home/antoniok/anto/circt_modular_release/benchmark_results/LargeBoomV3NoCompressed/summary.csv

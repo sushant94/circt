@@ -55,6 +55,7 @@ OP_SCHEMA = {
     "ugt": "binary",
     "ugte": "binary",
     "slt": "binary",
+    "sgt": "binary",
     "sll": "binary",
     "srl": "binary",
     "sra": "binary",
@@ -92,6 +93,10 @@ def _prefix_name(name: Optional[str], namespace: str) -> Optional[str]:
 def _sanitize_label(value: str) -> str:
     cleaned = value.replace("/", "_").replace(".", "_")
     return cleaned
+
+
+def _should_ignore_name(name: str, ignore_substrings: Sequence[str]) -> bool:
+    return any(fragment in name for fragment in ignore_substrings)
 
 
 def _find_btormc() -> Optional[str]:
@@ -274,6 +279,16 @@ class BtorProgram:
         self._sort_cache[sort_id] = signature
         return signature
 
+    def node_sort_signature(self, nid: int) -> SortSignature:
+        node = self.nodes[nid]
+        if node.op == "sort":
+            return self.sort_signature(nid)
+        if node.schema == "root":
+            return self.node_sort_signature(int(node.data[0]))
+        if node.schema in {"decl", "const", "next", "init", "unary", "binary", "ternary", "extend", "slice"}:
+            return self.sort_signature(int(node.data[0]))
+        raise BtorError(f"Cannot determine result sort for node {nid} ({node.op})")
+
     def named_nodes(self, op: str) -> Dict[str, int]:
         result: Dict[str, int] = {}
         for nid in self.order:
@@ -288,18 +303,7 @@ class BtorProgram:
     def input_ids(self) -> List[int]:
         return [nid for nid in self.order if self.nodes[nid].op == "input"]
 
-    def transition_system_closure(self, state_ids: Iterable[int]) -> Set[int]:
-        root_ids: Set[int] = set()
-        for state_id in state_ids:
-            root_ids.add(state_id)
-            next_id = self.next_by_state.get(state_id)
-            if next_id is None:
-                raise BtorError(f"State {state_id} has no matching next node")
-            root_ids.add(next_id)
-            init_id = self.init_by_state.get(state_id)
-            if init_id is not None:
-                root_ids.add(init_id)
-
+    def closure_from_roots(self, root_ids: Iterable[int]) -> Set[int]:
         visited: Set[int] = set()
         stack: List[int] = list(root_ids)
         while stack:
@@ -311,6 +315,19 @@ class BtorProgram:
                 if ref not in visited:
                     stack.append(ref)
         return visited
+
+    def transition_system_closure(self, state_ids: Iterable[int]) -> Set[int]:
+        root_ids: Set[int] = set()
+        for state_id in state_ids:
+            root_ids.add(state_id)
+            next_id = self.next_by_state.get(state_id)
+            if next_id is None:
+                raise BtorError(f"State {state_id} has no matching next node")
+            root_ids.add(next_id)
+            init_id = self.init_by_state.get(state_id)
+            if init_id is not None:
+                root_ids.add(init_id)
+        return self.closure_from_roots(root_ids)
 
 
 class BtorWriter:
@@ -356,6 +373,7 @@ class BtorWriter:
         state_name_prefix: Optional[str] = None,
         strip_namespace: Optional[str] = None,
         keep_roots: bool = False,
+        skip_init_states: Optional[Set[int]] = None,
     ) -> Dict[int, int]:
         id_map: Dict[int, int] = {}
         for nid in program.order:
@@ -369,6 +387,13 @@ class BtorWriter:
 
             if node.op == "input" and input_remap and nid in input_remap:
                 id_map[nid] = input_remap[nid]
+                continue
+
+            if (
+                node.op == "init"
+                and skip_init_states
+                and int(node.data[1]) in skip_init_states
+            ):
                 continue
 
             rewritten = list(node.data)
@@ -394,13 +419,20 @@ class BtorWriter:
         path.write_text("\n".join(self.lines) + "\n")
 
 
-def _index_by_normalized_name(program: BtorProgram, op: str) -> Dict[str, Tuple[int, str]]:
+def _index_by_normalized_name(
+    program: BtorProgram,
+    op: str,
+    *,
+    ignore_substrings: Sequence[str] = (),
+) -> Dict[str, Tuple[int, str]]:
     by_name: Dict[str, Tuple[int, str]] = {}
     for nid in program.order:
         node = program.nodes[nid]
         if node.op != op or not node.name:
             continue
         normalized = _normalize_name(node.name)
+        if _should_ignore_name(normalized, ignore_substrings):
+            continue
         if normalized in by_name:
             raise BtorError(
                 f"Normalized {op} name collision '{normalized}' in {program.path}: "
@@ -408,6 +440,23 @@ def _index_by_normalized_name(program: BtorProgram, op: str) -> Dict[str, Tuple[
             )
         by_name[normalized] = (nid, node.name)
     return by_name
+
+
+def _ignored_named_nodes(
+    program: BtorProgram,
+    op: str,
+    *,
+    ignore_substrings: Sequence[str] = (),
+) -> List[Tuple[int, str, str]]:
+    ignored: List[Tuple[int, str, str]] = []
+    for nid in program.order:
+        node = program.nodes[nid]
+        if node.op != op or not node.name:
+            continue
+        normalized = _normalize_name(node.name)
+        if _should_ignore_name(normalized, ignore_substrings):
+            ignored.append((nid, normalized, node.name))
+    return ignored
 
 
 def _sort_to_json(signature: SortSignature) -> object:
@@ -488,6 +537,8 @@ def build_equiv_miter(
     *,
     left_label: Optional[str] = None,
     right_label: Optional[str] = None,
+    compare_op: str = "state",
+    ignore_substrings: Sequence[str] = (),
 ) -> Dict[str, object]:
     left_program = BtorProgram.parse(left_path)
     right_program = BtorProgram.parse(right_path)
@@ -495,10 +546,39 @@ def build_equiv_miter(
     left_label = left_label or _sanitize_label(left_path.stem)
     right_label = right_label or _sanitize_label(right_path.stem)
 
-    left_input_index = _index_by_normalized_name(left_program, "input")
-    right_input_index = _index_by_normalized_name(right_program, "input")
-    left_state_index = _index_by_normalized_name(left_program, "state")
-    right_state_index = _index_by_normalized_name(right_program, "state")
+    if compare_op not in {"state", "output"}:
+        raise BtorError(f"Unsupported compare op '{compare_op}'")
+
+    left_input_index = _index_by_normalized_name(
+        left_program, "input", ignore_substrings=ignore_substrings
+    )
+    right_input_index = _index_by_normalized_name(
+        right_program, "input", ignore_substrings=ignore_substrings
+    )
+    left_state_index = _index_by_normalized_name(
+        left_program, "state", ignore_substrings=ignore_substrings
+    )
+    right_state_index = _index_by_normalized_name(
+        right_program, "state", ignore_substrings=ignore_substrings
+    )
+    left_compare_index = _index_by_normalized_name(
+        left_program, compare_op, ignore_substrings=ignore_substrings
+    )
+    right_compare_index = _index_by_normalized_name(
+        right_program, compare_op, ignore_substrings=ignore_substrings
+    )
+    ignored_left_inputs = _ignored_named_nodes(
+        left_program, "input", ignore_substrings=ignore_substrings
+    )
+    ignored_right_inputs = _ignored_named_nodes(
+        right_program, "input", ignore_substrings=ignore_substrings
+    )
+    ignored_left_states = _ignored_named_nodes(
+        left_program, "state", ignore_substrings=ignore_substrings
+    )
+    ignored_right_states = _ignored_named_nodes(
+        right_program, "state", ignore_substrings=ignore_substrings
+    )
 
     matched_inputs = sorted(set(left_input_index) & set(right_input_index))
     unmatched_left_inputs = sorted(set(left_input_index) - set(right_input_index))
@@ -506,22 +586,40 @@ def build_equiv_miter(
     matched_states = sorted(set(left_state_index) & set(right_state_index))
     unmatched_left_states = sorted(set(left_state_index) - set(right_state_index))
     unmatched_right_states = sorted(set(right_state_index) - set(left_state_index))
+    matched_compare = sorted(set(left_compare_index) & set(right_compare_index))
+    unmatched_left_compare = sorted(set(left_compare_index) - set(right_compare_index))
+    unmatched_right_compare = sorted(set(right_compare_index) - set(left_compare_index))
 
     writer = BtorWriter()
     left_selected = left_program.transition_system_closure(left_program.state_ids())
     right_selected = right_program.transition_system_closure(right_program.state_ids())
+    if compare_op == "output":
+        left_selected.update(
+            left_program.closure_from_roots(
+                left_compare_index[normalized][0] for normalized in matched_compare
+            )
+        )
+        right_selected.update(
+            right_program.closure_from_roots(
+                right_compare_index[normalized][0] for normalized in matched_compare
+            )
+        )
 
     left_input_remap: Dict[int, int] = {}
     right_input_remap: Dict[int, int] = {}
     matched_input_report = []
     unmatched_left_input_report = []
     unmatched_right_input_report = []
+    ignored_left_input_report = []
+    ignored_right_input_report = []
+    ignored_left_state_report = []
+    ignored_right_state_report = []
 
     for normalized in matched_inputs:
         left_id, left_name = left_input_index[normalized]
         right_id, right_name = right_input_index[normalized]
-        left_sort = left_program.sort_signature(int(left_program.nodes[left_id].data[0]))
-        right_sort = right_program.sort_signature(int(right_program.nodes[right_id].data[0]))
+        left_sort = left_program.node_sort_signature(left_id)
+        right_sort = right_program.node_sort_signature(right_id)
         if left_sort != right_sort:
             raise BtorError(
                 f"Shared input '{normalized}' has mismatched sorts: {left_name} vs {right_name}"
@@ -576,8 +674,57 @@ def build_equiv_miter(
             }
         )
 
+    for nid, normalized, original_name in ignored_left_inputs:
+        signature = left_program.node_sort_signature(nid)
+        if signature.kind != "bitvec":
+            raise BtorError(f"Ignored input '{original_name}' is not a bitvec and cannot be zeroed")
+        zero_id = writer.add_node("consth", [writer.add_sort(signature), "0"])
+        left_input_remap[nid] = zero_id
+        ignored_left_input_report.append(
+            {
+                "normalized": normalized,
+                "name": original_name,
+                "sort": _sort_to_json(signature),
+                "replacement": "const_zero",
+            }
+        )
+
+    for nid, normalized, original_name in ignored_right_inputs:
+        signature = right_program.node_sort_signature(nid)
+        if signature.kind != "bitvec":
+            raise BtorError(f"Ignored input '{original_name}' is not a bitvec and cannot be zeroed")
+        zero_id = writer.add_node("consth", [writer.add_sort(signature), "0"])
+        right_input_remap[nid] = zero_id
+        ignored_right_input_report.append(
+            {
+                "normalized": normalized,
+                "name": original_name,
+                "sort": _sort_to_json(signature),
+                "replacement": "const_zero",
+            }
+        )
+
     init_bindings: Dict[str, Dict[str, object]] = {}
     matched_state_report = []
+    ignored_left_state_zero_ids: Dict[int, int] = {}
+    ignored_right_state_zero_ids: Dict[int, int] = {}
+
+    for nid, _, original_name in ignored_left_states:
+        signature = left_program.node_sort_signature(nid)
+        if signature.kind != "bitvec":
+            raise BtorError(f"Ignored state '{original_name}' is not a bitvec and cannot be zeroed")
+        ignored_left_state_zero_ids[nid] = writer.add_node(
+            "consth", [writer.add_sort(signature), "0"]
+        )
+
+    for nid, _, original_name in ignored_right_states:
+        signature = right_program.node_sort_signature(nid)
+        if signature.kind != "bitvec":
+            raise BtorError(f"Ignored state '{original_name}' is not a bitvec and cannot be zeroed")
+        ignored_right_state_zero_ids[nid] = writer.add_node(
+            "consth", [writer.add_sort(signature), "0"]
+        )
+
     for normalized in matched_states:
         left_id, left_name = left_state_index[normalized]
         right_id, right_name = right_state_index[normalized]
@@ -653,6 +800,7 @@ def build_equiv_miter(
         input_remap=left_input_remap,
         state_name_prefix=left_label,
         keep_roots=False,
+        skip_init_states={nid for nid, _, _ in ignored_left_states},
     )
     right_map = writer.import_nodes(
         right_program,
@@ -660,7 +808,46 @@ def build_equiv_miter(
         input_remap=right_input_remap,
         state_name_prefix=right_label,
         keep_roots=False,
+        skip_init_states={nid for nid, _, _ in ignored_right_states},
     )
+
+    for nid, normalized, original_name in ignored_left_states:
+        signature = left_program.node_sort_signature(nid)
+        writer.add_node(
+            "init",
+            [
+                writer.add_sort(signature),
+                left_map[nid],
+                ignored_left_state_zero_ids[nid],
+            ],
+        )
+        ignored_left_state_report.append(
+            {
+                "normalized": normalized,
+                "name": original_name,
+                "sort": _sort_to_json(signature),
+                "replacement": "const_zero_init",
+            }
+        )
+
+    for nid, normalized, original_name in ignored_right_states:
+        signature = right_program.node_sort_signature(nid)
+        writer.add_node(
+            "init",
+            [
+                writer.add_sort(signature),
+                right_map[nid],
+                ignored_right_state_zero_ids[nid],
+            ],
+        )
+        ignored_right_state_report.append(
+            {
+                "normalized": normalized,
+                "name": original_name,
+                "sort": _sort_to_json(signature),
+                "replacement": "const_zero_init",
+            }
+        )
 
     for normalized in matched_states:
         binding = init_bindings[normalized]
@@ -696,7 +883,7 @@ def build_equiv_miter(
             "normalized": normalized,
             "name": left_state_index[normalized][1],
             "sort": _sort_to_json(
-                left_program.sort_signature(int(left_program.nodes[left_state_index[normalized][0]].data[0]))
+                left_program.node_sort_signature(left_state_index[normalized][0])
             ),
         }
         for normalized in unmatched_left_states
@@ -706,9 +893,7 @@ def build_equiv_miter(
             "normalized": normalized,
             "name": right_state_index[normalized][1],
             "sort": _sort_to_json(
-                right_program.sort_signature(
-                    int(right_program.nodes[right_state_index[normalized][0]].data[0])
-                )
+                right_program.node_sort_signature(right_state_index[normalized][0])
             ),
         }
         for normalized in unmatched_right_states
@@ -716,14 +901,19 @@ def build_equiv_miter(
 
     mismatch_expr: Optional[int] = None
     mismatch_nodes = []
-    for normalized in matched_states:
-        left_id = left_state_index[normalized][0]
-        right_id = right_state_index[normalized][0]
-        left_sort = left_program.sort_signature(int(left_program.nodes[left_id].data[0]))
-        right_sort = right_program.sort_signature(int(right_program.nodes[right_id].data[0]))
+    matched_compare_report = []
+    for normalized in matched_compare:
+        left_id = left_compare_index[normalized][0]
+        right_id = right_compare_index[normalized][0]
+        left_sort = left_program.node_sort_signature(left_id)
+        right_sort = right_program.node_sort_signature(right_id)
         compare_sort = left_sort
-        left_expr = left_map[left_id]
-        right_expr = right_map[right_id]
+        if compare_op == "output":
+            left_expr = left_map[int(left_program.nodes[left_id].data[0])]
+            right_expr = right_map[int(right_program.nodes[right_id].data[0])]
+        else:
+            left_expr = left_map[left_id]
+            right_expr = right_map[right_id]
         if left_sort != right_sort:
             compare_sort = SortSignature(
                 "bitvec",
@@ -766,8 +956,40 @@ def build_equiv_miter(
                 [writer.bit1_sort, mismatch_expr, neq_id],
             )
 
+        matched_compare_report.append(
+            {
+                "normalized": normalized,
+                "left": left_compare_index[normalized][1],
+                "right": right_compare_index[normalized][1],
+                "sort": _sort_to_json(left_sort),
+                "right_sort": _sort_to_json(right_sort),
+                "widened_compare": left_sort != right_sort,
+            }
+        )
+
     if mismatch_expr is None:
-        raise BtorError("No shared states were found for the equivalence miter")
+        raise BtorError(f"No shared {compare_op}s were found for the equivalence miter")
+
+    unmatched_left_compare_report = [
+        {
+            "normalized": normalized,
+            "name": left_compare_index[normalized][1],
+            "sort": _sort_to_json(
+                left_program.node_sort_signature(left_compare_index[normalized][0])
+            ),
+        }
+        for normalized in unmatched_left_compare
+    ]
+    unmatched_right_compare_report = [
+        {
+            "normalized": normalized,
+            "name": right_compare_index[normalized][1],
+            "sort": _sort_to_json(
+                right_program.node_sort_signature(right_compare_index[normalized][0])
+            ),
+        }
+        for normalized in unmatched_right_compare
+    ]
 
     writer.add_node("bad", [mismatch_expr], "equiv.bad")
     writer.write_to(output_path)
@@ -780,17 +1002,33 @@ def build_equiv_miter(
         "matched_inputs": matched_input_report,
         "unmatched_left_inputs": unmatched_left_input_report,
         "unmatched_right_inputs": unmatched_right_input_report,
+        "ignored_left_inputs": ignored_left_input_report,
+        "ignored_right_inputs": ignored_right_input_report,
+        "ignored_left_states": ignored_left_state_report,
+        "ignored_right_states": ignored_right_state_report,
         "matched_states": matched_state_report,
         "unmatched_left_states": unmatched_left_state_report,
         "unmatched_right_states": unmatched_right_state_report,
+        "compare_op": compare_op,
+        "ignore_substrings": list(ignore_substrings),
+        "matched_compare": matched_compare_report,
+        "unmatched_left_compare": unmatched_left_compare_report,
+        "unmatched_right_compare": unmatched_right_compare_report,
         "mismatch_nodes": mismatch_nodes,
         "counts": {
             "matched_inputs": len(matched_input_report),
             "unmatched_left_inputs": len(unmatched_left_input_report),
             "unmatched_right_inputs": len(unmatched_right_input_report),
+            "ignored_left_inputs": len(ignored_left_input_report),
+            "ignored_right_inputs": len(ignored_right_input_report),
+            "ignored_left_states": len(ignored_left_state_report),
+            "ignored_right_states": len(ignored_right_state_report),
             "matched_states": len(matched_state_report),
             "unmatched_left_states": len(unmatched_left_state_report),
             "unmatched_right_states": len(unmatched_right_state_report),
+            "matched_compare": len(matched_compare_report),
+            "unmatched_left_compare": len(unmatched_left_compare_report),
+            "unmatched_right_compare": len(unmatched_right_compare_report),
             "added_init_inputs": len(matched_state_report),
             "bad_nodes": 1,
         },
@@ -823,6 +1061,18 @@ def main() -> None:
     build_parser.add_argument("right_design", type=Path)
     build_parser.add_argument("--left-label", default=None)
     build_parser.add_argument("--right-label", default=None)
+    build_parser.add_argument(
+        "--compare",
+        choices=("state", "output"),
+        default="state",
+        help="Which shared named nodes to compare in the generated miter",
+    )
+    build_parser.add_argument(
+        "--ignore-substring",
+        action="append",
+        default=[],
+        help="Ignore normalized names containing this substring when matching inputs/states/outputs",
+    )
     build_parser.add_argument("--output", type=Path, default=None)
     build_parser.add_argument("--report", type=Path)
 
@@ -845,6 +1095,8 @@ def main() -> None:
             output_path,
             left_label=args.left_label,
             right_label=args.right_label,
+            compare_op=args.compare,
+            ignore_substrings=args.ignore_substring,
         )
         report_path = args.report or output_path.with_suffix(".json")
         _write_report(report_path, report)

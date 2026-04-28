@@ -1,0 +1,73 @@
+{
+  "timestamp": "2026-04-25T18:57:47.265670",
+  "firtool": "/home/antoniok/anto/circt_modular_release/build/bin/firtool",
+  "runs": 10,
+  "warmup_runs": 0,
+  "common_args": [
+    "--format=fir"
+  ],
+  "tests": [
+    {
+      "name": "MediumBoomV3NoCompressed",
+      "input": "/home/antoniok/anto/fir_sources/MediumBoomV3NoCompressed.fir",
+      "args": []
+    }
+  ],
+  "variants": [
+    {
+      "name": "btor2",
+      "args": [
+        "--btor2",
+        "--annotation-file",
+        "/home/antoniok/anto/circt_modular_release/benchmark_results/MediumBoomV3NoCompressed/generated_annotations/btor2.anno.json"
+      ],
+      "generated_annotations": [
+        {
+          "class": "sifive.enterprise.firrtl.ConvertMemToRegOfVecAnnotation$"
+        }
+      ]
+    },
+    {
+      "name": "btor2pp",
+      "args": [
+        "--btor2pp",
+        "--annotation-file",
+        "/home/antoniok/anto/circt_modular_release/benchmark_results/MediumBoomV3NoCompressed/generated_annotations/btor2pp.anno.json"
+      ],
+      "generated_annotations": [
+        {
+          "class": "sifive.enterprise.firrtl.ConvertMemToRegOfVecAnnotation$"
+        }
+      ]
+    },
+    {
+      "name": "btor2pp-split-mems",
+      "args": [
+        "--btor2pp",
+        "--annotation-file",
+        "/home/antoniok/anto/circt_modular_release/benchmark_results/MediumBoomV3NoCompressed/generated_annotations/btor2pp-split-mems.anno.json"
+      ],
+      "generated_annotations": [
+        {
+          "class": "circt.HHoudiniSplitMemsAnnotation"
+        }
+      ]
+    },
+    {
+      "name": "btor2pp-split-reg-vecs",
+      "args": [
+        "--btor2pp",
+        "--annotation-file",
+        "/home/antoniok/anto/circt_modular_release/benchmark_results/MediumBoomV3NoCompressed/generated_annotations/btor2pp-split-reg-vecs.anno.json"
+      ],
+      "generated_annotations": [
+        {
+          "class": "circt.HHoudiniSplitRegVecsAnnotation"
+        },
+        {
+          "class": "sifive.enterprise.firrtl.ConvertMemToRegOfVecAnnotation$"
+        }
+      ]
+    }
+  ]
+}

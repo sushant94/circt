@@ -1,0 +1,8 @@
+[
+  {
+    "class": "circt.HHoudiniSplitRegVecsAnnotation"
+  },
+  {
+    "class": "sifive.enterprise.firrtl.ConvertMemToRegOfVecAnnotation$"
+  }
+]

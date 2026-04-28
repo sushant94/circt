@@ -20,6 +20,8 @@ lit.site.cfg.py
 *.egg-info
 *.whl
 
+benchmark_results/data_processor/.venv
+
 # External software
 /ext
 

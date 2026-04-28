@@ -1339,7 +1339,8 @@ void ConvertHWToBTOR2PPPass::runOnOperation() {
         Operation *moduleOp = moduleMap.at(moduleName);
         auto &portInfo = modulePorts.at(moduleOp);  
 
-        os << indent << instanceLID << " " << "inst " << moduleName << "\n";
+        os << indent << instanceLID << " " << "inst " << moduleName << " "
+           << instance.getInstanceName() << "\n";
 
         lid++;
         

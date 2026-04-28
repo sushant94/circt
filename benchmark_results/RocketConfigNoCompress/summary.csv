@@ -1,0 +1,5 @@
+test_name,input_file,test_args,variant_name,runs_requested,runs_succeeded,avg_seconds,min_seconds,max_seconds,stdev_seconds
+RocketConfigNoCompress,/home/antoniok/anto/fir_sources/RocketConfigNoCompress.fir,,btor2,10,10,8.263200866,8.015505999,9.098305658,0.310144584
+RocketConfigNoCompress,/home/antoniok/anto/fir_sources/RocketConfigNoCompress.fir,,btor2pp,10,10,11.499611969,10.950505830,12.013860002,0.284426112
+RocketConfigNoCompress,/home/antoniok/anto/fir_sources/RocketConfigNoCompress.fir,,btor2pp-split-mems,10,10,8.364069915,8.173902042,8.520900428,0.105543895
+RocketConfigNoCompress,/home/antoniok/anto/fir_sources/RocketConfigNoCompress.fir,,btor2pp-split-reg-vecs,10,10,11.494980040,11.116976447,11.862486400,0.217769293

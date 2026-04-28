@@ -84,8 +84,20 @@ PRESET_COMMON_ARGS: dict[str, list[str]] = {
 
 PRESET_VARIANTS: dict[str, list[Variant]] = {
     "hhoudini-compare": [
-        Variant(name="btor2", args=["--btor2"]),
-        Variant(name="btor2pp", args=["--btor2pp"]),
+        Variant(
+            name="btor2",
+            args=["--btor2"],
+            generated_annotations=[
+                {"class": "sifive.enterprise.firrtl.ConvertMemToRegOfVecAnnotation$"},
+            ],
+        ),
+        Variant(
+            name="btor2pp",
+            args=["--btor2pp"],
+            generated_annotations=[
+                {"class": "sifive.enterprise.firrtl.ConvertMemToRegOfVecAnnotation$"},
+            ],
+        ),
         Variant(
             name="btor2pp-split-mems",
             args=["--btor2pp"],
@@ -164,7 +176,7 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help=(
             "Directory for benchmark outputs. "
-            "Default: benchmark_results/<timestamp>"
+            "Default: benchmark_results/<config-or-test-name>"
         ),
     )
     parser.add_argument(
@@ -335,12 +347,35 @@ def ensure_inputs_exist(firtool: Path, tests: list[TestCase]) -> None:
             raise FileNotFoundError(f"Input file not found: {test.input_path}")
 
 
-def make_output_dir(explicit_output_dir: str | None) -> Path:
+def sanitize_output_name(value: str) -> str:
+    sanitized = "".join(
+        char if char.isalnum() or char in {"-", "_", "."} else "_"
+        for char in value.strip()
+    )
+    return sanitized or "benchmark"
+
+
+def derive_output_name(
+    config_path: str | None,
+    tests: list[TestCase],
+) -> str:
+    if config_path:
+        return sanitize_output_name(Path(config_path).stem)
+    if len(tests) == 1:
+        return sanitize_output_name(tests[0].name)
+    return sanitize_output_name(f"{tests[0].name}_plus_{len(tests) - 1}_more")
+
+
+def make_output_dir(
+    explicit_output_dir: str | None,
+    config_path: str | None,
+    tests: list[TestCase],
+) -> Path:
     if explicit_output_dir:
         output_dir = resolve_path(explicit_output_dir, Path.cwd())
     else:
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        output_dir = Path.cwd() / "benchmark_results" / timestamp
+        output_name = derive_output_name(config_path, tests)
+        output_dir = Path.cwd() / "benchmark_results" / output_name
     output_dir.mkdir(parents=True, exist_ok=True)
     return output_dir
 
@@ -449,7 +484,7 @@ def main() -> int:
         print(f"error: {exc}", file=sys.stderr)
         return 1
 
-    output_dir = make_output_dir(args.output_dir)
+    output_dir = make_output_dir(args.output_dir, args.config, tests)
     variants = [materialize_variant(variant, output_dir) for variant in variants]
     raw_csv_path = output_dir / "raw_results.csv"
     summary_csv_path = output_dir / "summary.csv"

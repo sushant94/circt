@@ -1,0 +1,73 @@
+Benchmark started: 2026-04-25T17:58:41.358459
+firtool: /home/antoniok/anto/circt_modular_release/build/bin/firtool
+runs: 10
+warmup_runs: 0
+common_args: --format=fir
+
+[1/4] RocketConfigNoCompress :: btor2
+input: /home/antoniok/anto/fir_sources/RocketConfigNoCompress.fir
+test_args: (none)
+command: /home/antoniok/anto/circt_modular_release/build/bin/firtool /home/antoniok/anto/fir_sources/RocketConfigNoCompress.fir --format=fir --btor2 --annotation-file /home/antoniok/anto/circt_modular_release/benchmark_results/20260425_175841/generated_annotations/btor2.anno.json
+run 1: 9.098305658 s
+run 2: 8.223461919 s
+run 3: 8.179421462 s
+run 4: 8.361732252 s
+run 5: 8.067709900 s
+run 6: 8.015505999 s
+run 7: 8.178720959 s
+run 8: 8.213138893 s
+run 9: 8.063983984 s
+run 10: 8.230027631 s
+summary: avg=8.263200866 s, min=8.015505999 s, max=9.098305658 s, stdev=0.310144584 s, success=10/10
+
+[2/4] RocketConfigNoCompress :: btor2pp
+input: /home/antoniok/anto/fir_sources/RocketConfigNoCompress.fir
+test_args: (none)
+command: /home/antoniok/anto/circt_modular_release/build/bin/firtool /home/antoniok/anto/fir_sources/RocketConfigNoCompress.fir --format=fir --btor2pp --annotation-file /home/antoniok/anto/circt_modular_release/benchmark_results/20260425_175841/generated_annotations/btor2pp.anno.json
+run 1: 12.013860002 s
+run 2: 11.252867855 s
+run 3: 11.554115601 s
+run 4: 11.669635713 s
+run 5: 11.504559778 s
+run 6: 11.621684082 s
+run 7: 10.950505830 s
+run 8: 11.649070889 s
+run 9: 11.453237861 s
+run 10: 11.326582074 s
+summary: avg=11.499611969 s, min=10.950505830 s, max=12.013860002 s, stdev=0.284426112 s, success=10/10
+
+[3/4] RocketConfigNoCompress :: btor2pp-split-mems
+input: /home/antoniok/anto/fir_sources/RocketConfigNoCompress.fir
+test_args: (none)
+command: /home/antoniok/anto/circt_modular_release/build/bin/firtool /home/antoniok/anto/fir_sources/RocketConfigNoCompress.fir --format=fir --btor2pp --annotation-file /home/antoniok/anto/circt_modular_release/benchmark_results/20260425_175841/generated_annotations/btor2pp-split-mems.anno.json
+run 1: 8.222417332 s
+run 2: 8.424832344 s
+run 3: 8.414909020 s
+run 4: 8.520900428 s
+run 5: 8.173902042 s
+run 6: 8.328649163 s
+run 7: 8.357223593 s
+run 8: 8.346774735 s
+run 9: 8.380852990 s
+run 10: 8.470237501 s
+summary: avg=8.364069915 s, min=8.173902042 s, max=8.520900428 s, stdev=0.105543895 s, success=10/10
+
+[4/4] RocketConfigNoCompress :: btor2pp-split-reg-vecs
+input: /home/antoniok/anto/fir_sources/RocketConfigNoCompress.fir
+test_args: (none)
+command: /home/antoniok/anto/circt_modular_release/build/bin/firtool /home/antoniok/anto/fir_sources/RocketConfigNoCompress.fir --format=fir --btor2pp --annotation-file /home/antoniok/anto/circt_modular_release/benchmark_results/20260425_175841/generated_annotations/btor2pp-split-reg-vecs.anno.json
+run 1: 11.334542900 s
+run 2: 11.500136673 s
+run 3: 11.116976447 s
+run 4: 11.391462348 s
+run 5: 11.537340656 s
+run 6: 11.862486400 s
+run 7: 11.664709434 s
+run 8: 11.709428988 s
+run 9: 11.308128513 s
+run 10: 11.524588041 s
+summary: avg=11.494980040 s, min=11.116976447 s, max=11.862486400 s, stdev=0.217769293 s, success=10/10
+
+Completed successfully.
+Raw results: /home/antoniok/anto/circt_modular_release/benchmark_results/20260425_175841/raw_results.csv
+Summary: /home/antoniok/anto/circt_modular_release/benchmark_results/20260425_175841/summary.csv
