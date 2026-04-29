@@ -1,7 +1,7 @@
 import os
 import re
 
-INPUT_FILE = os.path.join(os.path.dirname(__file__), '..', '..', 'smallboomv3_mem.btor2pp')
+INPUT_FILE = os.path.join(os.path.dirname(__file__), '..', '..', 'smallboomv3.btor2pp')
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'output_files')
 
 # Ensure output directory exists

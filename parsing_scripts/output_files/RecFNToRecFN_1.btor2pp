@@ -1,0 +1,53 @@
+include RoundAnyRawFNToRecFN_ie8_is24_oe11_os53.btor2pp
+
+module RecFNToRecFN_1 {
+  1 sort bitvec 33
+  2 input 1 io_in
+  3 inst RoundAnyRawFNToRecFN_ie8_is24_oe11_os53 roundAnyRawFNToRecFN
+  4 ref RoundAnyRawFNToRecFN_ie8_is24_oe11_os53 2 io_invalidExc
+  5 ref RoundAnyRawFNToRecFN_ie8_is24_oe11_os53 3 io_in_isNaN
+  6 ref RoundAnyRawFNToRecFN_ie8_is24_oe11_os53 4 io_in_isInf
+  7 ref RoundAnyRawFNToRecFN_ie8_is24_oe11_os53 5 io_in_isZero
+  8 ref RoundAnyRawFNToRecFN_ie8_is24_oe11_os53 6 io_in_sign
+  9 ref RoundAnyRawFNToRecFN_ie8_is24_oe11_os53 8 io_in_sExp
+  10 ref RoundAnyRawFNToRecFN_ie8_is24_oe11_os53 10 io_in_sig
+  11 ref RoundAnyRawFNToRecFN_ie8_is24_oe11_os53 56 io_out
+  12 get 3 11 io_out
+  13 sort bitvec 2
+  14 consth 13 3
+  15 sort bitvec 1
+  16 consth 15 1
+  17 sort bitvec 3
+  18 consth 17 0
+  19 consth 15 0
+  20 sort bitvec 9
+  21 slice 20 2 31 23 rawIn_exp
+  22 slice 17 2 31 29 _rawIn_isZero_T
+  23 neq 15 22 18 _rawIn_out_sig_T
+  24 xor 15 23 16 rawIn_isZero
+  25 slice 13 2 31 30 _rawIn_isSpecial_T
+  26 eq 15 25 14 rawIn_isSpecial
+  27 slice 15 2 29 29 _rawIn_out_isInf_T
+  28 and 15 26 27 rawIn_isNaN
+  29 xor 15 27 16 _rawIn_out_isInf_T_1
+  30 and 15 26 29 rawIn_isInf
+  31 slice 15 2 32 32 rawIn_sign
+  32 sort bitvec 10
+  33 concat 32 19 21 rawIn_sExp
+  34 sort bitvec 23
+  35 slice 34 2 22 0 _rawIn_out_sig_T_2
+  36 sort bitvec 25
+  37 concat 13 19 23
+  38 concat 36 37 35 rawIn_sig
+  39 slice 15 2 22 22 _roundAnyRawFNToRecFN_io_invalidExc_T
+  40 xor 15 39 16 _roundAnyRawFNToRecFN_io_invalidExc_T_1
+  41 and 15 28 40 roundAnyRawFNToRecFN.io_invalidExc
+  42 set 3 4 41 io_invalidExc
+  43 set 3 5 28 io_in_isNaN
+  44 set 3 6 30 io_in_isInf
+  45 set 3 7 24 io_in_isZero
+  46 set 3 8 31 io_in_sign
+  47 set 3 9 33 io_in_sExp
+  48 set 3 10 38 io_in_sig
+  49 output 12 io_out
+}

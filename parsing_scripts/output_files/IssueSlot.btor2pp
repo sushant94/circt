@@ -1,0 +1,577 @@
+
+module IssueSlot {
+  1 sort bitvec 1
+  2 input 1 reset
+  3 input 1 io_grant
+  4 sort bitvec 8
+  5 input 4 io_brupdate_b1_resolve_mask
+  6 input 4 io_brupdate_b1_mispredict_mask
+  7 input 1 io_kill
+  8 input 1 io_clear
+  9 input 1 io_wakeup_ports_0_valid
+  10 sort bitvec 6
+  11 input 10 io_wakeup_ports_0_bits_pdst
+  12 input 1 io_wakeup_ports_1_valid
+  13 input 10 io_wakeup_ports_1_bits_pdst
+  14 input 1 io_in_uop_valid
+  15 sort bitvec 7
+  16 input 15 io_in_uop_bits_uopc
+  17 sort bitvec 32
+  18 input 17 io_in_uop_bits_inst
+  19 input 17 io_in_uop_bits_debug_inst
+  20 input 1 io_in_uop_bits_is_rvc
+  21 sort bitvec 40
+  22 input 21 io_in_uop_bits_debug_pc
+  23 sort bitvec 3
+  24 input 23 io_in_uop_bits_iq_type
+  25 sort bitvec 10
+  26 input 25 io_in_uop_bits_fu_code
+  27 sort bitvec 2
+  28 input 27 io_in_uop_bits_iw_state
+  29 input 1 io_in_uop_bits_is_br
+  30 input 1 io_in_uop_bits_is_jalr
+  31 input 1 io_in_uop_bits_is_jal
+  32 input 1 io_in_uop_bits_is_sfb
+  33 input 4 io_in_uop_bits_br_mask
+  34 input 23 io_in_uop_bits_br_tag
+  35 sort bitvec 4
+  36 input 35 io_in_uop_bits_ftq_idx
+  37 input 1 io_in_uop_bits_edge_inst
+  38 input 10 io_in_uop_bits_pc_lob
+  39 input 1 io_in_uop_bits_taken
+  40 sort bitvec 20
+  41 input 40 io_in_uop_bits_imm_packed
+  42 sort bitvec 12
+  43 input 42 io_in_uop_bits_csr_addr
+  44 sort bitvec 5
+  45 input 44 io_in_uop_bits_rob_idx
+  46 input 23 io_in_uop_bits_ldq_idx
+  47 input 23 io_in_uop_bits_stq_idx
+  48 input 27 io_in_uop_bits_rxq_idx
+  49 input 10 io_in_uop_bits_pdst
+  50 input 10 io_in_uop_bits_prs1
+  51 input 10 io_in_uop_bits_prs2
+  52 input 10 io_in_uop_bits_prs3
+  53 input 35 io_in_uop_bits_ppred
+  54 input 1 io_in_uop_bits_prs1_busy
+  55 input 1 io_in_uop_bits_prs2_busy
+  56 input 1 io_in_uop_bits_prs3_busy
+  57 input 1 io_in_uop_bits_ppred_busy
+  58 input 10 io_in_uop_bits_stale_pdst
+  59 input 1 io_in_uop_bits_exception
+  60 sort bitvec 64
+  61 input 60 io_in_uop_bits_exc_cause
+  62 input 1 io_in_uop_bits_bypassable
+  63 input 44 io_in_uop_bits_mem_cmd
+  64 input 27 io_in_uop_bits_mem_size
+  65 input 1 io_in_uop_bits_mem_signed
+  66 input 1 io_in_uop_bits_is_fence
+  67 input 1 io_in_uop_bits_is_fencei
+  68 input 1 io_in_uop_bits_is_amo
+  69 input 1 io_in_uop_bits_uses_ldq
+  70 input 1 io_in_uop_bits_uses_stq
+  71 input 1 io_in_uop_bits_is_sys_pc2epc
+  72 input 1 io_in_uop_bits_is_unique
+  73 input 1 io_in_uop_bits_flush_on_commit
+  74 input 1 io_in_uop_bits_ldst_is_rs1
+  75 input 10 io_in_uop_bits_ldst
+  76 input 10 io_in_uop_bits_lrs1
+  77 input 10 io_in_uop_bits_lrs2
+  78 input 10 io_in_uop_bits_lrs3
+  79 input 1 io_in_uop_bits_ldst_val
+  80 input 27 io_in_uop_bits_dst_rtype
+  81 input 27 io_in_uop_bits_lrs1_rtype
+  82 input 27 io_in_uop_bits_lrs2_rtype
+  83 input 1 io_in_uop_bits_frs3_en
+  84 input 1 io_in_uop_bits_fp_val
+  85 input 1 io_in_uop_bits_fp_single
+  86 input 1 io_in_uop_bits_xcpt_pf_if
+  87 input 1 io_in_uop_bits_xcpt_ae_if
+  88 input 1 io_in_uop_bits_xcpt_ma_if
+  89 input 1 io_in_uop_bits_bp_debug_if
+  90 input 1 io_in_uop_bits_bp_xcpt_if
+  91 input 27 io_in_uop_bits_debug_fsrc
+  92 input 27 io_in_uop_bits_debug_tsrc
+  93 state 27 state
+  94 state 1 p1
+  95 state 1 p2
+  96 state 1 p3
+  97 state 1 ppred
+  98 state 15 slot_uop_uopc
+  99 state 17 slot_uop_inst
+  100 state 17 slot_uop_debug_inst
+  101 state 1 slot_uop_is_rvc
+  102 state 21 slot_uop_debug_pc
+  103 state 23 slot_uop_iq_type
+  104 state 25 slot_uop_fu_code
+  105 state 27 slot_uop_iw_state
+  106 state 1 slot_uop_is_br
+  107 state 1 slot_uop_is_jalr
+  108 state 1 slot_uop_is_jal
+  109 state 1 slot_uop_is_sfb
+  110 state 4 slot_uop_br_mask
+  111 state 23 slot_uop_br_tag
+  112 state 35 slot_uop_ftq_idx
+  113 state 1 slot_uop_edge_inst
+  114 state 10 slot_uop_pc_lob
+  115 state 1 slot_uop_taken
+  116 state 40 slot_uop_imm_packed
+  117 state 42 slot_uop_csr_addr
+  118 state 44 slot_uop_rob_idx
+  119 state 23 slot_uop_ldq_idx
+  120 state 23 slot_uop_stq_idx
+  121 state 27 slot_uop_rxq_idx
+  122 state 10 slot_uop_pdst
+  123 state 10 slot_uop_prs1
+  124 state 10 slot_uop_prs2
+  125 state 10 slot_uop_prs3
+  126 state 35 slot_uop_ppred
+  127 state 1 slot_uop_prs1_busy
+  128 state 1 slot_uop_prs2_busy
+  129 state 1 slot_uop_prs3_busy
+  130 state 1 slot_uop_ppred_busy
+  131 state 10 slot_uop_stale_pdst
+  132 state 1 slot_uop_exception
+  133 state 60 slot_uop_exc_cause
+  134 state 1 slot_uop_bypassable
+  135 state 44 slot_uop_mem_cmd
+  136 state 27 slot_uop_mem_size
+  137 state 1 slot_uop_mem_signed
+  138 state 1 slot_uop_is_fence
+  139 state 1 slot_uop_is_fencei
+  140 state 1 slot_uop_is_amo
+  141 state 1 slot_uop_uses_ldq
+  142 state 1 slot_uop_uses_stq
+  143 state 1 slot_uop_is_sys_pc2epc
+  144 state 1 slot_uop_is_unique
+  145 state 1 slot_uop_flush_on_commit
+  146 state 1 slot_uop_ldst_is_rs1
+  147 state 10 slot_uop_ldst
+  148 state 10 slot_uop_lrs1
+  149 state 10 slot_uop_lrs2
+  150 state 10 slot_uop_lrs3
+  151 state 1 slot_uop_ldst_val
+  152 state 27 slot_uop_dst_rtype
+  153 state 27 slot_uop_lrs1_rtype
+  154 state 27 slot_uop_lrs2_rtype
+  155 state 1 slot_uop_frs3_en
+  156 state 1 slot_uop_fp_val
+  157 state 1 slot_uop_fp_single
+  158 state 1 slot_uop_xcpt_pf_if
+  159 state 1 slot_uop_xcpt_ae_if
+  160 state 1 slot_uop_xcpt_ma_if
+  161 state 1 slot_uop_bp_debug_if
+  162 state 1 slot_uop_bp_xcpt_if
+  163 state 27 slot_uop_debug_fsrc
+  164 state 27 slot_uop_debug_tsrc
+  165 consth 1 0
+  166 consth 1 1
+  167 consth 27 0
+  168 consth 27 2
+  169 consth 10 0
+  170 consth 15 0
+  171 consth 15 3
+  172 consth 27 1
+  173 consth 4 0
+  174 consth 4 FF
+  175 ite 10 14 50 123 next_uop_prs1
+  176 ite 10 14 51 124 next_uop_prs2
+  177 ite 10 14 52 125 next_uop_prs3
+  178 and 4 6 110
+  179 neq 1 178 173
+  180 eq 1 93 172
+  181 and 1 3 180
+  182 eq 1 93 168
+  183 and 1 3 182
+  184 and 1 183 94
+  185 and 1 184 95
+  186 and 1 185 97
+  187 or 1 181 186
+  188 or 1 179 7
+  189 or 1 188 187
+  190 or 1 8 189
+  191 ite 27 183 172 93
+  192 ite 27 190 167 191
+  193 ite 27 14 28 192
+  194 ite 27 7 167 193
+  195 or 1 7 187
+  196 xor 1 184 166
+  197 or 1 195 196
+  198 ite 15 197 98 171 next_uopc
+  199 xor 1 184 166
+  200 or 1 195 199
+  201 ite 27 200 153 168 next_lrs1_rtype
+  202 xor 1 183 166
+  203 or 1 195 202
+  204 or 1 203 94
+  205 ite 27 204 154 168 next_lrs2_rtype
+  206 ite 15 14 16 198
+  207 ite 17 14 18 99
+  208 ite 17 14 19 100
+  209 ite 1 14 20 101
+  210 ite 21 14 22 102
+  211 ite 23 14 24 103
+  212 ite 25 14 26 104
+  213 ite 27 14 28 105
+  214 ite 1 14 29 106
+  215 ite 1 14 30 107
+  216 ite 1 14 31 108
+  217 ite 1 14 32 109
+  218 ite 23 14 34 111
+  219 ite 35 14 36 112
+  220 ite 1 14 37 113
+  221 ite 10 14 38 114
+  222 ite 1 14 39 115
+  223 ite 40 14 41 116
+  224 ite 42 14 43 117
+  225 ite 44 14 45 118
+  226 ite 23 14 46 119
+  227 ite 23 14 47 120
+  228 ite 27 14 48 121
+  229 ite 10 14 49 122
+  230 ite 10 14 50 123
+  231 ite 10 14 51 124
+  232 ite 10 14 52 125
+  233 ite 35 14 53 126
+  234 ite 1 14 54 127
+  235 ite 1 14 55 128
+  236 ite 1 14 56 129
+  237 ite 1 14 57 130
+  238 ite 10 14 58 131
+  239 ite 1 14 59 132
+  240 ite 60 14 61 133
+  241 ite 1 14 62 134
+  242 ite 44 14 63 135
+  243 ite 27 14 64 136
+  244 ite 1 14 65 137
+  245 ite 1 14 66 138
+  246 ite 1 14 67 139
+  247 ite 1 14 68 140
+  248 ite 1 14 69 141
+  249 ite 1 14 70 142
+  250 ite 1 14 71 143
+  251 ite 1 14 72 144
+  252 ite 1 14 73 145
+  253 ite 1 14 74 146
+  254 ite 10 14 75 147
+  255 ite 10 14 76 148
+  256 ite 10 14 77 149
+  257 ite 10 14 78 150
+  258 ite 1 14 79 151
+  259 ite 27 14 80 152
+  260 ite 27 14 81 201
+  261 ite 27 14 82 205
+  262 ite 1 14 83 155
+  263 ite 1 14 84 156
+  264 ite 1 14 85 157
+  265 ite 1 14 86 158
+  266 ite 1 14 87 159
+  267 ite 1 14 88 160
+  268 ite 1 14 89 161
+  269 ite 1 14 90 162
+  270 ite 27 14 91 163
+  271 ite 27 14 92 164
+  272 eq 1 93 167
+  273 or 1 272 8
+  274 or 1 273 7
+  275 xor 1 2 166
+  276 and 1 14 275
+  277 implies 1 276 274
+  278 not 1 277
+  279 bad 278
+  280 xor 1 54 166 _p1_T
+  281 ite 1 14 280 94
+  282 xor 1 55 166 _p2_T
+  283 ite 1 14 282 95
+  284 xor 1 56 166 _p3_T
+  285 ite 1 14 284 96
+  286 xor 1 57 166 _ppred_T
+  287 ite 1 14 286 97
+  288 eq 1 11 175
+  289 and 1 9 288
+  290 eq 1 11 176
+  291 and 1 9 290
+  292 eq 1 11 177
+  293 and 1 9 292
+  294 eq 1 13 175
+  295 and 1 12 294
+  296 eq 1 13 176
+  297 and 1 12 296
+  298 eq 1 13 177
+  299 and 1 12 298
+  300 or 1 299 293
+  301 or 1 300 285
+  302 or 1 295 289
+  303 or 1 302 281
+  304 or 1 297 291
+  305 or 1 304 283
+  306 xor 4 5 174 _next_br_mask_T
+  307 and 4 110 306 next_br_mask
+  308 ite 27 189 167 191 next_state
+  309 ite 4 14 33 307
+  310 neq 1 93 167 io_valid
+  311 xor 1 7 166 _io_request_T_14
+  312 eq 1 93 172 _may_vacate_T
+  313 and 1 94 95 _io_request_T_11
+  314 and 1 313 96 _io_request_T_11
+  315 and 1 314 97 _io_request_T_11
+  316 and 1 315 311 _io_request_T_11
+  317 or 1 94 95 _io_request_T_12
+  318 and 1 182 317
+  319 and 1 318 97
+  320 and 1 319 311
+  321 ite 1 312 316 320 io_request
+  322 eq 1 93 168 _may_vacate_T_1
+  323 and 1 322 94 _may_vacate_T_4
+  324 and 1 323 95 _may_vacate_T_4
+  325 and 1 324 97 _may_vacate_T_4
+  326 or 1 312 325 _may_vacate_T_5
+  327 and 1 3 326 may_vacate
+  328 xor 1 327 166 _io_will_be_valid_T_3
+  329 and 1 310 328 io_will_be_valid
+  330 xor 1 94 166 io_out_uop_prs1_busy
+  331 xor 1 95 166 io_out_uop_prs2_busy
+  332 xor 1 96 166 io_out_uop_prs3_busy
+  333 xor 1 97 166 io_out_uop_ppred_busy
+  334 and 1 94 95
+  335 and 1 334 97
+  336 and 1 94 97
+  337 xor 1 336 166
+  338 xor 1 322 166
+  339 or 1 338 335
+  340 or 1 339 337
+  341 ite 27 340 154 168 io_uop_lrs2_rtype
+  342 and 1 95 97
+  343 or 1 335 336
+  344 xor 1 342 166
+  345 xor 1 322 166
+  346 or 1 345 343
+  347 or 1 346 344
+  348 ite 15 347 98 171 io_uop_uopc
+  349 xor 1 342 166
+  350 xor 1 322 166
+  351 or 1 350 343
+  352 or 1 351 349
+  353 ite 27 352 153 168 io_uop_lrs1_rtype
+  354 output 310 io_valid
+  355 output 329 io_will_be_valid
+  356 output 321 io_request
+  357 output 198 io_out_uop_uopc
+  358 output 99 io_out_uop_inst
+  359 output 100 io_out_uop_debug_inst
+  360 output 101 io_out_uop_is_rvc
+  361 output 102 io_out_uop_debug_pc
+  362 output 103 io_out_uop_iq_type
+  363 output 104 io_out_uop_fu_code
+  364 output 308 io_out_uop_iw_state
+  365 output 106 io_out_uop_is_br
+  366 output 107 io_out_uop_is_jalr
+  367 output 108 io_out_uop_is_jal
+  368 output 109 io_out_uop_is_sfb
+  369 output 307 io_out_uop_br_mask
+  370 output 111 io_out_uop_br_tag
+  371 output 112 io_out_uop_ftq_idx
+  372 output 113 io_out_uop_edge_inst
+  373 output 114 io_out_uop_pc_lob
+  374 output 115 io_out_uop_taken
+  375 output 116 io_out_uop_imm_packed
+  376 output 117 io_out_uop_csr_addr
+  377 output 118 io_out_uop_rob_idx
+  378 output 119 io_out_uop_ldq_idx
+  379 output 120 io_out_uop_stq_idx
+  380 output 121 io_out_uop_rxq_idx
+  381 output 122 io_out_uop_pdst
+  382 output 123 io_out_uop_prs1
+  383 output 124 io_out_uop_prs2
+  384 output 125 io_out_uop_prs3
+  385 output 126 io_out_uop_ppred
+  386 output 330 io_out_uop_prs1_busy
+  387 output 331 io_out_uop_prs2_busy
+  388 output 332 io_out_uop_prs3_busy
+  389 output 333 io_out_uop_ppred_busy
+  390 output 131 io_out_uop_stale_pdst
+  391 output 132 io_out_uop_exception
+  392 output 133 io_out_uop_exc_cause
+  393 output 134 io_out_uop_bypassable
+  394 output 135 io_out_uop_mem_cmd
+  395 output 136 io_out_uop_mem_size
+  396 output 137 io_out_uop_mem_signed
+  397 output 138 io_out_uop_is_fence
+  398 output 139 io_out_uop_is_fencei
+  399 output 140 io_out_uop_is_amo
+  400 output 141 io_out_uop_uses_ldq
+  401 output 142 io_out_uop_uses_stq
+  402 output 143 io_out_uop_is_sys_pc2epc
+  403 output 144 io_out_uop_is_unique
+  404 output 145 io_out_uop_flush_on_commit
+  405 output 146 io_out_uop_ldst_is_rs1
+  406 output 147 io_out_uop_ldst
+  407 output 148 io_out_uop_lrs1
+  408 output 149 io_out_uop_lrs2
+  409 output 150 io_out_uop_lrs3
+  410 output 151 io_out_uop_ldst_val
+  411 output 152 io_out_uop_dst_rtype
+  412 output 201 io_out_uop_lrs1_rtype
+  413 output 205 io_out_uop_lrs2_rtype
+  414 output 155 io_out_uop_frs3_en
+  415 output 156 io_out_uop_fp_val
+  416 output 157 io_out_uop_fp_single
+  417 output 158 io_out_uop_xcpt_pf_if
+  418 output 159 io_out_uop_xcpt_ae_if
+  419 output 160 io_out_uop_xcpt_ma_if
+  420 output 161 io_out_uop_bp_debug_if
+  421 output 162 io_out_uop_bp_xcpt_if
+  422 output 163 io_out_uop_debug_fsrc
+  423 output 164 io_out_uop_debug_tsrc
+  424 output 348 io_uop_uopc
+  425 output 99 io_uop_inst
+  426 output 100 io_uop_debug_inst
+  427 output 101 io_uop_is_rvc
+  428 output 102 io_uop_debug_pc
+  429 output 103 io_uop_iq_type
+  430 output 104 io_uop_fu_code
+  431 output 105 io_uop_iw_state
+  432 output 106 io_uop_is_br
+  433 output 107 io_uop_is_jalr
+  434 output 108 io_uop_is_jal
+  435 output 109 io_uop_is_sfb
+  436 output 110 io_uop_br_mask
+  437 output 111 io_uop_br_tag
+  438 output 112 io_uop_ftq_idx
+  439 output 113 io_uop_edge_inst
+  440 output 114 io_uop_pc_lob
+  441 output 115 io_uop_taken
+  442 output 116 io_uop_imm_packed
+  443 output 117 io_uop_csr_addr
+  444 output 118 io_uop_rob_idx
+  445 output 119 io_uop_ldq_idx
+  446 output 120 io_uop_stq_idx
+  447 output 121 io_uop_rxq_idx
+  448 output 122 io_uop_pdst
+  449 output 123 io_uop_prs1
+  450 output 124 io_uop_prs2
+  451 output 125 io_uop_prs3
+  452 output 126 io_uop_ppred
+  453 output 127 io_uop_prs1_busy
+  454 output 128 io_uop_prs2_busy
+  455 output 129 io_uop_prs3_busy
+  456 output 130 io_uop_ppred_busy
+  457 output 131 io_uop_stale_pdst
+  458 output 132 io_uop_exception
+  459 output 133 io_uop_exc_cause
+  460 output 134 io_uop_bypassable
+  461 output 135 io_uop_mem_cmd
+  462 output 136 io_uop_mem_size
+  463 output 137 io_uop_mem_signed
+  464 output 138 io_uop_is_fence
+  465 output 139 io_uop_is_fencei
+  466 output 140 io_uop_is_amo
+  467 output 141 io_uop_uses_ldq
+  468 output 142 io_uop_uses_stq
+  469 output 143 io_uop_is_sys_pc2epc
+  470 output 144 io_uop_is_unique
+  471 output 145 io_uop_flush_on_commit
+  472 output 146 io_uop_ldst_is_rs1
+  473 output 147 io_uop_ldst
+  474 output 148 io_uop_lrs1
+  475 output 149 io_uop_lrs2
+  476 output 150 io_uop_lrs3
+  477 output 151 io_uop_ldst_val
+  478 output 152 io_uop_dst_rtype
+  479 output 353 io_uop_lrs1_rtype
+  480 output 341 io_uop_lrs2_rtype
+  481 output 155 io_uop_frs3_en
+  482 output 156 io_uop_fp_val
+  483 output 157 io_uop_fp_single
+  484 output 158 io_uop_xcpt_pf_if
+  485 output 159 io_uop_xcpt_ae_if
+  486 output 160 io_uop_xcpt_ma_if
+  487 output 161 io_uop_bp_debug_if
+  488 output 162 io_uop_bp_xcpt_if
+  489 output 163 io_uop_debug_fsrc
+  490 output 164 io_uop_debug_tsrc
+  491 ite 27 2 167 194
+  492 next 27 93 491
+  493 ite 1 2 165 303
+  494 next 1 94 493
+  495 ite 1 2 165 305
+  496 next 1 95 495
+  497 ite 1 2 165 301
+  498 next 1 96 497
+  499 ite 1 2 165 287
+  500 next 1 97 499
+  501 ite 15 2 170 206
+  502 next 15 98 501
+  503 next 17 99 207
+  504 next 17 100 208
+  505 next 1 101 209
+  506 next 21 102 210
+  507 next 23 103 211
+  508 next 25 104 212
+  509 next 27 105 213
+  510 next 1 106 214
+  511 next 1 107 215
+  512 next 1 108 216
+  513 next 1 109 217
+  514 next 4 110 309
+  515 next 23 111 218
+  516 next 35 112 219
+  517 next 1 113 220
+  518 next 10 114 221
+  519 next 1 115 222
+  520 next 40 116 223
+  521 next 42 117 224
+  522 next 44 118 225
+  523 next 23 119 226
+  524 next 23 120 227
+  525 next 27 121 228
+  526 ite 10 2 169 229
+  527 next 10 122 526
+  528 next 10 123 230
+  529 next 10 124 231
+  530 next 10 125 232
+  531 next 35 126 233
+  532 next 1 127 234
+  533 next 1 128 235
+  534 next 1 129 236
+  535 next 1 130 237
+  536 next 10 131 238
+  537 next 1 132 239
+  538 next 60 133 240
+  539 ite 1 2 165 241
+  540 next 1 134 539
+  541 next 44 135 242
+  542 next 27 136 243
+  543 next 1 137 244
+  544 next 1 138 245
+  545 next 1 139 246
+  546 next 1 140 247
+  547 ite 1 2 165 248
+  548 next 1 141 547
+  549 ite 1 2 165 249
+  550 next 1 142 549
+  551 next 1 143 250
+  552 next 1 144 251
+  553 next 1 145 252
+  554 next 1 146 253
+  555 next 10 147 254
+  556 next 10 148 255
+  557 next 10 149 256
+  558 next 10 150 257
+  559 next 1 151 258
+  560 ite 27 2 168 259
+  561 next 27 152 560
+  562 next 27 153 260
+  563 next 27 154 261
+  564 next 1 155 262
+  565 ite 1 2 165 263
+  566 next 1 156 565
+  567 next 1 157 264
+  568 next 1 158 265
+  569 next 1 159 266
+  570 next 1 160 267
+  571 next 1 161 268
+  572 next 1 162 269
+  573 next 27 163 270
+  574 next 27 164 271
+}

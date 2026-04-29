@@ -1,0 +1,301 @@
+
+module RoundAnyRawFNToRecFN_ie8_is26_oe8_os24 {
+  1 sort bitvec 1
+  2 input 1 io_invalidExc
+  3 input 1 io_in_isNaN
+  4 input 1 io_in_isInf
+  5 input 1 io_in_isZero
+  6 input 1 io_in_sign
+  7 sort bitvec 10
+  8 input 7 io_in_sExp
+  9 sort bitvec 27
+  10 input 9 io_in_sig
+  11 sort bitvec 3
+  12 input 11 io_roundingMode
+  13 sort bitvec 6
+  14 consth 13 3F
+  15 sort bitvec 7
+  16 consth 15 7F
+  17 sort bitvec 53
+  18 consth 17 0
+  19 sort bitvec 2
+  20 consth 19 1
+  21 sort bitvec 4
+  22 consth 21 2
+  23 sort bitvec 52
+  24 consth 23 0
+  25 sort bitvec 24
+  26 consth 25 FFFFFF
+  27 sort bitvec 11
+  28 consth 27 6B
+  29 sort bitvec 26
+  30 consth 29 1
+  31 consth 29 3FFFFFF
+  32 sort bitvec 22
+  33 consth 32 3FFFFF
+  34 consth 19 0
+  35 consth 21 0
+  36 sort bitvec 8
+  37 consth 36 0
+  38 sort bitvec 59
+  39 consth 38 0
+  40 sort bitvec 9
+  41 consth 40 1FF
+  42 consth 11 2
+  43 consth 11 4
+  44 consth 11 6
+  45 consth 11 7
+  46 consth 19 3
+  47 consth 29 0
+  48 consth 40 1C0
+  49 consth 40 6B
+  50 consth 40 17F
+  51 consth 40 180
+  52 sort bitvec 65
+  53 consth 52 10000000000000000
+  54 sort bitvec 12
+  55 consth 54 F0F
+  56 sort bitvec 14
+  57 consth 56 3333
+  58 sort bitvec 15
+  59 consth 58 5555
+  60 consth 32 0
+  61 consth 11 0
+  62 sort bitvec 25
+  63 consth 62 0
+  64 consth 11 3
+  65 consth 40 0
+  66 consth 40 194
+  67 consth 1 0
+  68 consth 1 1
+  69 eq 1 12 61 roundingMode_near_even
+  70 eq 1 12 42 roundingMode_min
+  71 eq 1 12 64 roundingMode_max
+  72 eq 1 12 43 roundingMode_near_maxMag
+  73 eq 1 12 44 roundingMode_odd
+  74 and 1 70 6 _roundMagUp_T
+  75 xor 1 6 68 _roundMagUp_T_1
+  76 and 1 71 75 _roundMagUp_T_2
+  77 or 1 74 76 roundMagUp
+  78 slice 1 10 26 26 doShiftSigDown1
+  79 slice 40 8 8 0 _roundMask_T
+  80 xor 40 79 41 _roundMask_T_1
+  81 slice 1 80 8 8 roundMask_msb
+  82 slice 1 80 7 7 roundMask_msb_1
+  83 slice 1 80 6 6 roundMask_msb_2
+  84 slice 13 80 5 0 roundMask_lsbs_2
+  85 concat 52 39 84
+  86 sra 52 53 85 roundMask_shift
+  87 slice 36 86 57 50 _roundMask_T_6
+  88 sort bitvec 16
+  89 concat 88 37 87
+  90 slice 36 86 49 42 _roundMask_T_8
+  91 concat 88 90 37 _roundMask_T_11
+  92 or 88 89 91 _roundMask_T_12
+  93 slice 54 92 15 4 _roundMask_T_16
+  94 and 54 93 55
+  95 concat 88 35 94
+  96 slice 54 92 11 0 _roundMask_T_18
+  97 and 54 96 55
+  98 concat 88 97 35 _roundMask_T_21
+  99 or 88 95 98 _roundMask_T_22
+  100 slice 56 99 15 2 _roundMask_T_26
+  101 and 56 100 57
+  102 concat 88 34 101
+  103 slice 56 99 13 0 _roundMask_T_28
+  104 and 56 103 57
+  105 concat 88 104 34 _roundMask_T_31
+  106 or 88 102 105 _roundMask_T_32
+  107 slice 58 106 15 1 _roundMask_T_36
+  108 and 58 107 59
+  109 concat 88 67 108
+  110 slice 58 106 14 0 _roundMask_T_38
+  111 and 58 110 59
+  112 concat 88 111 67 _roundMask_T_41
+  113 or 88 109 112 _roundMask_T_42
+  114 slice 1 86 58 58 _roundMask_T_46
+  115 slice 1 86 59 59 _roundMask_T_47
+  116 slice 1 86 60 60 _roundMask_T_50
+  117 slice 1 86 61 61 _roundMask_T_51
+  118 slice 1 86 62 62 _roundMask_T_55
+  119 slice 1 86 63 63 _roundMask_T_56
+  120 sort bitvec 17
+  121 concat 120 113 114
+  122 sort bitvec 18
+  123 concat 122 121 115
+  124 sort bitvec 19
+  125 concat 124 123 116
+  126 sort bitvec 20
+  127 concat 126 125 117
+  128 sort bitvec 21
+  129 concat 128 127 118
+  130 concat 32 129 119 _roundMask_T_59
+  131 xor 32 130 33 _roundMask_T_60
+  132 ite 32 83 60 131 _roundMask_T_61
+  133 xor 32 132 33 _roundMask_T_62
+  134 concat 62 133 45 _roundMask_T_63
+  135 sra 52 53 85 roundMask_shift_1
+  136 slice 1 135 0 0 _roundMask_T_66
+  137 slice 1 135 1 1 _roundMask_T_67
+  138 slice 1 135 2 2 _roundMask_T_69
+  139 concat 19 136 137
+  140 concat 11 139 138 _roundMask_T_70
+  141 ite 11 83 140 61 _roundMask_T_71
+  142 concat 62 60 141
+  143 ite 62 82 134 142 _roundMask_T_72
+  144 ite 62 81 143 63 _roundMask_T_73
+  145 slice 25 144 24 1
+  146 slice 1 144 0 0
+  147 or 1 146 78 _common_underflow_T_4
+  148 xor 25 145 26
+  149 xor 1 147 68
+  150 slice 29 10 26 1
+  151 concat 62 68 148
+  152 concat 29 151 149
+  153 concat 62 145 147
+  154 concat 29 153 68
+  155 and 29 150 152 _roundPosBit_T
+  156 and 29 155 154 _roundPosBit_T
+  157 neq 1 156 47 roundPosBit
+  158 slice 29 10 25 0
+  159 concat 62 145 147
+  160 concat 29 159 68
+  161 and 29 158 160 _anyRoundExtra_T
+  162 concat 23 156 161
+  163 neq 1 162 24 anyRound
+  164 or 1 69 72 _overflow_roundMagUp_T
+  165 and 1 164 157 _roundIncr_T_1
+  166 and 1 77 163 _roundIncr_T_2
+  167 or 1 165 166 roundIncr
+  168 slice 62 10 26 2
+  169 concat 62 145 147
+  170 or 62 168 169 _roundedSig_T
+  171 concat 29 67 170
+  172 add 29 171 30 _roundedSig_T_2
+  173 eq 1 161 47 _roundedSig_T_4
+  174 and 1 69 157 _roundedSig_T_5
+  175 and 1 174 173 _roundedSig_T_5
+  176 concat 62 145 147
+  177 concat 29 176 68 _roundedSig_T_6
+  178 ite 29 175 177 47 _roundedSig_T_7
+  179 xor 29 178 31 _roundedSig_T_8
+  180 and 29 172 179 _roundedSig_T_9
+  181 xor 25 145 26
+  182 xor 1 147 68
+  183 slice 62 10 26 2
+  184 concat 62 181 182
+  185 and 62 183 184 _roundedSig_T_12
+  186 and 1 73 163 _roundedSig_T_13
+  187 concat 62 68 148
+  188 concat 29 187 149
+  189 concat 62 145 147
+  190 concat 29 189 68
+  191 and 29 188 190 _roundedSig_T_14
+  192 ite 29 186 191 47 _roundedSig_T_15
+  193 concat 29 67 185
+  194 or 29 193 192 _roundedSig_T_16
+  195 ite 29 167 180 194 roundedSig
+  196 slice 19 195 25 24 _sRoundedExp_T
+  197 slice 1 8 9 9
+  198 concat 27 197 8
+  199 concat 27 65 196
+  200 add 27 198 199 sRoundedExp
+  201 slice 40 200 8 0 common_expOut
+  202 sort bitvec 23
+  203 slice 202 195 23 1 _common_fractOut_T
+  204 slice 202 195 22 0 _common_fractOut_T_1
+  205 ite 202 78 203 204 common_fractOut
+  206 slice 21 200 10 7
+  207 sgt 1 206 22 common_overflow
+  208 slt 1 200 28 common_totalUnderflow
+  209 slice 1 10 2 2 _unboundedRange_anyRound_T
+  210 slice 1 10 1 1 _unboundedRange_roundPosBit_T_1
+  211 ite 1 78 209 210 unboundedRange_roundPosBit
+  212 and 1 78 209 _unboundedRange_anyRound_T_1
+  213 slice 19 10 1 0 _unboundedRange_anyRound_T_2
+  214 concat 11 212 213
+  215 neq 1 214 61 unboundedRange_anyRound
+  216 and 1 164 211 _unboundedRange_roundIncr_T_1
+  217 and 1 77 215 _unboundedRange_roundIncr_T_2
+  218 or 1 216 217 unboundedRange_roundIncr
+  219 slice 1 195 25 25 _roundCarry_T
+  220 slice 1 195 24 24 _roundCarry_T_1
+  221 ite 1 78 219 220 roundCarry
+  222 slice 19 8 9 8
+  223 neq 1 222 20 _common_underflow_T_1
+  224 slice 1 144 1 1 _common_underflow_T_9
+  225 ite 1 78 224 147 _common_underflow_T_5
+  226 slice 1 144 2 2 _common_underflow_T_8
+  227 ite 1 78 226 224 _common_underflow_T_10
+  228 xor 1 227 68 _common_underflow_T_11
+  229 and 1 228 221 _common_underflow_T_15
+  230 and 1 229 157 _common_underflow_T_15
+  231 and 1 230 218 _common_underflow_T_15
+  232 xor 1 231 68 _common_underflow_T_16
+  233 and 1 163 223 _common_underflow_T_17
+  234 and 1 233 225 _common_underflow_T_17
+  235 and 1 234 232 _common_underflow_T_17
+  236 or 1 208 235 common_underflow
+  237 concat 9 208 156
+  238 concat 17 237 161
+  239 neq 1 238 18 common_inexact
+  240 or 1 2 3 isNaNOut
+  241 xor 1 240 68 _commonCase_T
+  242 xor 1 4 68 _commonCase_T_1
+  243 xor 1 5 68 _commonCase_T_3
+  244 and 1 241 242 commonCase
+  245 and 1 244 243 commonCase
+  246 and 1 245 207 overflow
+  247 and 1 245 236 underflow
+  248 and 1 245 239 _inexact_T
+  249 or 1 246 248 inexact
+  250 or 1 164 77 overflow_roundMagUp
+  251 or 1 77 73 _pegMinNonzeroMagOut_T_1
+  252 and 1 245 208 pegMinNonzeroMagOut
+  253 and 1 252 251 pegMinNonzeroMagOut
+  254 xor 1 250 68 _pegMaxFiniteMagOut_T
+  255 and 1 246 254 pegMaxFiniteMagOut
+  256 and 1 246 250 _notNaN_isInfOut_T
+  257 or 1 4 256 notNaN_isInfOut
+  258 xor 1 240 68
+  259 and 1 258 6 signOut
+  260 or 1 5 208 _expOut_T
+  261 ite 40 260 48 65 _expOut_T_1
+  262 xor 40 261 41 _expOut_T_2
+  263 ite 40 253 66 65 _expOut_T_5
+  264 xor 40 263 41 _expOut_T_6
+  265 xor 1 255 68
+  266 concat 19 68 265
+  267 concat 40 266 16 _expOut_T_9
+  268 xor 1 257 68
+  269 concat 11 46 268
+  270 concat 40 269 14 _expOut_T_12
+  271 and 40 201 262 _expOut_T_13
+  272 and 40 271 264 _expOut_T_13
+  273 and 40 272 267 _expOut_T_13
+  274 and 40 273 270 _expOut_T_13
+  275 ite 40 253 49 65 _expOut_T_14
+  276 ite 40 255 50 65 _expOut_T_16
+  277 ite 40 257 51 65 _expOut_T_18
+  278 ite 40 240 48 65 _expOut_T_20
+  279 or 40 274 275 expOut
+  280 or 40 279 276 expOut
+  281 or 40 280 277 expOut
+  282 or 40 281 278 expOut
+  283 or 1 240 5 _fractOut_T_1
+  284 or 1 283 208 _fractOut_T_1
+  285 concat 202 240 60 _fractOut_T_2
+  286 ite 202 284 285 205 _fractOut_T_3
+  287 sext 202 255 22 _fractOut_T_4
+  288 or 202 286 287 fractOut
+  289 sort bitvec 33
+  290 concat 7 259 282
+  291 concat 289 290 288 io_out
+  292 sort bitvec 5
+  293 concat 19 2 67
+  294 concat 11 293 246
+  295 concat 21 294 247
+  296 concat 292 295 249 io_exceptionFlags
+  297 output 291 io_out
+  298 output 296 io_exceptionFlags
+}

@@ -1,0 +1,242 @@
+
+module MulAddRecFNToRaw_preMul_e11_s53 {
+  1 sort bitvec 2
+  2 input 1 io_op
+  3 sort bitvec 65
+  4 input 3 io_a
+  5 input 3 io_b
+  6 input 3 io_c
+  7 sort bitvec 13
+  8 consth 7 1FCB
+  9 sort bitvec 52
+  10 consth 9 FFFFFFFFFFFFF
+  11 consth 7 36
+  12 sort bitvec 14
+  13 consth 12 3838
+  14 consth 7 A1
+  15 consth 12 0
+  16 sort bitvec 16
+  17 consth 16 0
+  18 sort bitvec 3
+  19 consth 18 7
+  20 consth 7 0
+  21 sort bitvec 59
+  22 consth 21 0
+  23 consth 1 0
+  24 sort bitvec 4
+  25 consth 24 0
+  26 sort bitvec 157
+  27 consth 26 0
+  28 consth 1 3
+  29 sort bitvec 1
+  30 consth 29 1
+  31 consth 18 0
+  32 sort bitvec 8
+  33 consth 32 A1
+  34 consth 29 0
+  35 consth 32 0
+  36 consth 3 10000000000000000
+  37 sort bitvec 6
+  38 consth 37 33
+  39 sort bitvec 7
+  40 consth 39 55
+  41 sort bitvec 12
+  42 slice 41 4 63 52 rawA_exp
+  43 slice 18 4 63 61 _rawA_isZero_T
+  44 neq 29 43 31 _rawA_out_sig_T
+  45 xor 29 44 30 rawA_isZero
+  46 slice 1 4 63 62 _rawA_isSpecial_T
+  47 eq 29 46 28 rawA_isSpecial
+  48 slice 29 4 61 61 _rawA_out_isInf_T
+  49 and 29 47 48 rawA_isNaN
+  50 xor 29 48 30 _rawA_out_isInf_T_1
+  51 and 29 47 50 rawA_isInf
+  52 slice 29 4 64 64 rawA_sign
+  53 slice 9 4 51 0 _rawA_out_sig_T_2
+  54 slice 41 5 63 52 rawB_exp
+  55 slice 18 5 63 61 _rawB_isZero_T
+  56 neq 29 55 31 _rawB_out_sig_T
+  57 xor 29 56 30 rawB_isZero
+  58 slice 1 5 63 62 _rawB_isSpecial_T
+  59 eq 29 58 28 rawB_isSpecial
+  60 slice 29 5 61 61 _rawB_out_isInf_T
+  61 and 29 59 60 rawB_isNaN
+  62 xor 29 60 30 _rawB_out_isInf_T_1
+  63 and 29 59 62 rawB_isInf
+  64 slice 29 5 64 64 rawB_sign
+  65 slice 9 5 51 0 _rawB_out_sig_T_2
+  66 slice 41 6 63 52 rawC_exp
+  67 slice 18 6 63 61 _rawC_isZero_T
+  68 neq 29 67 31 _rawC_out_sig_T
+  69 xor 29 68 30 rawC_isZero
+  70 slice 1 6 63 62 _rawC_isSpecial_T
+  71 eq 29 70 28 rawC_isSpecial
+  72 slice 29 6 61 61 _rawC_out_isInf_T
+  73 and 29 71 72 rawC_isNaN
+  74 xor 29 72 30 _rawC_out_isInf_T_1
+  75 and 29 71 74 rawC_isInf
+  76 slice 29 6 64 64 rawC_sign
+  77 slice 9 6 51 0 _rawC_out_sig_T_2
+  78 sort bitvec 54
+  79 concat 1 34 68
+  80 concat 78 79 77 rawC_sig
+  81 slice 29 2 1 1 _signProd_T_1
+  82 xor 29 52 64 signProd
+  83 xor 29 82 81 signProd
+  84 concat 12 23 42
+  85 concat 12 23 54
+  86 add 12 84 85 _sExpAlignedProd_T_1
+  87 add 12 86 13 _sExpAlignedProd_T_1
+  88 slice 29 2 0 0 _doSubMags_T_1
+  89 xor 29 83 76 doSubMags
+  90 xor 29 89 88 doSubMags
+  91 concat 12 23 66
+  92 sub 12 87 91 _sNatCAlignDist_T
+  93 slice 7 92 12 0 posNatCAlignDist
+  94 slt 29 92 15 _isMinCAlign_T_1
+  95 or 29 45 57 isMinCAlign
+  96 or 29 95 94 isMinCAlign
+  97 ult 29 93 11 _CIsDominant_T_1
+  98 or 29 96 97 _CIsDominant_T_2
+  99 and 29 68 98 CIsDominant
+  100 ult 29 93 14 _CAlignDist_T
+  101 slice 32 92 7 0 _CAlignDist_T_1
+  102 ite 32 100 101 33 _CAlignDist_T_2
+  103 ite 32 96 35 102 CAlignDist
+  104 xor 29 68 30
+  105 xor 9 77 10
+  106 concat 1 30 104
+  107 concat 78 106 105 _mainAlignedSigC_T
+  108 ite 78 90 107 80 _mainAlignedSigC_T_1
+  109 sort bitvec 111
+  110 sext 109 90 110 _mainAlignedSigC_T_2
+  111 sort bitvec 165
+  112 concat 111 108 110 _mainAlignedSigC_T_3
+  113 concat 111 27 103
+  114 sra 111 112 113 mainAlignedSigC
+  115 slice 24 6 3 0 _reduced4CExtra_reducedVec_0_T
+  116 neq 29 115 25 reduced4CExtra_reducedVec_0
+  117 slice 24 6 7 4 _reduced4CExtra_reducedVec_1_T
+  118 neq 29 117 25 reduced4CExtra_reducedVec_1
+  119 slice 24 6 11 8 _reduced4CExtra_reducedVec_2_T
+  120 neq 29 119 25 reduced4CExtra_reducedVec_2
+  121 slice 24 6 15 12 _reduced4CExtra_reducedVec_3_T
+  122 neq 29 121 25 reduced4CExtra_reducedVec_3
+  123 slice 24 6 19 16 _reduced4CExtra_reducedVec_4_T
+  124 neq 29 123 25 reduced4CExtra_reducedVec_4
+  125 slice 24 6 23 20 _reduced4CExtra_reducedVec_5_T
+  126 neq 29 125 25 reduced4CExtra_reducedVec_5
+  127 slice 24 6 27 24 _reduced4CExtra_reducedVec_6_T
+  128 neq 29 127 25 reduced4CExtra_reducedVec_6
+  129 slice 24 6 31 28 _reduced4CExtra_reducedVec_7_T
+  130 neq 29 129 25 reduced4CExtra_reducedVec_7
+  131 slice 24 6 35 32 _reduced4CExtra_reducedVec_8_T
+  132 neq 29 131 25 reduced4CExtra_reducedVec_8
+  133 slice 24 6 39 36 _reduced4CExtra_reducedVec_9_T
+  134 neq 29 133 25 reduced4CExtra_reducedVec_9
+  135 slice 24 6 43 40 _reduced4CExtra_reducedVec_10_T
+  136 neq 29 135 25 reduced4CExtra_reducedVec_10
+  137 slice 24 6 47 44 _reduced4CExtra_reducedVec_11_T
+  138 neq 29 137 25 reduced4CExtra_reducedVec_11
+  139 slice 24 6 51 48 _reduced4CExtra_reducedVec_12_T
+  140 neq 29 139 25 reduced4CExtra_reducedVec_12
+  141 slice 37 103 7 2 _reduced4CExtra_T_2
+  142 concat 3 22 141
+  143 sra 3 36 142 reduced4CExtra_shift
+  144 slice 24 143 31 28 _reduced4CExtra_T_7
+  145 concat 32 25 144
+  146 slice 24 143 27 24 _reduced4CExtra_T_9
+  147 concat 32 146 25 _reduced4CExtra_T_12
+  148 or 32 145 147 _reduced4CExtra_T_13
+  149 slice 37 148 7 2 _reduced4CExtra_T_17
+  150 and 37 149 38
+  151 concat 32 23 150
+  152 slice 37 148 5 0 _reduced4CExtra_T_19
+  153 and 37 152 38
+  154 concat 32 153 23 _reduced4CExtra_T_22
+  155 or 32 151 154 _reduced4CExtra_T_23
+  156 slice 39 155 7 1 _reduced4CExtra_T_27
+  157 and 39 156 40
+  158 concat 32 34 157
+  159 slice 39 155 6 0 _reduced4CExtra_T_29
+  160 and 39 159 40
+  161 concat 32 160 34 _reduced4CExtra_T_32
+  162 or 32 158 161 _reduced4CExtra_T_33
+  163 slice 29 143 32 32 _reduced4CExtra_T_37
+  164 slice 29 143 33 33 _reduced4CExtra_T_38
+  165 slice 29 143 34 34 _reduced4CExtra_T_41
+  166 slice 29 143 35 35 _reduced4CExtra_T_42
+  167 slice 29 143 36 36 _reduced4CExtra_T_45
+  168 sort bitvec 9
+  169 concat 168 162 163
+  170 sort bitvec 10
+  171 concat 170 169 164
+  172 sort bitvec 11
+  173 concat 172 171 165
+  174 concat 41 173 166
+  175 concat 7 174 167 _reduced4CExtra_T_47
+  176 concat 1 140 138
+  177 concat 18 176 136
+  178 concat 24 177 134
+  179 sort bitvec 5
+  180 concat 179 178 132
+  181 concat 37 180 130
+  182 concat 39 181 128
+  183 concat 32 182 126
+  184 concat 168 183 124
+  185 concat 170 184 122
+  186 concat 172 185 120
+  187 concat 41 186 118
+  188 concat 7 187 116
+  189 and 7 188 175
+  190 slice 18 114 2 0 _alignedSigC_T_5
+  191 eq 29 190 19 _alignedSigC_T_2
+  192 eq 29 189 20 _alignedSigC_T_3
+  193 and 29 191 192 _alignedSigC_T_4
+  194 concat 16 190 189
+  195 neq 29 194 17 _alignedSigC_T_7
+  196 ite 29 90 193 195 _alignedSigC_T_8
+  197 sort bitvec 53
+  198 concat 197 44 53 io_mulAddA
+  199 concat 197 56 65 io_mulAddB
+  200 sort bitvec 106
+  201 slice 200 114 108 3 io_mulAddC
+  202 slice 29 4 51 51 _io_toPostMul_isSigNaNAny_T
+  203 xor 29 202 30 _io_toPostMul_isSigNaNAny_T_1
+  204 and 29 49 203 _io_toPostMul_isSigNaNAny_T_2
+  205 slice 29 5 51 51 _io_toPostMul_isSigNaNAny_T_3
+  206 xor 29 205 30 _io_toPostMul_isSigNaNAny_T_4
+  207 and 29 61 206 _io_toPostMul_isSigNaNAny_T_5
+  208 slice 29 6 51 51 _io_toPostMul_isSigNaNAny_T_7
+  209 xor 29 208 30 _io_toPostMul_isSigNaNAny_T_8
+  210 and 29 73 209 _io_toPostMul_isSigNaNAny_T_9
+  211 or 29 204 207 io_toPostMul_isSigNaNAny
+  212 or 29 211 210 io_toPostMul_isSigNaNAny
+  213 or 29 49 61 io_toPostMul_isNaNAOrB
+  214 slice 7 87 12 0
+  215 add 7 214 8 _io_toPostMul_sExpSum_T
+  216 concat 7 34 66
+  217 ite 7 99 216 215 _io_toPostMul_sExpSum_T_3
+  218 slice 37 103 5 0 io_toPostMul_CDom_CAlignDist
+  219 sort bitvec 55
+  220 slice 219 114 163 109 io_toPostMul_highAlignedSigC
+  221 output 198 io_mulAddA
+  222 output 199 io_mulAddB
+  223 output 201 io_mulAddC
+  224 output 212 io_toPostMul_isSigNaNAny
+  225 output 213 io_toPostMul_isNaNAOrB
+  226 output 51 io_toPostMul_isInfA
+  227 output 45 io_toPostMul_isZeroA
+  228 output 63 io_toPostMul_isInfB
+  229 output 57 io_toPostMul_isZeroB
+  230 output 83 io_toPostMul_signProd
+  231 output 73 io_toPostMul_isNaNC
+  232 output 75 io_toPostMul_isInfC
+  233 output 69 io_toPostMul_isZeroC
+  234 output 217 io_toPostMul_sExpSum
+  235 output 90 io_toPostMul_doSubMags
+  236 output 99 io_toPostMul_CIsDominant
+  237 output 218 io_toPostMul_CDom_CAlignDist
+  238 output 220 io_toPostMul_highAlignedSigC
+  239 output 196 io_toPostMul_bit0AlignedSigC
+}

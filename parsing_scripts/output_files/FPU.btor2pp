@@ -1,0 +1,360 @@
+include UOPCodeFPUDecoder.btor2pp
+include FPUFMAPipe_l4_f64.btor2pp
+include FMADecoder.btor2pp
+include FPUFMAPipe_l4_f32.btor2pp
+include FPToInt.btor2pp
+include FPToFP.btor2pp
+
+module FPU {
+  1 sort bitvec 1
+  2 input 1 reset
+  3 input 1 io_req_valid
+  4 sort bitvec 7
+  5 input 4 io_req_bits_uop_uopc
+  6 sort bitvec 20
+  7 input 6 io_req_bits_uop_imm_packed
+  8 sort bitvec 65
+  9 input 8 io_req_bits_rs1_data
+  10 input 8 io_req_bits_rs2_data
+  11 input 8 io_req_bits_rs3_data
+  12 sort bitvec 3
+  13 input 12 io_req_bits_fcsr_rm
+  14 state 1 fpiu_out_REG
+  15 state 1 fpiu_out_pipe_v
+  16 sort bitvec 64
+  17 state 16 fpiu_out_pipe_b_toint
+  18 sort bitvec 5
+  19 state 18 fpiu_out_pipe_b_exc
+  20 state 1 fpiu_out_pipe_pipe_v
+  21 state 16 fpiu_out_pipe_pipe_b_toint
+  22 state 18 fpiu_out_pipe_pipe_b_exc
+  23 state 1 fpiu_out_pipe_pipe_pipe_v
+  24 state 16 fpiu_out_pipe_pipe_pipe_b_toint
+  25 state 18 fpiu_out_pipe_pipe_pipe_b_exc
+  26 state 1 fpmu_double_pipe_v
+  27 state 1 fpmu_double_pipe_b
+  28 state 1 fpmu_double_pipe_pipe_v
+  29 state 1 fpmu_double_pipe_pipe_b
+  30 state 1 fpmu_double_pipe_pipe_pipe_v
+  31 state 1 fpmu_double_pipe_pipe_pipe_b
+  32 state 1 fpmu_double_pipe_pipe_pipe_pipe_b
+  33 inst UOPCodeFPUDecoder fp_decoder
+  34 ref UOPCodeFPUDecoder 2 io_uopc
+  35 ref UOPCodeFPUDecoder 270 io_sigs_ren2
+  36 ref UOPCodeFPUDecoder 271 io_sigs_ren3
+  37 ref UOPCodeFPUDecoder 272 io_sigs_swap23
+  38 ref UOPCodeFPUDecoder 273 io_sigs_typeTagIn
+  39 ref UOPCodeFPUDecoder 274 io_sigs_typeTagOut
+  40 ref UOPCodeFPUDecoder 275 io_sigs_fromint
+  41 ref UOPCodeFPUDecoder 276 io_sigs_toint
+  42 ref UOPCodeFPUDecoder 277 io_sigs_fastpipe
+  43 ref UOPCodeFPUDecoder 278 io_sigs_fma
+  44 ref UOPCodeFPUDecoder 279 io_sigs_wflags
+  45 get 33 35 io_sigs_ren2
+  46 get 33 36 io_sigs_ren3
+  47 get 33 37 io_sigs_swap23
+  48 get 33 38 io_sigs_typeTagIn
+  49 get 33 39 io_sigs_typeTagOut
+  50 get 33 40 io_sigs_fromint
+  51 get 33 41 io_sigs_toint
+  52 get 33 42 io_sigs_fastpipe
+  53 get 33 43 io_sigs_fma
+  54 get 33 44 io_sigs_wflags
+  55 inst FPUFMAPipe_l4_f64 dfma
+  56 ref FPUFMAPipe_l4_f64 2 reset
+  57 ref FPUFMAPipe_l4_f64 3 io_in_valid
+  58 ref FPUFMAPipe_l4_f64 4 io_in_bits_ren3
+  59 ref FPUFMAPipe_l4_f64 5 io_in_bits_swap23
+  60 ref FPUFMAPipe_l4_f64 7 io_in_bits_rm
+  61 ref FPUFMAPipe_l4_f64 9 io_in_bits_fmaCmd
+  62 ref FPUFMAPipe_l4_f64 11 io_in_bits_in1
+  63 ref FPUFMAPipe_l4_f64 12 io_in_bits_in2
+  64 ref FPUFMAPipe_l4_f64 13 io_in_bits_in3
+  65 ref FPUFMAPipe_l4_f64 67 io_out_valid
+  66 ref FPUFMAPipe_l4_f64 68 io_out_bits_data
+  67 ref FPUFMAPipe_l4_f64 69 io_out_bits_exc
+  68 get 55 65 io_out_valid
+  69 get 55 66 io_out_bits_data
+  70 get 55 67 io_out_bits_exc
+  71 inst FMADecoder dfma_io_in_bits_fma_decoder
+  72 ref FMADecoder 2 io_uopc
+  73 ref FMADecoder 81 io_cmd
+  74 get 71 73 io_cmd
+  75 inst FPUFMAPipe_l4_f32 sfma
+  76 ref FPUFMAPipe_l4_f32 2 reset
+  77 ref FPUFMAPipe_l4_f32 3 io_in_valid
+  78 ref FPUFMAPipe_l4_f32 4 io_in_bits_ren3
+  79 ref FPUFMAPipe_l4_f32 5 io_in_bits_swap23
+  80 ref FPUFMAPipe_l4_f32 7 io_in_bits_rm
+  81 ref FPUFMAPipe_l4_f32 9 io_in_bits_fmaCmd
+  82 ref FPUFMAPipe_l4_f32 11 io_in_bits_in1
+  83 ref FPUFMAPipe_l4_f32 12 io_in_bits_in2
+  84 ref FPUFMAPipe_l4_f32 13 io_in_bits_in3
+  85 ref FPUFMAPipe_l4_f32 70 io_out_valid
+  86 ref FPUFMAPipe_l4_f32 71 io_out_bits_data
+  87 ref FPUFMAPipe_l4_f32 72 io_out_bits_exc
+  88 get 75 85 io_out_valid
+  89 get 75 86 io_out_bits_data
+  90 get 75 87 io_out_bits_exc
+  91 inst FMADecoder sfma_io_in_bits_fma_decoder
+  92 get 91 73 io_cmd
+  93 inst FPToInt fpiu
+  94 ref FPToInt 2 io_in_valid
+  95 ref FPToInt 3 io_in_bits_ren2
+  96 ref FPToInt 5 io_in_bits_typeTagOut
+  97 ref FPToInt 6 io_in_bits_wflags
+  98 ref FPToInt 8 io_in_bits_rm
+  99 ref FPToInt 9 io_in_bits_typ
+  100 ref FPToInt 10 io_in_bits_fmt
+  101 ref FPToInt 12 io_in_bits_in1
+  102 ref FPToInt 13 io_in_bits_in2
+  103 ref FPToInt 404 io_out_bits_lt
+  104 ref FPToInt 405 io_out_bits_toint
+  105 ref FPToInt 406 io_out_bits_exc
+  106 get 93 103 io_out_bits_lt
+  107 get 93 104 io_out_bits_toint
+  108 get 93 105 io_out_bits_exc
+  109 inst FPToFP fpmu
+  110 ref FPToFP 2 reset
+  111 ref FPToFP 3 io_in_valid
+  112 ref FPToFP 4 io_in_bits_ren2
+  113 ref FPToFP 6 io_in_bits_typeTagOut
+  114 ref FPToFP 7 io_in_bits_wflags
+  115 ref FPToFP 9 io_in_bits_rm
+  116 ref FPToFP 11 io_in_bits_in1
+  117 ref FPToFP 12 io_in_bits_in2
+  118 ref FPToFP 13 io_lt
+  119 ref FPToFP 139 io_out_valid
+  120 ref FPToFP 140 io_out_bits_data
+  121 ref FPToFP 141 io_out_bits_exc
+  122 get 109 119 io_out_valid
+  123 get 109 120 io_out_bits_data
+  124 get 109 121 io_out_bits_exc
+  125 consth 12 5
+  126 sort bitvec 12
+  127 consth 126 700
+  128 sort bitvec 29
+  129 consth 128 0
+  130 sort bitvec 2
+  131 consth 130 1
+  132 consth 12 0
+  133 sort bitvec 32
+  134 consth 133 0
+  135 consth 18 1F
+  136 consth 12 7
+  137 consth 1 1
+  138 consth 8 E008000000000000
+  139 consth 4 46
+  140 sort bitvec 33
+  141 consth 140 E0400000
+  142 consth 6 FFFFF
+  143 consth 130 0
+  144 consth 140 0
+  145 consth 126 FFF
+  146 consth 1 0
+  147 slice 12 7 2 0 _fp_rm_T_2
+  148 eq 1 147 136 _fp_rm_T_1
+  149 ite 12 148 13 147 fp_rm
+  150 and 1 3 53 _sfma_io_in_valid_T
+  151 eq 1 49 131 _fpmu_double_T_1
+  152 and 1 150 151 dfma.io_in_valid
+  153 slice 1 9 31 31 _fpiu_io_in_bits_req_in1_prev_unswizzled_T
+  154 slice 1 9 52 52 _fpiu_io_in_bits_req_in1_prev_unswizzled_T_1
+  155 sort bitvec 31
+  156 slice 155 9 30 0 _fpiu_io_in_bits_req_in1_prev_unswizzled_T_2
+  157 slice 18 9 64 60 _fpiu_io_in_bits_req_in1_prev_isbox_T
+  158 slice 1 10 31 31 _fpiu_io_in_bits_req_in2_prev_unswizzled_T
+  159 slice 1 10 52 52 _fpiu_io_in_bits_req_in2_prev_unswizzled_T_1
+  160 slice 155 10 30 0 _fpiu_io_in_bits_req_in2_prev_unswizzled_T_2
+  161 slice 18 10 64 60 _fpiu_io_in_bits_req_in2_prev_isbox_T
+  162 slice 1 11 31 31 _fpiu_io_in_bits_req_in3_prev_unswizzled_T
+  163 slice 1 11 52 52 _fpiu_io_in_bits_req_in3_prev_unswizzled_T_1
+  164 slice 155 11 30 0 _fpiu_io_in_bits_req_in3_prev_unswizzled_T_2
+  165 slice 18 11 64 60 _fpiu_io_in_bits_req_in3_prev_isbox_T
+  166 ite 8 47 10 11 dfma_io_in_bits_req_in3
+  167 slice 130 7 9 8 fpiu_io_in_bits_req_typ
+  168 neq 1 48 143 _fpiu_io_in_bits_req_fmt_T_1
+  169 eq 1 5 139 _fpiu_io_in_bits_T
+  170 eq 1 49 143 _sfma_io_in_valid_T_1
+  171 and 1 150 170 sfma.io_in_valid
+  172 concat 130 153 154
+  173 concat 140 172 156 sfma_io_in_bits_req_in1_floats_0
+  174 eq 1 157 135 sfma_io_in_bits_req_in1_oks_0
+  175 ite 140 174 144 141 _sfma_io_in_bits_req_in1_T
+  176 or 140 173 175 _sfma_io_in_bits_req_in1_T_1
+  177 concat 8 134 176 sfma_io_in_bits_req_in1
+  178 concat 130 158 159
+  179 concat 140 178 160 sfma_io_in_bits_req_in2_floats_0
+  180 eq 1 161 135 sfma_io_in_bits_req_in2_oks_0
+  181 ite 140 180 144 141 _sfma_io_in_bits_req_in2_T
+  182 or 140 179 181 _sfma_io_in_bits_req_in2_T_1
+  183 concat 8 134 182 sfma_io_in_bits_req_in2
+  184 concat 130 162 163
+  185 concat 140 184 164 sfma_io_in_bits_req_in3_floats_0
+  186 eq 1 165 135 sfma_io_in_bits_req_in3_oks_0
+  187 ite 140 186 144 141 _sfma_io_in_bits_req_in3_T
+  188 or 140 185 187 _sfma_io_in_bits_req_in3_T_1
+  189 ite 140 47 182 188
+  190 concat 8 134 189 sfma_io_in_bits_req_in3
+  191 and 1 52 54 _fpiu_io_in_valid_T
+  192 or 1 51 191 _fpiu_io_in_valid_T_1
+  193 and 1 3 192 fpiu.io_in_valid
+  194 sort bitvec 23
+  195 slice 194 9 22 0 fpiu_io_in_bits_req_in1_prev_prev_fractIn
+  196 sort bitvec 8
+  197 slice 196 9 30 23
+  198 slice 130 9 30 29
+  199 concat 12 154 198 fpiu_io_in_bits_req_in1_prev_prev_expOut_expCode
+  200 sort bitvec 4
+  201 concat 200 132 154
+  202 concat 126 201 197
+  203 add 126 202 127 _fpiu_io_in_bits_req_in1_prev_prev_expOut_commonCase_T_2
+  204 eq 1 199 132 _fpiu_io_in_bits_req_in1_prev_prev_expOut_T
+  205 ugt 1 199 125 _fpiu_io_in_bits_req_in1_prev_prev_expOut_T_1
+  206 or 1 204 205 _fpiu_io_in_bits_req_in1_prev_prev_expOut_T_2
+  207 sort bitvec 9
+  208 slice 207 203 8 0 _fpiu_io_in_bits_req_in1_prev_prev_expOut_T_3
+  209 concat 12 154 198
+  210 concat 126 209 208 _fpiu_io_in_bits_req_in1_prev_prev_expOut_T_4
+  211 ite 126 206 210 203 fpiu_io_in_bits_req_in1_prev_prev_expOut
+  212 sort bitvec 13
+  213 concat 212 153 211
+  214 sort bitvec 36
+  215 concat 214 213 195
+  216 concat 8 215 129 fpiu_io_in_bits_req_in1_floats_0
+  217 eq 1 157 135 fpiu_io_in_bits_req_in1_oks_0
+  218 slice 1 48 0 0 fpiu_io_in_bits_req_in1_truncIdx
+  219 or 1 218 217 _fpiu_io_in_bits_req_in1_T_1
+  220 slice 1 48 0 0 fpiu_io_in_bits_req_in1_truncIdx_1
+  221 ite 8 220 9 216 _fpiu_io_in_bits_req_in1_T_3
+  222 ite 8 219 221 138 fpmu.io_in_bits_in1
+  223 slice 194 10 22 0 fpiu_io_in_bits_req_in2_prev_prev_fractIn
+  224 slice 196 10 30 23
+  225 slice 130 10 30 29
+  226 concat 12 159 225 fpiu_io_in_bits_req_in2_prev_prev_expOut_expCode
+  227 concat 200 132 159
+  228 concat 126 227 224
+  229 add 126 228 127 _fpiu_io_in_bits_req_in2_prev_prev_expOut_commonCase_T_2
+  230 eq 1 226 132 _fpiu_io_in_bits_req_in2_prev_prev_expOut_T
+  231 ugt 1 226 125 _fpiu_io_in_bits_req_in2_prev_prev_expOut_T_1
+  232 or 1 230 231 _fpiu_io_in_bits_req_in2_prev_prev_expOut_T_2
+  233 slice 207 229 8 0 _fpiu_io_in_bits_req_in2_prev_prev_expOut_T_3
+  234 concat 12 159 225
+  235 concat 126 234 233 _fpiu_io_in_bits_req_in2_prev_prev_expOut_T_4
+  236 ite 126 232 235 229 fpiu_io_in_bits_req_in2_prev_prev_expOut
+  237 concat 212 158 236
+  238 concat 214 237 223
+  239 concat 8 238 129 fpiu_io_in_bits_req_in2_floats_0
+  240 eq 1 161 135 fpiu_io_in_bits_req_in2_oks_0
+  241 slice 1 48 0 0 fpiu_io_in_bits_req_in2_truncIdx
+  242 or 1 241 240 _fpiu_io_in_bits_req_in2_T_1
+  243 slice 1 48 0 0 fpiu_io_in_bits_req_in2_truncIdx_1
+  244 ite 8 243 10 239 _fpiu_io_in_bits_req_in2_T_3
+  245 ite 8 242 244 138 fpmu.io_in_bits_in2
+  246 concat 130 146 168
+  247 ite 130 169 143 246 fpiu_io_in_bits_req_fmt
+  248 xor 1 52 137 _fpiu_out_T
+  249 and 1 193 248 _fpiu_out_T_1
+  250 ite 16 14 107 17
+  251 ite 18 14 108 19
+  252 ite 16 15 17 21
+  253 ite 18 15 19 22
+  254 ite 16 20 21 24
+  255 ite 18 20 22 25
+  256 concat 8 146 24 fpiu_result_data
+  257 and 1 3 52 fpmu.io_in_valid
+  258 ite 1 257 151 27
+  259 ite 1 26 27 29
+  260 ite 1 28 29 31
+  261 ite 1 30 31 32
+  262 or 1 23 122 io_resp_valid
+  263 or 1 262 88 io_resp_valid
+  264 or 1 263 68 io_resp_valid
+  265 slice 1 89 31 31 _fpu_out_data_opts_bigger_swizzledNaN_T_5
+  266 slice 1 89 32 32 _fpu_out_data_opts_bigger_swizzledNaN_T_6
+  267 slice 155 89 30 0 _fpu_out_data_opts_bigger_swizzledNaN_T_7
+  268 concat 212 145 265
+  269 concat 140 268 142
+  270 sort bitvec 34
+  271 concat 270 269 266
+  272 concat 8 271 267 fpu_out_data_opts_0_1
+  273 slice 1 123 31 31 _fpu_out_data_opts_bigger_swizzledNaN_T_9
+  274 slice 1 123 32 32 _fpu_out_data_opts_bigger_swizzledNaN_T_10
+  275 slice 155 123 30 0 _fpu_out_data_opts_bigger_swizzledNaN_T_11
+  276 concat 212 145 273
+  277 concat 140 276 142
+  278 concat 270 277 274
+  279 concat 8 278 275 fpu_out_data_opts_0_2
+  280 ite 8 32 123 279 _fpu_out_data_T_5
+  281 ite 8 23 256 280 _fpu_out_data_T_6
+  282 ite 8 88 272 281 _fpu_out_data_T_7
+  283 ite 8 68 69 282 fpu_out_data
+  284 ite 18 23 25 124 _fpu_out_exc_T
+  285 ite 18 88 90 284 _fpu_out_exc_T_1
+  286 ite 18 68 70 285 fpu_out_exc
+  287 set 33 34 5 io_uopc
+  288 set 55 56 2 reset
+  289 set 55 57 152 io_in_valid
+  290 set 55 58 46 io_in_bits_ren3
+  291 set 55 59 47 io_in_bits_swap23
+  292 set 55 60 149 io_in_bits_rm
+  293 set 55 61 74 io_in_bits_fmaCmd
+  294 set 55 62 9 io_in_bits_in1
+  295 set 55 63 10 io_in_bits_in2
+  296 set 55 64 166 io_in_bits_in3
+  297 set 71 72 5 io_uopc
+  298 set 75 76 2 reset
+  299 set 75 77 171 io_in_valid
+  300 set 75 78 46 io_in_bits_ren3
+  301 set 75 79 47 io_in_bits_swap23
+  302 set 75 80 149 io_in_bits_rm
+  303 set 75 81 92 io_in_bits_fmaCmd
+  304 set 75 82 177 io_in_bits_in1
+  305 set 75 83 183 io_in_bits_in2
+  306 set 75 84 190 io_in_bits_in3
+  307 set 91 72 5 io_uopc
+  308 set 93 94 193 io_in_valid
+  309 set 93 95 45 io_in_bits_ren2
+  310 set 93 96 49 io_in_bits_typeTagOut
+  311 set 93 97 54 io_in_bits_wflags
+  312 set 93 98 149 io_in_bits_rm
+  313 set 93 99 167 io_in_bits_typ
+  314 set 93 100 247 io_in_bits_fmt
+  315 set 93 101 222 io_in_bits_in1
+  316 set 93 102 245 io_in_bits_in2
+  317 set 109 110 2 reset
+  318 set 109 111 257 io_in_valid
+  319 set 109 112 45 io_in_bits_ren2
+  320 set 109 113 49 io_in_bits_typeTagOut
+  321 set 109 114 54 io_in_bits_wflags
+  322 set 109 115 149 io_in_bits_rm
+  323 set 109 116 222 io_in_bits_in1
+  324 set 109 117 245 io_in_bits_in2
+  325 set 109 118 106 io_lt
+  326 output 283 io_resp_bits_data
+  327 output 264 io_resp_bits_fflags_valid
+  328 output 286 io_resp_bits_fflags_bits_flags
+  329 next 1 14 249
+  330 ite 1 2 146 14
+  331 next 1 15 330
+  332 next 16 17 250
+  333 next 18 19 251
+  334 ite 1 2 146 15
+  335 next 1 20 334
+  336 next 16 21 252
+  337 next 18 22 253
+  338 ite 1 2 146 20
+  339 next 1 23 338
+  340 next 16 24 254
+  341 next 18 25 255
+  342 ite 1 2 146 257 fpmu.io_in_valid
+  343 next 1 26 342
+  344 next 1 27 258
+  345 ite 1 2 146 26
+  346 next 1 28 345
+  347 next 1 29 259
+  348 ite 1 2 146 28
+  349 next 1 30 348
+  350 next 1 31 260
+  351 next 1 32 261
+}

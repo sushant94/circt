@@ -1,0 +1,84 @@
+
+module FMADecoder {
+  1 sort bitvec 7
+  2 input 1 io_uopc
+  3 sort bitvec 3
+  4 consth 3 0
+  5 sort bitvec 4
+  6 consth 5 0
+  7 sort bitvec 6
+  8 consth 7 3F
+  9 consth 1 7F
+  10 slice 7 2 5 0
+  11 xor 7 10 8 decoder_decoded_invInputs
+  12 sort bitvec 1
+  13 slice 12 11 0 0 decoder_decoded_andMatrixOutputs_andMatrixInput_0
+  14 slice 12 11 1 1 decoder_decoded_andMatrixOutputs_andMatrixInput_1
+  15 slice 12 11 2 2 decoder_decoded_andMatrixOutputs_andMatrixInput_2
+  16 slice 12 2 3 3 decoder_decoded_andMatrixOutputs_andMatrixInput_3
+  17 slice 12 2 4 4 decoder_decoded_andMatrixOutputs_andMatrixInput_4
+  18 slice 12 11 5 5 decoder_decoded_andMatrixOutputs_andMatrixInput_5
+  19 slice 12 2 6 6 decoder_decoded_andMatrixOutputs_andMatrixInput_6
+  20 sort bitvec 2
+  21 concat 20 13 14
+  22 concat 3 21 15
+  23 concat 5 22 16
+  24 sort bitvec 5
+  25 concat 24 23 17
+  26 concat 7 25 18
+  27 concat 1 26 19 _decoder_decoded_andMatrixOutputs_T
+  28 eq 12 27 9 decoder_decoded_andMatrixOutputs_6_2
+  29 slice 12 2 0 0 decoder_decoded_andMatrixOutputs_andMatrixInput_0_1
+  30 slice 12 2 1 1 decoder_decoded_andMatrixOutputs_andMatrixInput_1_1
+  31 concat 20 29 30
+  32 concat 3 31 16
+  33 concat 5 32 17
+  34 concat 24 33 18
+  35 concat 7 34 19 _decoder_decoded_andMatrixOutputs_T_1
+  36 eq 12 35 8 decoder_decoded_andMatrixOutputs_0_2
+  37 slice 12 2 2 2 decoder_decoded_andMatrixOutputs_andMatrixInput_1_2
+  38 concat 20 30 37
+  39 concat 3 38 16
+  40 concat 5 39 17
+  41 concat 24 40 18
+  42 concat 7 41 19 _decoder_decoded_andMatrixOutputs_T_2
+  43 eq 12 42 8 decoder_decoded_andMatrixOutputs_1_2
+  44 concat 20 29 30
+  45 concat 3 44 37
+  46 concat 5 45 16
+  47 concat 24 46 17
+  48 concat 7 47 18
+  49 concat 1 48 19 _decoder_decoded_andMatrixOutputs_T_3
+  50 eq 12 49 9 decoder_decoded_andMatrixOutputs_2_2
+  51 slice 12 11 3 3 decoder_decoded_andMatrixOutputs_andMatrixInput_2_4
+  52 slice 12 11 4 4 decoder_decoded_andMatrixOutputs_andMatrixInput_3_4
+  53 slice 12 2 5 5 decoder_decoded_andMatrixOutputs_andMatrixInput_4_4
+  54 concat 20 13 14
+  55 concat 3 54 51
+  56 concat 5 55 52
+  57 concat 24 56 53
+  58 concat 7 57 19 _decoder_decoded_andMatrixOutputs_T_4
+  59 eq 12 58 8 decoder_decoded_andMatrixOutputs_4_2
+  60 concat 20 30 15
+  61 concat 3 60 51
+  62 concat 5 61 52
+  63 concat 24 62 53
+  64 concat 7 63 19 _decoder_decoded_andMatrixOutputs_T_5
+  65 eq 12 64 8 decoder_decoded_andMatrixOutputs_3_2
+  66 concat 20 29 30
+  67 concat 3 66 15
+  68 concat 5 67 51
+  69 concat 24 68 52
+  70 concat 7 69 53
+  71 concat 1 70 19 _decoder_decoded_andMatrixOutputs_T_6
+  72 eq 12 71 9 decoder_decoded_andMatrixOutputs_5_2
+  73 concat 20 28 36
+  74 concat 3 73 43
+  75 concat 5 74 65 _decoder_decoded_orMatrixOutputs_T
+  76 neq 12 75 6 _decoder_decoded_orMatrixOutputs_T_1
+  77 concat 20 50 59
+  78 concat 3 77 72 _decoder_decoded_orMatrixOutputs_T_2
+  79 neq 12 78 4 _decoder_decoded_orMatrixOutputs_T_3
+  80 concat 20 79 76 decoder_0
+  81 output 80 io_cmd
+}

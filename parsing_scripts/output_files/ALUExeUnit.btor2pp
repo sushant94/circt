@@ -1,0 +1,879 @@
+include MemAddrCalcUnit.btor2pp
+
+module ALUExeUnit {
+  1 sort bitvec 1
+  2 input 1 reset
+  3 input 1 io_req_valid
+  4 sort bitvec 7
+  5 input 4 io_req_bits_uop_uopc
+  6 sort bitvec 32
+  7 input 6 io_req_bits_uop_inst
+  8 input 6 io_req_bits_uop_debug_inst
+  9 input 1 io_req_bits_uop_is_rvc
+  10 sort bitvec 40
+  11 input 10 io_req_bits_uop_debug_pc
+  12 sort bitvec 3
+  13 input 12 io_req_bits_uop_iq_type
+  14 sort bitvec 10
+  15 input 14 io_req_bits_uop_fu_code
+  16 sort bitvec 4
+  17 input 16 io_req_bits_uop_ctrl_br_type
+  18 sort bitvec 2
+  19 input 18 io_req_bits_uop_ctrl_op1_sel
+  20 input 12 io_req_bits_uop_ctrl_op2_sel
+  21 input 12 io_req_bits_uop_ctrl_imm_sel
+  22 sort bitvec 5
+  23 input 22 io_req_bits_uop_ctrl_op_fcn
+  24 input 1 io_req_bits_uop_ctrl_fcn_dw
+  25 input 12 io_req_bits_uop_ctrl_csr_cmd
+  26 input 1 io_req_bits_uop_ctrl_is_load
+  27 input 1 io_req_bits_uop_ctrl_is_sta
+  28 input 1 io_req_bits_uop_ctrl_is_std
+  29 input 18 io_req_bits_uop_iw_state
+  30 input 1 io_req_bits_uop_is_br
+  31 input 1 io_req_bits_uop_is_jalr
+  32 input 1 io_req_bits_uop_is_jal
+  33 input 1 io_req_bits_uop_is_sfb
+  34 sort bitvec 8
+  35 input 34 io_req_bits_uop_br_mask
+  36 input 12 io_req_bits_uop_br_tag
+  37 input 16 io_req_bits_uop_ftq_idx
+  38 input 1 io_req_bits_uop_edge_inst
+  39 sort bitvec 6
+  40 input 39 io_req_bits_uop_pc_lob
+  41 input 1 io_req_bits_uop_taken
+  42 sort bitvec 20
+  43 input 42 io_req_bits_uop_imm_packed
+  44 sort bitvec 12
+  45 input 44 io_req_bits_uop_csr_addr
+  46 input 22 io_req_bits_uop_rob_idx
+  47 input 12 io_req_bits_uop_ldq_idx
+  48 input 12 io_req_bits_uop_stq_idx
+  49 input 18 io_req_bits_uop_rxq_idx
+  50 input 39 io_req_bits_uop_pdst
+  51 input 39 io_req_bits_uop_prs1
+  52 input 39 io_req_bits_uop_prs2
+  53 input 39 io_req_bits_uop_prs3
+  54 input 16 io_req_bits_uop_ppred
+  55 input 1 io_req_bits_uop_prs1_busy
+  56 input 1 io_req_bits_uop_prs2_busy
+  57 input 1 io_req_bits_uop_prs3_busy
+  58 input 1 io_req_bits_uop_ppred_busy
+  59 input 39 io_req_bits_uop_stale_pdst
+  60 input 1 io_req_bits_uop_exception
+  61 sort bitvec 64
+  62 input 61 io_req_bits_uop_exc_cause
+  63 input 1 io_req_bits_uop_bypassable
+  64 input 22 io_req_bits_uop_mem_cmd
+  65 input 18 io_req_bits_uop_mem_size
+  66 input 1 io_req_bits_uop_mem_signed
+  67 input 1 io_req_bits_uop_is_fence
+  68 input 1 io_req_bits_uop_is_fencei
+  69 input 1 io_req_bits_uop_is_amo
+  70 input 1 io_req_bits_uop_uses_ldq
+  71 input 1 io_req_bits_uop_uses_stq
+  72 input 1 io_req_bits_uop_is_sys_pc2epc
+  73 input 1 io_req_bits_uop_is_unique
+  74 input 1 io_req_bits_uop_flush_on_commit
+  75 input 1 io_req_bits_uop_ldst_is_rs1
+  76 input 39 io_req_bits_uop_ldst
+  77 input 39 io_req_bits_uop_lrs1
+  78 input 39 io_req_bits_uop_lrs2
+  79 input 39 io_req_bits_uop_lrs3
+  80 input 1 io_req_bits_uop_ldst_val
+  81 input 18 io_req_bits_uop_dst_rtype
+  82 input 18 io_req_bits_uop_lrs1_rtype
+  83 input 18 io_req_bits_uop_lrs2_rtype
+  84 input 1 io_req_bits_uop_frs3_en
+  85 input 1 io_req_bits_uop_fp_val
+  86 input 1 io_req_bits_uop_fp_single
+  87 input 1 io_req_bits_uop_xcpt_pf_if
+  88 input 1 io_req_bits_uop_xcpt_ae_if
+  89 input 1 io_req_bits_uop_xcpt_ma_if
+  90 input 1 io_req_bits_uop_bp_debug_if
+  91 input 1 io_req_bits_uop_bp_xcpt_if
+  92 input 18 io_req_bits_uop_debug_fsrc
+  93 input 18 io_req_bits_uop_debug_tsrc
+  94 sort bitvec 65
+  95 input 94 io_req_bits_rs1_data
+  96 input 94 io_req_bits_rs2_data
+  97 input 1 io_ll_fresp_ready
+  98 input 34 io_brupdate_b1_resolve_mask
+  99 input 34 io_brupdate_b1_mispredict_mask
+  100 input 1 io_lsu_io_iresp_valid
+  101 input 22 io_lsu_io_iresp_bits_uop_rob_idx
+  102 input 39 io_lsu_io_iresp_bits_uop_pdst
+  103 input 1 io_lsu_io_iresp_bits_uop_is_amo
+  104 input 1 io_lsu_io_iresp_bits_uop_uses_stq
+  105 input 18 io_lsu_io_iresp_bits_uop_dst_rtype
+  106 input 61 io_lsu_io_iresp_bits_data
+  107 input 1 io_lsu_io_iresp_bits_predicated
+  108 input 1 io_lsu_io_fresp_valid
+  109 input 4 io_lsu_io_fresp_bits_uop_uopc
+  110 input 6 io_lsu_io_fresp_bits_uop_inst
+  111 input 6 io_lsu_io_fresp_bits_uop_debug_inst
+  112 input 1 io_lsu_io_fresp_bits_uop_is_rvc
+  113 input 10 io_lsu_io_fresp_bits_uop_debug_pc
+  114 input 12 io_lsu_io_fresp_bits_uop_iq_type
+  115 input 14 io_lsu_io_fresp_bits_uop_fu_code
+  116 input 16 io_lsu_io_fresp_bits_uop_ctrl_br_type
+  117 input 18 io_lsu_io_fresp_bits_uop_ctrl_op1_sel
+  118 input 12 io_lsu_io_fresp_bits_uop_ctrl_op2_sel
+  119 input 12 io_lsu_io_fresp_bits_uop_ctrl_imm_sel
+  120 input 22 io_lsu_io_fresp_bits_uop_ctrl_op_fcn
+  121 input 1 io_lsu_io_fresp_bits_uop_ctrl_fcn_dw
+  122 input 12 io_lsu_io_fresp_bits_uop_ctrl_csr_cmd
+  123 input 1 io_lsu_io_fresp_bits_uop_ctrl_is_load
+  124 input 1 io_lsu_io_fresp_bits_uop_ctrl_is_sta
+  125 input 1 io_lsu_io_fresp_bits_uop_ctrl_is_std
+  126 input 18 io_lsu_io_fresp_bits_uop_iw_state
+  127 input 1 io_lsu_io_fresp_bits_uop_iw_p1_poisoned
+  128 input 1 io_lsu_io_fresp_bits_uop_iw_p2_poisoned
+  129 input 1 io_lsu_io_fresp_bits_uop_is_br
+  130 input 1 io_lsu_io_fresp_bits_uop_is_jalr
+  131 input 1 io_lsu_io_fresp_bits_uop_is_jal
+  132 input 1 io_lsu_io_fresp_bits_uop_is_sfb
+  133 input 34 io_lsu_io_fresp_bits_uop_br_mask
+  134 input 12 io_lsu_io_fresp_bits_uop_br_tag
+  135 input 16 io_lsu_io_fresp_bits_uop_ftq_idx
+  136 input 1 io_lsu_io_fresp_bits_uop_edge_inst
+  137 input 39 io_lsu_io_fresp_bits_uop_pc_lob
+  138 input 1 io_lsu_io_fresp_bits_uop_taken
+  139 input 42 io_lsu_io_fresp_bits_uop_imm_packed
+  140 input 44 io_lsu_io_fresp_bits_uop_csr_addr
+  141 input 22 io_lsu_io_fresp_bits_uop_rob_idx
+  142 input 12 io_lsu_io_fresp_bits_uop_ldq_idx
+  143 input 12 io_lsu_io_fresp_bits_uop_stq_idx
+  144 input 18 io_lsu_io_fresp_bits_uop_rxq_idx
+  145 input 39 io_lsu_io_fresp_bits_uop_pdst
+  146 input 39 io_lsu_io_fresp_bits_uop_prs1
+  147 input 39 io_lsu_io_fresp_bits_uop_prs2
+  148 input 39 io_lsu_io_fresp_bits_uop_prs3
+  149 input 16 io_lsu_io_fresp_bits_uop_ppred
+  150 input 1 io_lsu_io_fresp_bits_uop_prs1_busy
+  151 input 1 io_lsu_io_fresp_bits_uop_prs2_busy
+  152 input 1 io_lsu_io_fresp_bits_uop_prs3_busy
+  153 input 1 io_lsu_io_fresp_bits_uop_ppred_busy
+  154 input 39 io_lsu_io_fresp_bits_uop_stale_pdst
+  155 input 1 io_lsu_io_fresp_bits_uop_exception
+  156 input 61 io_lsu_io_fresp_bits_uop_exc_cause
+  157 input 1 io_lsu_io_fresp_bits_uop_bypassable
+  158 input 22 io_lsu_io_fresp_bits_uop_mem_cmd
+  159 input 18 io_lsu_io_fresp_bits_uop_mem_size
+  160 input 1 io_lsu_io_fresp_bits_uop_mem_signed
+  161 input 1 io_lsu_io_fresp_bits_uop_is_fence
+  162 input 1 io_lsu_io_fresp_bits_uop_is_fencei
+  163 input 1 io_lsu_io_fresp_bits_uop_is_amo
+  164 input 1 io_lsu_io_fresp_bits_uop_uses_ldq
+  165 input 1 io_lsu_io_fresp_bits_uop_uses_stq
+  166 input 1 io_lsu_io_fresp_bits_uop_is_sys_pc2epc
+  167 input 1 io_lsu_io_fresp_bits_uop_is_unique
+  168 input 1 io_lsu_io_fresp_bits_uop_flush_on_commit
+  169 input 1 io_lsu_io_fresp_bits_uop_ldst_is_rs1
+  170 input 39 io_lsu_io_fresp_bits_uop_ldst
+  171 input 39 io_lsu_io_fresp_bits_uop_lrs1
+  172 input 39 io_lsu_io_fresp_bits_uop_lrs2
+  173 input 39 io_lsu_io_fresp_bits_uop_lrs3
+  174 input 1 io_lsu_io_fresp_bits_uop_ldst_val
+  175 input 18 io_lsu_io_fresp_bits_uop_dst_rtype
+  176 input 18 io_lsu_io_fresp_bits_uop_lrs1_rtype
+  177 input 18 io_lsu_io_fresp_bits_uop_lrs2_rtype
+  178 input 1 io_lsu_io_fresp_bits_uop_frs3_en
+  179 input 1 io_lsu_io_fresp_bits_uop_fp_val
+  180 input 1 io_lsu_io_fresp_bits_uop_fp_single
+  181 input 1 io_lsu_io_fresp_bits_uop_xcpt_pf_if
+  182 input 1 io_lsu_io_fresp_bits_uop_xcpt_ae_if
+  183 input 1 io_lsu_io_fresp_bits_uop_xcpt_ma_if
+  184 input 1 io_lsu_io_fresp_bits_uop_bp_debug_if
+  185 input 1 io_lsu_io_fresp_bits_uop_bp_xcpt_if
+  186 input 18 io_lsu_io_fresp_bits_uop_debug_fsrc
+  187 input 18 io_lsu_io_fresp_bits_uop_debug_tsrc
+  188 input 94 io_lsu_io_fresp_bits_data
+  189 input 1 io_lsu_io_fresp_bits_predicated
+  190 input 1 io_lsu_io_fresp_bits_fflags_valid
+  191 input 4 io_lsu_io_fresp_bits_fflags_bits_uop_uopc
+  192 input 6 io_lsu_io_fresp_bits_fflags_bits_uop_inst
+  193 input 6 io_lsu_io_fresp_bits_fflags_bits_uop_debug_inst
+  194 input 1 io_lsu_io_fresp_bits_fflags_bits_uop_is_rvc
+  195 input 10 io_lsu_io_fresp_bits_fflags_bits_uop_debug_pc
+  196 input 12 io_lsu_io_fresp_bits_fflags_bits_uop_iq_type
+  197 input 14 io_lsu_io_fresp_bits_fflags_bits_uop_fu_code
+  198 input 16 io_lsu_io_fresp_bits_fflags_bits_uop_ctrl_br_type
+  199 input 18 io_lsu_io_fresp_bits_fflags_bits_uop_ctrl_op1_sel
+  200 input 12 io_lsu_io_fresp_bits_fflags_bits_uop_ctrl_op2_sel
+  201 input 12 io_lsu_io_fresp_bits_fflags_bits_uop_ctrl_imm_sel
+  202 input 22 io_lsu_io_fresp_bits_fflags_bits_uop_ctrl_op_fcn
+  203 input 1 io_lsu_io_fresp_bits_fflags_bits_uop_ctrl_fcn_dw
+  204 input 12 io_lsu_io_fresp_bits_fflags_bits_uop_ctrl_csr_cmd
+  205 input 1 io_lsu_io_fresp_bits_fflags_bits_uop_ctrl_is_load
+  206 input 1 io_lsu_io_fresp_bits_fflags_bits_uop_ctrl_is_sta
+  207 input 1 io_lsu_io_fresp_bits_fflags_bits_uop_ctrl_is_std
+  208 input 18 io_lsu_io_fresp_bits_fflags_bits_uop_iw_state
+  209 input 1 io_lsu_io_fresp_bits_fflags_bits_uop_iw_p1_poisoned
+  210 input 1 io_lsu_io_fresp_bits_fflags_bits_uop_iw_p2_poisoned
+  211 input 1 io_lsu_io_fresp_bits_fflags_bits_uop_is_br
+  212 input 1 io_lsu_io_fresp_bits_fflags_bits_uop_is_jalr
+  213 input 1 io_lsu_io_fresp_bits_fflags_bits_uop_is_jal
+  214 input 1 io_lsu_io_fresp_bits_fflags_bits_uop_is_sfb
+  215 input 34 io_lsu_io_fresp_bits_fflags_bits_uop_br_mask
+  216 input 12 io_lsu_io_fresp_bits_fflags_bits_uop_br_tag
+  217 input 16 io_lsu_io_fresp_bits_fflags_bits_uop_ftq_idx
+  218 input 1 io_lsu_io_fresp_bits_fflags_bits_uop_edge_inst
+  219 input 39 io_lsu_io_fresp_bits_fflags_bits_uop_pc_lob
+  220 input 1 io_lsu_io_fresp_bits_fflags_bits_uop_taken
+  221 input 42 io_lsu_io_fresp_bits_fflags_bits_uop_imm_packed
+  222 input 44 io_lsu_io_fresp_bits_fflags_bits_uop_csr_addr
+  223 input 22 io_lsu_io_fresp_bits_fflags_bits_uop_rob_idx
+  224 input 12 io_lsu_io_fresp_bits_fflags_bits_uop_ldq_idx
+  225 input 12 io_lsu_io_fresp_bits_fflags_bits_uop_stq_idx
+  226 input 18 io_lsu_io_fresp_bits_fflags_bits_uop_rxq_idx
+  227 input 39 io_lsu_io_fresp_bits_fflags_bits_uop_pdst
+  228 input 39 io_lsu_io_fresp_bits_fflags_bits_uop_prs1
+  229 input 39 io_lsu_io_fresp_bits_fflags_bits_uop_prs2
+  230 input 39 io_lsu_io_fresp_bits_fflags_bits_uop_prs3
+  231 input 16 io_lsu_io_fresp_bits_fflags_bits_uop_ppred
+  232 input 1 io_lsu_io_fresp_bits_fflags_bits_uop_prs1_busy
+  233 input 1 io_lsu_io_fresp_bits_fflags_bits_uop_prs2_busy
+  234 input 1 io_lsu_io_fresp_bits_fflags_bits_uop_prs3_busy
+  235 input 1 io_lsu_io_fresp_bits_fflags_bits_uop_ppred_busy
+  236 input 39 io_lsu_io_fresp_bits_fflags_bits_uop_stale_pdst
+  237 input 1 io_lsu_io_fresp_bits_fflags_bits_uop_exception
+  238 input 61 io_lsu_io_fresp_bits_fflags_bits_uop_exc_cause
+  239 input 1 io_lsu_io_fresp_bits_fflags_bits_uop_bypassable
+  240 input 22 io_lsu_io_fresp_bits_fflags_bits_uop_mem_cmd
+  241 input 18 io_lsu_io_fresp_bits_fflags_bits_uop_mem_size
+  242 input 1 io_lsu_io_fresp_bits_fflags_bits_uop_mem_signed
+  243 input 1 io_lsu_io_fresp_bits_fflags_bits_uop_is_fence
+  244 input 1 io_lsu_io_fresp_bits_fflags_bits_uop_is_fencei
+  245 input 1 io_lsu_io_fresp_bits_fflags_bits_uop_is_amo
+  246 input 1 io_lsu_io_fresp_bits_fflags_bits_uop_uses_ldq
+  247 input 1 io_lsu_io_fresp_bits_fflags_bits_uop_uses_stq
+  248 input 1 io_lsu_io_fresp_bits_fflags_bits_uop_is_sys_pc2epc
+  249 input 1 io_lsu_io_fresp_bits_fflags_bits_uop_is_unique
+  250 input 1 io_lsu_io_fresp_bits_fflags_bits_uop_flush_on_commit
+  251 input 1 io_lsu_io_fresp_bits_fflags_bits_uop_ldst_is_rs1
+  252 input 39 io_lsu_io_fresp_bits_fflags_bits_uop_ldst
+  253 input 39 io_lsu_io_fresp_bits_fflags_bits_uop_lrs1
+  254 input 39 io_lsu_io_fresp_bits_fflags_bits_uop_lrs2
+  255 input 39 io_lsu_io_fresp_bits_fflags_bits_uop_lrs3
+  256 input 1 io_lsu_io_fresp_bits_fflags_bits_uop_ldst_val
+  257 input 18 io_lsu_io_fresp_bits_fflags_bits_uop_dst_rtype
+  258 input 18 io_lsu_io_fresp_bits_fflags_bits_uop_lrs1_rtype
+  259 input 18 io_lsu_io_fresp_bits_fflags_bits_uop_lrs2_rtype
+  260 input 1 io_lsu_io_fresp_bits_fflags_bits_uop_frs3_en
+  261 input 1 io_lsu_io_fresp_bits_fflags_bits_uop_fp_val
+  262 input 1 io_lsu_io_fresp_bits_fflags_bits_uop_fp_single
+  263 input 1 io_lsu_io_fresp_bits_fflags_bits_uop_xcpt_pf_if
+  264 input 1 io_lsu_io_fresp_bits_fflags_bits_uop_xcpt_ae_if
+  265 input 1 io_lsu_io_fresp_bits_fflags_bits_uop_xcpt_ma_if
+  266 input 1 io_lsu_io_fresp_bits_fflags_bits_uop_bp_debug_if
+  267 input 1 io_lsu_io_fresp_bits_fflags_bits_uop_bp_xcpt_if
+  268 input 18 io_lsu_io_fresp_bits_fflags_bits_uop_debug_fsrc
+  269 input 18 io_lsu_io_fresp_bits_fflags_bits_uop_debug_tsrc
+  270 input 22 io_lsu_io_fresp_bits_fflags_bits_flags
+  271 inst MemAddrCalcUnit maddrcalc
+  272 ref MemAddrCalcUnit 2 reset
+  273 ref MemAddrCalcUnit 3 io_req_valid
+  274 ref MemAddrCalcUnit 5 io_req_bits_uop_uopc
+  275 ref MemAddrCalcUnit 7 io_req_bits_uop_inst
+  276 ref MemAddrCalcUnit 8 io_req_bits_uop_debug_inst
+  277 ref MemAddrCalcUnit 9 io_req_bits_uop_is_rvc
+  278 ref MemAddrCalcUnit 11 io_req_bits_uop_debug_pc
+  279 ref MemAddrCalcUnit 13 io_req_bits_uop_iq_type
+  280 ref MemAddrCalcUnit 15 io_req_bits_uop_fu_code
+  281 ref MemAddrCalcUnit 17 io_req_bits_uop_ctrl_br_type
+  282 ref MemAddrCalcUnit 19 io_req_bits_uop_ctrl_op1_sel
+  283 ref MemAddrCalcUnit 20 io_req_bits_uop_ctrl_op2_sel
+  284 ref MemAddrCalcUnit 21 io_req_bits_uop_ctrl_imm_sel
+  285 ref MemAddrCalcUnit 23 io_req_bits_uop_ctrl_op_fcn
+  286 ref MemAddrCalcUnit 24 io_req_bits_uop_ctrl_fcn_dw
+  287 ref MemAddrCalcUnit 25 io_req_bits_uop_ctrl_csr_cmd
+  288 ref MemAddrCalcUnit 26 io_req_bits_uop_ctrl_is_load
+  289 ref MemAddrCalcUnit 27 io_req_bits_uop_ctrl_is_sta
+  290 ref MemAddrCalcUnit 28 io_req_bits_uop_ctrl_is_std
+  291 ref MemAddrCalcUnit 29 io_req_bits_uop_iw_state
+  292 ref MemAddrCalcUnit 30 io_req_bits_uop_is_br
+  293 ref MemAddrCalcUnit 31 io_req_bits_uop_is_jalr
+  294 ref MemAddrCalcUnit 32 io_req_bits_uop_is_jal
+  295 ref MemAddrCalcUnit 33 io_req_bits_uop_is_sfb
+  296 ref MemAddrCalcUnit 35 io_req_bits_uop_br_mask
+  297 ref MemAddrCalcUnit 36 io_req_bits_uop_br_tag
+  298 ref MemAddrCalcUnit 37 io_req_bits_uop_ftq_idx
+  299 ref MemAddrCalcUnit 38 io_req_bits_uop_edge_inst
+  300 ref MemAddrCalcUnit 40 io_req_bits_uop_pc_lob
+  301 ref MemAddrCalcUnit 41 io_req_bits_uop_taken
+  302 ref MemAddrCalcUnit 43 io_req_bits_uop_imm_packed
+  303 ref MemAddrCalcUnit 45 io_req_bits_uop_csr_addr
+  304 ref MemAddrCalcUnit 46 io_req_bits_uop_rob_idx
+  305 ref MemAddrCalcUnit 47 io_req_bits_uop_ldq_idx
+  306 ref MemAddrCalcUnit 48 io_req_bits_uop_stq_idx
+  307 ref MemAddrCalcUnit 49 io_req_bits_uop_rxq_idx
+  308 ref MemAddrCalcUnit 50 io_req_bits_uop_pdst
+  309 ref MemAddrCalcUnit 51 io_req_bits_uop_prs1
+  310 ref MemAddrCalcUnit 52 io_req_bits_uop_prs2
+  311 ref MemAddrCalcUnit 53 io_req_bits_uop_prs3
+  312 ref MemAddrCalcUnit 54 io_req_bits_uop_ppred
+  313 ref MemAddrCalcUnit 55 io_req_bits_uop_prs1_busy
+  314 ref MemAddrCalcUnit 56 io_req_bits_uop_prs2_busy
+  315 ref MemAddrCalcUnit 57 io_req_bits_uop_prs3_busy
+  316 ref MemAddrCalcUnit 58 io_req_bits_uop_ppred_busy
+  317 ref MemAddrCalcUnit 59 io_req_bits_uop_stale_pdst
+  318 ref MemAddrCalcUnit 60 io_req_bits_uop_exception
+  319 ref MemAddrCalcUnit 62 io_req_bits_uop_exc_cause
+  320 ref MemAddrCalcUnit 63 io_req_bits_uop_bypassable
+  321 ref MemAddrCalcUnit 64 io_req_bits_uop_mem_cmd
+  322 ref MemAddrCalcUnit 65 io_req_bits_uop_mem_size
+  323 ref MemAddrCalcUnit 66 io_req_bits_uop_mem_signed
+  324 ref MemAddrCalcUnit 67 io_req_bits_uop_is_fence
+  325 ref MemAddrCalcUnit 68 io_req_bits_uop_is_fencei
+  326 ref MemAddrCalcUnit 69 io_req_bits_uop_is_amo
+  327 ref MemAddrCalcUnit 70 io_req_bits_uop_uses_ldq
+  328 ref MemAddrCalcUnit 71 io_req_bits_uop_uses_stq
+  329 ref MemAddrCalcUnit 72 io_req_bits_uop_is_sys_pc2epc
+  330 ref MemAddrCalcUnit 73 io_req_bits_uop_is_unique
+  331 ref MemAddrCalcUnit 74 io_req_bits_uop_flush_on_commit
+  332 ref MemAddrCalcUnit 75 io_req_bits_uop_ldst_is_rs1
+  333 ref MemAddrCalcUnit 76 io_req_bits_uop_ldst
+  334 ref MemAddrCalcUnit 77 io_req_bits_uop_lrs1
+  335 ref MemAddrCalcUnit 78 io_req_bits_uop_lrs2
+  336 ref MemAddrCalcUnit 79 io_req_bits_uop_lrs3
+  337 ref MemAddrCalcUnit 80 io_req_bits_uop_ldst_val
+  338 ref MemAddrCalcUnit 81 io_req_bits_uop_dst_rtype
+  339 ref MemAddrCalcUnit 82 io_req_bits_uop_lrs1_rtype
+  340 ref MemAddrCalcUnit 83 io_req_bits_uop_lrs2_rtype
+  341 ref MemAddrCalcUnit 84 io_req_bits_uop_frs3_en
+  342 ref MemAddrCalcUnit 85 io_req_bits_uop_fp_val
+  343 ref MemAddrCalcUnit 86 io_req_bits_uop_fp_single
+  344 ref MemAddrCalcUnit 87 io_req_bits_uop_xcpt_pf_if
+  345 ref MemAddrCalcUnit 88 io_req_bits_uop_xcpt_ae_if
+  346 ref MemAddrCalcUnit 89 io_req_bits_uop_xcpt_ma_if
+  347 ref MemAddrCalcUnit 90 io_req_bits_uop_bp_debug_if
+  348 ref MemAddrCalcUnit 91 io_req_bits_uop_bp_xcpt_if
+  349 ref MemAddrCalcUnit 92 io_req_bits_uop_debug_fsrc
+  350 ref MemAddrCalcUnit 93 io_req_bits_uop_debug_tsrc
+  351 ref MemAddrCalcUnit 95 io_req_bits_rs1_data
+  352 ref MemAddrCalcUnit 96 io_req_bits_rs2_data
+  353 ref MemAddrCalcUnit 97 io_brupdate_b1_resolve_mask
+  354 ref MemAddrCalcUnit 98 io_brupdate_b1_mispredict_mask
+  355 ref MemAddrCalcUnit 197 io_resp_valid
+  356 ref MemAddrCalcUnit 198 io_resp_bits_uop_uopc
+  357 ref MemAddrCalcUnit 199 io_resp_bits_uop_inst
+  358 ref MemAddrCalcUnit 200 io_resp_bits_uop_debug_inst
+  359 ref MemAddrCalcUnit 201 io_resp_bits_uop_is_rvc
+  360 ref MemAddrCalcUnit 202 io_resp_bits_uop_debug_pc
+  361 ref MemAddrCalcUnit 203 io_resp_bits_uop_iq_type
+  362 ref MemAddrCalcUnit 204 io_resp_bits_uop_fu_code
+  363 ref MemAddrCalcUnit 205 io_resp_bits_uop_ctrl_br_type
+  364 ref MemAddrCalcUnit 206 io_resp_bits_uop_ctrl_op1_sel
+  365 ref MemAddrCalcUnit 207 io_resp_bits_uop_ctrl_op2_sel
+  366 ref MemAddrCalcUnit 208 io_resp_bits_uop_ctrl_imm_sel
+  367 ref MemAddrCalcUnit 209 io_resp_bits_uop_ctrl_op_fcn
+  368 ref MemAddrCalcUnit 210 io_resp_bits_uop_ctrl_fcn_dw
+  369 ref MemAddrCalcUnit 211 io_resp_bits_uop_ctrl_csr_cmd
+  370 ref MemAddrCalcUnit 212 io_resp_bits_uop_ctrl_is_load
+  371 ref MemAddrCalcUnit 213 io_resp_bits_uop_ctrl_is_sta
+  372 ref MemAddrCalcUnit 214 io_resp_bits_uop_ctrl_is_std
+  373 ref MemAddrCalcUnit 215 io_resp_bits_uop_iw_state
+  374 ref MemAddrCalcUnit 216 io_resp_bits_uop_is_br
+  375 ref MemAddrCalcUnit 217 io_resp_bits_uop_is_jalr
+  376 ref MemAddrCalcUnit 218 io_resp_bits_uop_is_jal
+  377 ref MemAddrCalcUnit 219 io_resp_bits_uop_is_sfb
+  378 ref MemAddrCalcUnit 220 io_resp_bits_uop_br_mask
+  379 ref MemAddrCalcUnit 221 io_resp_bits_uop_br_tag
+  380 ref MemAddrCalcUnit 222 io_resp_bits_uop_ftq_idx
+  381 ref MemAddrCalcUnit 223 io_resp_bits_uop_edge_inst
+  382 ref MemAddrCalcUnit 224 io_resp_bits_uop_pc_lob
+  383 ref MemAddrCalcUnit 225 io_resp_bits_uop_taken
+  384 ref MemAddrCalcUnit 226 io_resp_bits_uop_imm_packed
+  385 ref MemAddrCalcUnit 227 io_resp_bits_uop_csr_addr
+  386 ref MemAddrCalcUnit 228 io_resp_bits_uop_rob_idx
+  387 ref MemAddrCalcUnit 229 io_resp_bits_uop_ldq_idx
+  388 ref MemAddrCalcUnit 230 io_resp_bits_uop_stq_idx
+  389 ref MemAddrCalcUnit 231 io_resp_bits_uop_rxq_idx
+  390 ref MemAddrCalcUnit 232 io_resp_bits_uop_pdst
+  391 ref MemAddrCalcUnit 233 io_resp_bits_uop_prs1
+  392 ref MemAddrCalcUnit 234 io_resp_bits_uop_prs2
+  393 ref MemAddrCalcUnit 235 io_resp_bits_uop_prs3
+  394 ref MemAddrCalcUnit 236 io_resp_bits_uop_ppred
+  395 ref MemAddrCalcUnit 237 io_resp_bits_uop_prs1_busy
+  396 ref MemAddrCalcUnit 238 io_resp_bits_uop_prs2_busy
+  397 ref MemAddrCalcUnit 239 io_resp_bits_uop_prs3_busy
+  398 ref MemAddrCalcUnit 240 io_resp_bits_uop_ppred_busy
+  399 ref MemAddrCalcUnit 241 io_resp_bits_uop_stale_pdst
+  400 ref MemAddrCalcUnit 242 io_resp_bits_uop_exception
+  401 ref MemAddrCalcUnit 243 io_resp_bits_uop_exc_cause
+  402 ref MemAddrCalcUnit 244 io_resp_bits_uop_bypassable
+  403 ref MemAddrCalcUnit 245 io_resp_bits_uop_mem_cmd
+  404 ref MemAddrCalcUnit 246 io_resp_bits_uop_mem_size
+  405 ref MemAddrCalcUnit 247 io_resp_bits_uop_mem_signed
+  406 ref MemAddrCalcUnit 248 io_resp_bits_uop_is_fence
+  407 ref MemAddrCalcUnit 249 io_resp_bits_uop_is_fencei
+  408 ref MemAddrCalcUnit 250 io_resp_bits_uop_is_amo
+  409 ref MemAddrCalcUnit 251 io_resp_bits_uop_uses_ldq
+  410 ref MemAddrCalcUnit 252 io_resp_bits_uop_uses_stq
+  411 ref MemAddrCalcUnit 253 io_resp_bits_uop_is_sys_pc2epc
+  412 ref MemAddrCalcUnit 254 io_resp_bits_uop_is_unique
+  413 ref MemAddrCalcUnit 255 io_resp_bits_uop_flush_on_commit
+  414 ref MemAddrCalcUnit 256 io_resp_bits_uop_ldst_is_rs1
+  415 ref MemAddrCalcUnit 257 io_resp_bits_uop_ldst
+  416 ref MemAddrCalcUnit 258 io_resp_bits_uop_lrs1
+  417 ref MemAddrCalcUnit 259 io_resp_bits_uop_lrs2
+  418 ref MemAddrCalcUnit 260 io_resp_bits_uop_lrs3
+  419 ref MemAddrCalcUnit 261 io_resp_bits_uop_ldst_val
+  420 ref MemAddrCalcUnit 262 io_resp_bits_uop_dst_rtype
+  421 ref MemAddrCalcUnit 263 io_resp_bits_uop_lrs1_rtype
+  422 ref MemAddrCalcUnit 264 io_resp_bits_uop_lrs2_rtype
+  423 ref MemAddrCalcUnit 265 io_resp_bits_uop_frs3_en
+  424 ref MemAddrCalcUnit 266 io_resp_bits_uop_fp_val
+  425 ref MemAddrCalcUnit 267 io_resp_bits_uop_fp_single
+  426 ref MemAddrCalcUnit 268 io_resp_bits_uop_xcpt_pf_if
+  427 ref MemAddrCalcUnit 269 io_resp_bits_uop_xcpt_ae_if
+  428 ref MemAddrCalcUnit 270 io_resp_bits_uop_xcpt_ma_if
+  429 ref MemAddrCalcUnit 271 io_resp_bits_uop_bp_debug_if
+  430 ref MemAddrCalcUnit 272 io_resp_bits_uop_bp_xcpt_if
+  431 ref MemAddrCalcUnit 273 io_resp_bits_uop_debug_fsrc
+  432 ref MemAddrCalcUnit 274 io_resp_bits_uop_debug_tsrc
+  433 ref MemAddrCalcUnit 275 io_resp_bits_data
+  434 ref MemAddrCalcUnit 276 io_resp_bits_addr
+  435 ref MemAddrCalcUnit 277 io_resp_bits_mxcpt_valid
+  436 ref MemAddrCalcUnit 278 io_resp_bits_mxcpt_bits
+  437 ref MemAddrCalcUnit 279 io_resp_bits_sfence_valid
+  438 ref MemAddrCalcUnit 280 io_resp_bits_sfence_bits_rs1
+  439 ref MemAddrCalcUnit 281 io_resp_bits_sfence_bits_rs2
+  440 ref MemAddrCalcUnit 282 io_resp_bits_sfence_bits_addr
+  441 ref MemAddrCalcUnit 283 io_resp_bits_sfence_bits_asid
+  442 get 271 355 io_resp_valid
+  443 get 271 356 io_resp_bits_uop_uopc
+  444 get 271 357 io_resp_bits_uop_inst
+  445 get 271 358 io_resp_bits_uop_debug_inst
+  446 get 271 359 io_resp_bits_uop_is_rvc
+  447 get 271 360 io_resp_bits_uop_debug_pc
+  448 get 271 361 io_resp_bits_uop_iq_type
+  449 get 271 362 io_resp_bits_uop_fu_code
+  450 get 271 363 io_resp_bits_uop_ctrl_br_type
+  451 get 271 364 io_resp_bits_uop_ctrl_op1_sel
+  452 get 271 365 io_resp_bits_uop_ctrl_op2_sel
+  453 get 271 366 io_resp_bits_uop_ctrl_imm_sel
+  454 get 271 367 io_resp_bits_uop_ctrl_op_fcn
+  455 get 271 368 io_resp_bits_uop_ctrl_fcn_dw
+  456 get 271 369 io_resp_bits_uop_ctrl_csr_cmd
+  457 get 271 370 io_resp_bits_uop_ctrl_is_load
+  458 get 271 371 io_resp_bits_uop_ctrl_is_sta
+  459 get 271 372 io_resp_bits_uop_ctrl_is_std
+  460 get 271 373 io_resp_bits_uop_iw_state
+  461 get 271 374 io_resp_bits_uop_is_br
+  462 get 271 375 io_resp_bits_uop_is_jalr
+  463 get 271 376 io_resp_bits_uop_is_jal
+  464 get 271 377 io_resp_bits_uop_is_sfb
+  465 get 271 378 io_resp_bits_uop_br_mask
+  466 get 271 379 io_resp_bits_uop_br_tag
+  467 get 271 380 io_resp_bits_uop_ftq_idx
+  468 get 271 381 io_resp_bits_uop_edge_inst
+  469 get 271 382 io_resp_bits_uop_pc_lob
+  470 get 271 383 io_resp_bits_uop_taken
+  471 get 271 384 io_resp_bits_uop_imm_packed
+  472 get 271 385 io_resp_bits_uop_csr_addr
+  473 get 271 386 io_resp_bits_uop_rob_idx
+  474 get 271 387 io_resp_bits_uop_ldq_idx
+  475 get 271 388 io_resp_bits_uop_stq_idx
+  476 get 271 389 io_resp_bits_uop_rxq_idx
+  477 get 271 390 io_resp_bits_uop_pdst
+  478 get 271 391 io_resp_bits_uop_prs1
+  479 get 271 392 io_resp_bits_uop_prs2
+  480 get 271 393 io_resp_bits_uop_prs3
+  481 get 271 394 io_resp_bits_uop_ppred
+  482 get 271 395 io_resp_bits_uop_prs1_busy
+  483 get 271 396 io_resp_bits_uop_prs2_busy
+  484 get 271 397 io_resp_bits_uop_prs3_busy
+  485 get 271 398 io_resp_bits_uop_ppred_busy
+  486 get 271 399 io_resp_bits_uop_stale_pdst
+  487 get 271 400 io_resp_bits_uop_exception
+  488 get 271 401 io_resp_bits_uop_exc_cause
+  489 get 271 402 io_resp_bits_uop_bypassable
+  490 get 271 403 io_resp_bits_uop_mem_cmd
+  491 get 271 404 io_resp_bits_uop_mem_size
+  492 get 271 405 io_resp_bits_uop_mem_signed
+  493 get 271 406 io_resp_bits_uop_is_fence
+  494 get 271 407 io_resp_bits_uop_is_fencei
+  495 get 271 408 io_resp_bits_uop_is_amo
+  496 get 271 409 io_resp_bits_uop_uses_ldq
+  497 get 271 410 io_resp_bits_uop_uses_stq
+  498 get 271 411 io_resp_bits_uop_is_sys_pc2epc
+  499 get 271 412 io_resp_bits_uop_is_unique
+  500 get 271 413 io_resp_bits_uop_flush_on_commit
+  501 get 271 414 io_resp_bits_uop_ldst_is_rs1
+  502 get 271 415 io_resp_bits_uop_ldst
+  503 get 271 416 io_resp_bits_uop_lrs1
+  504 get 271 417 io_resp_bits_uop_lrs2
+  505 get 271 418 io_resp_bits_uop_lrs3
+  506 get 271 419 io_resp_bits_uop_ldst_val
+  507 get 271 420 io_resp_bits_uop_dst_rtype
+  508 get 271 421 io_resp_bits_uop_lrs1_rtype
+  509 get 271 422 io_resp_bits_uop_lrs2_rtype
+  510 get 271 423 io_resp_bits_uop_frs3_en
+  511 get 271 424 io_resp_bits_uop_fp_val
+  512 get 271 425 io_resp_bits_uop_fp_single
+  513 get 271 426 io_resp_bits_uop_xcpt_pf_if
+  514 get 271 427 io_resp_bits_uop_xcpt_ae_if
+  515 get 271 428 io_resp_bits_uop_xcpt_ma_if
+  516 get 271 429 io_resp_bits_uop_bp_debug_if
+  517 get 271 430 io_resp_bits_uop_bp_xcpt_if
+  518 get 271 431 io_resp_bits_uop_debug_fsrc
+  519 get 271 432 io_resp_bits_uop_debug_tsrc
+  520 get 271 433 io_resp_bits_data
+  521 get 271 434 io_resp_bits_addr
+  522 get 271 435 io_resp_bits_mxcpt_valid
+  523 get 271 436 io_resp_bits_mxcpt_bits
+  524 get 271 437 io_resp_bits_sfence_valid
+  525 get 271 438 io_resp_bits_sfence_bits_rs1
+  526 get 271 439 io_resp_bits_sfence_bits_rs2
+  527 get 271 440 io_resp_bits_sfence_bits_addr
+  528 get 271 441 io_resp_bits_sfence_bits_asid
+  529 consth 1 0
+  530 slice 1 15 2 2 _maddrcalc_io_req_valid_T_1
+  531 and 1 3 530 maddrcalc.io_req_valid
+  532 slice 61 520 63 0 io_lsu_io_req_bits_data
+  533 concat 94 529 106 io_ll_iresp_bits_data
+  534 set 271 272 2 reset
+  535 set 271 273 531 io_req_valid
+  536 set 271 274 5 io_req_bits_uop_uopc
+  537 set 271 275 7 io_req_bits_uop_inst
+  538 set 271 276 8 io_req_bits_uop_debug_inst
+  539 set 271 277 9 io_req_bits_uop_is_rvc
+  540 set 271 278 11 io_req_bits_uop_debug_pc
+  541 set 271 279 13 io_req_bits_uop_iq_type
+  542 set 271 280 15 io_req_bits_uop_fu_code
+  543 set 271 281 17 io_req_bits_uop_ctrl_br_type
+  544 set 271 282 19 io_req_bits_uop_ctrl_op1_sel
+  545 set 271 283 20 io_req_bits_uop_ctrl_op2_sel
+  546 set 271 284 21 io_req_bits_uop_ctrl_imm_sel
+  547 set 271 285 23 io_req_bits_uop_ctrl_op_fcn
+  548 set 271 286 24 io_req_bits_uop_ctrl_fcn_dw
+  549 set 271 287 25 io_req_bits_uop_ctrl_csr_cmd
+  550 set 271 288 26 io_req_bits_uop_ctrl_is_load
+  551 set 271 289 27 io_req_bits_uop_ctrl_is_sta
+  552 set 271 290 28 io_req_bits_uop_ctrl_is_std
+  553 set 271 291 29 io_req_bits_uop_iw_state
+  554 set 271 292 30 io_req_bits_uop_is_br
+  555 set 271 293 31 io_req_bits_uop_is_jalr
+  556 set 271 294 32 io_req_bits_uop_is_jal
+  557 set 271 295 33 io_req_bits_uop_is_sfb
+  558 set 271 296 35 io_req_bits_uop_br_mask
+  559 set 271 297 36 io_req_bits_uop_br_tag
+  560 set 271 298 37 io_req_bits_uop_ftq_idx
+  561 set 271 299 38 io_req_bits_uop_edge_inst
+  562 set 271 300 40 io_req_bits_uop_pc_lob
+  563 set 271 301 41 io_req_bits_uop_taken
+  564 set 271 302 43 io_req_bits_uop_imm_packed
+  565 set 271 303 45 io_req_bits_uop_csr_addr
+  566 set 271 304 46 io_req_bits_uop_rob_idx
+  567 set 271 305 47 io_req_bits_uop_ldq_idx
+  568 set 271 306 48 io_req_bits_uop_stq_idx
+  569 set 271 307 49 io_req_bits_uop_rxq_idx
+  570 set 271 308 50 io_req_bits_uop_pdst
+  571 set 271 309 51 io_req_bits_uop_prs1
+  572 set 271 310 52 io_req_bits_uop_prs2
+  573 set 271 311 53 io_req_bits_uop_prs3
+  574 set 271 312 54 io_req_bits_uop_ppred
+  575 set 271 313 55 io_req_bits_uop_prs1_busy
+  576 set 271 314 56 io_req_bits_uop_prs2_busy
+  577 set 271 315 57 io_req_bits_uop_prs3_busy
+  578 set 271 316 58 io_req_bits_uop_ppred_busy
+  579 set 271 317 59 io_req_bits_uop_stale_pdst
+  580 set 271 318 60 io_req_bits_uop_exception
+  581 set 271 319 62 io_req_bits_uop_exc_cause
+  582 set 271 320 63 io_req_bits_uop_bypassable
+  583 set 271 321 64 io_req_bits_uop_mem_cmd
+  584 set 271 322 65 io_req_bits_uop_mem_size
+  585 set 271 323 66 io_req_bits_uop_mem_signed
+  586 set 271 324 67 io_req_bits_uop_is_fence
+  587 set 271 325 68 io_req_bits_uop_is_fencei
+  588 set 271 326 69 io_req_bits_uop_is_amo
+  589 set 271 327 70 io_req_bits_uop_uses_ldq
+  590 set 271 328 71 io_req_bits_uop_uses_stq
+  591 set 271 329 72 io_req_bits_uop_is_sys_pc2epc
+  592 set 271 330 73 io_req_bits_uop_is_unique
+  593 set 271 331 74 io_req_bits_uop_flush_on_commit
+  594 set 271 332 75 io_req_bits_uop_ldst_is_rs1
+  595 set 271 333 76 io_req_bits_uop_ldst
+  596 set 271 334 77 io_req_bits_uop_lrs1
+  597 set 271 335 78 io_req_bits_uop_lrs2
+  598 set 271 336 79 io_req_bits_uop_lrs3
+  599 set 271 337 80 io_req_bits_uop_ldst_val
+  600 set 271 338 81 io_req_bits_uop_dst_rtype
+  601 set 271 339 82 io_req_bits_uop_lrs1_rtype
+  602 set 271 340 83 io_req_bits_uop_lrs2_rtype
+  603 set 271 341 84 io_req_bits_uop_frs3_en
+  604 set 271 342 85 io_req_bits_uop_fp_val
+  605 set 271 343 86 io_req_bits_uop_fp_single
+  606 set 271 344 87 io_req_bits_uop_xcpt_pf_if
+  607 set 271 345 88 io_req_bits_uop_xcpt_ae_if
+  608 set 271 346 89 io_req_bits_uop_xcpt_ma_if
+  609 set 271 347 90 io_req_bits_uop_bp_debug_if
+  610 set 271 348 91 io_req_bits_uop_bp_xcpt_if
+  611 set 271 349 92 io_req_bits_uop_debug_fsrc
+  612 set 271 350 93 io_req_bits_uop_debug_tsrc
+  613 set 271 351 95 io_req_bits_rs1_data
+  614 set 271 352 96 io_req_bits_rs2_data
+  615 set 271 353 98 io_brupdate_b1_resolve_mask
+  616 set 271 354 99 io_brupdate_b1_mispredict_mask
+  617 output 100 io_ll_iresp_valid
+  618 output 101 io_ll_iresp_bits_uop_rob_idx
+  619 output 102 io_ll_iresp_bits_uop_pdst
+  620 output 103 io_ll_iresp_bits_uop_is_amo
+  621 output 104 io_ll_iresp_bits_uop_uses_stq
+  622 output 105 io_ll_iresp_bits_uop_dst_rtype
+  623 output 533 io_ll_iresp_bits_data
+  624 output 107 io_ll_iresp_bits_predicated
+  625 output 108 io_ll_fresp_valid
+  626 output 109 io_ll_fresp_bits_uop_uopc
+  627 output 110 io_ll_fresp_bits_uop_inst
+  628 output 111 io_ll_fresp_bits_uop_debug_inst
+  629 output 112 io_ll_fresp_bits_uop_is_rvc
+  630 output 113 io_ll_fresp_bits_uop_debug_pc
+  631 output 114 io_ll_fresp_bits_uop_iq_type
+  632 output 115 io_ll_fresp_bits_uop_fu_code
+  633 output 116 io_ll_fresp_bits_uop_ctrl_br_type
+  634 output 117 io_ll_fresp_bits_uop_ctrl_op1_sel
+  635 output 118 io_ll_fresp_bits_uop_ctrl_op2_sel
+  636 output 119 io_ll_fresp_bits_uop_ctrl_imm_sel
+  637 output 120 io_ll_fresp_bits_uop_ctrl_op_fcn
+  638 output 121 io_ll_fresp_bits_uop_ctrl_fcn_dw
+  639 output 122 io_ll_fresp_bits_uop_ctrl_csr_cmd
+  640 output 123 io_ll_fresp_bits_uop_ctrl_is_load
+  641 output 124 io_ll_fresp_bits_uop_ctrl_is_sta
+  642 output 125 io_ll_fresp_bits_uop_ctrl_is_std
+  643 output 126 io_ll_fresp_bits_uop_iw_state
+  644 output 127 io_ll_fresp_bits_uop_iw_p1_poisoned
+  645 output 128 io_ll_fresp_bits_uop_iw_p2_poisoned
+  646 output 129 io_ll_fresp_bits_uop_is_br
+  647 output 130 io_ll_fresp_bits_uop_is_jalr
+  648 output 131 io_ll_fresp_bits_uop_is_jal
+  649 output 132 io_ll_fresp_bits_uop_is_sfb
+  650 output 133 io_ll_fresp_bits_uop_br_mask
+  651 output 134 io_ll_fresp_bits_uop_br_tag
+  652 output 135 io_ll_fresp_bits_uop_ftq_idx
+  653 output 136 io_ll_fresp_bits_uop_edge_inst
+  654 output 137 io_ll_fresp_bits_uop_pc_lob
+  655 output 138 io_ll_fresp_bits_uop_taken
+  656 output 139 io_ll_fresp_bits_uop_imm_packed
+  657 output 140 io_ll_fresp_bits_uop_csr_addr
+  658 output 141 io_ll_fresp_bits_uop_rob_idx
+  659 output 142 io_ll_fresp_bits_uop_ldq_idx
+  660 output 143 io_ll_fresp_bits_uop_stq_idx
+  661 output 144 io_ll_fresp_bits_uop_rxq_idx
+  662 output 145 io_ll_fresp_bits_uop_pdst
+  663 output 146 io_ll_fresp_bits_uop_prs1
+  664 output 147 io_ll_fresp_bits_uop_prs2
+  665 output 148 io_ll_fresp_bits_uop_prs3
+  666 output 149 io_ll_fresp_bits_uop_ppred
+  667 output 150 io_ll_fresp_bits_uop_prs1_busy
+  668 output 151 io_ll_fresp_bits_uop_prs2_busy
+  669 output 152 io_ll_fresp_bits_uop_prs3_busy
+  670 output 153 io_ll_fresp_bits_uop_ppred_busy
+  671 output 154 io_ll_fresp_bits_uop_stale_pdst
+  672 output 155 io_ll_fresp_bits_uop_exception
+  673 output 156 io_ll_fresp_bits_uop_exc_cause
+  674 output 157 io_ll_fresp_bits_uop_bypassable
+  675 output 158 io_ll_fresp_bits_uop_mem_cmd
+  676 output 159 io_ll_fresp_bits_uop_mem_size
+  677 output 160 io_ll_fresp_bits_uop_mem_signed
+  678 output 161 io_ll_fresp_bits_uop_is_fence
+  679 output 162 io_ll_fresp_bits_uop_is_fencei
+  680 output 163 io_ll_fresp_bits_uop_is_amo
+  681 output 164 io_ll_fresp_bits_uop_uses_ldq
+  682 output 165 io_ll_fresp_bits_uop_uses_stq
+  683 output 166 io_ll_fresp_bits_uop_is_sys_pc2epc
+  684 output 167 io_ll_fresp_bits_uop_is_unique
+  685 output 168 io_ll_fresp_bits_uop_flush_on_commit
+  686 output 169 io_ll_fresp_bits_uop_ldst_is_rs1
+  687 output 170 io_ll_fresp_bits_uop_ldst
+  688 output 171 io_ll_fresp_bits_uop_lrs1
+  689 output 172 io_ll_fresp_bits_uop_lrs2
+  690 output 173 io_ll_fresp_bits_uop_lrs3
+  691 output 174 io_ll_fresp_bits_uop_ldst_val
+  692 output 175 io_ll_fresp_bits_uop_dst_rtype
+  693 output 176 io_ll_fresp_bits_uop_lrs1_rtype
+  694 output 177 io_ll_fresp_bits_uop_lrs2_rtype
+  695 output 178 io_ll_fresp_bits_uop_frs3_en
+  696 output 179 io_ll_fresp_bits_uop_fp_val
+  697 output 180 io_ll_fresp_bits_uop_fp_single
+  698 output 181 io_ll_fresp_bits_uop_xcpt_pf_if
+  699 output 182 io_ll_fresp_bits_uop_xcpt_ae_if
+  700 output 183 io_ll_fresp_bits_uop_xcpt_ma_if
+  701 output 184 io_ll_fresp_bits_uop_bp_debug_if
+  702 output 185 io_ll_fresp_bits_uop_bp_xcpt_if
+  703 output 186 io_ll_fresp_bits_uop_debug_fsrc
+  704 output 187 io_ll_fresp_bits_uop_debug_tsrc
+  705 output 188 io_ll_fresp_bits_data
+  706 output 189 io_ll_fresp_bits_predicated
+  707 output 190 io_ll_fresp_bits_fflags_valid
+  708 output 191 io_ll_fresp_bits_fflags_bits_uop_uopc
+  709 output 192 io_ll_fresp_bits_fflags_bits_uop_inst
+  710 output 193 io_ll_fresp_bits_fflags_bits_uop_debug_inst
+  711 output 194 io_ll_fresp_bits_fflags_bits_uop_is_rvc
+  712 output 195 io_ll_fresp_bits_fflags_bits_uop_debug_pc
+  713 output 196 io_ll_fresp_bits_fflags_bits_uop_iq_type
+  714 output 197 io_ll_fresp_bits_fflags_bits_uop_fu_code
+  715 output 198 io_ll_fresp_bits_fflags_bits_uop_ctrl_br_type
+  716 output 199 io_ll_fresp_bits_fflags_bits_uop_ctrl_op1_sel
+  717 output 200 io_ll_fresp_bits_fflags_bits_uop_ctrl_op2_sel
+  718 output 201 io_ll_fresp_bits_fflags_bits_uop_ctrl_imm_sel
+  719 output 202 io_ll_fresp_bits_fflags_bits_uop_ctrl_op_fcn
+  720 output 203 io_ll_fresp_bits_fflags_bits_uop_ctrl_fcn_dw
+  721 output 204 io_ll_fresp_bits_fflags_bits_uop_ctrl_csr_cmd
+  722 output 205 io_ll_fresp_bits_fflags_bits_uop_ctrl_is_load
+  723 output 206 io_ll_fresp_bits_fflags_bits_uop_ctrl_is_sta
+  724 output 207 io_ll_fresp_bits_fflags_bits_uop_ctrl_is_std
+  725 output 208 io_ll_fresp_bits_fflags_bits_uop_iw_state
+  726 output 209 io_ll_fresp_bits_fflags_bits_uop_iw_p1_poisoned
+  727 output 210 io_ll_fresp_bits_fflags_bits_uop_iw_p2_poisoned
+  728 output 211 io_ll_fresp_bits_fflags_bits_uop_is_br
+  729 output 212 io_ll_fresp_bits_fflags_bits_uop_is_jalr
+  730 output 213 io_ll_fresp_bits_fflags_bits_uop_is_jal
+  731 output 214 io_ll_fresp_bits_fflags_bits_uop_is_sfb
+  732 output 215 io_ll_fresp_bits_fflags_bits_uop_br_mask
+  733 output 216 io_ll_fresp_bits_fflags_bits_uop_br_tag
+  734 output 217 io_ll_fresp_bits_fflags_bits_uop_ftq_idx
+  735 output 218 io_ll_fresp_bits_fflags_bits_uop_edge_inst
+  736 output 219 io_ll_fresp_bits_fflags_bits_uop_pc_lob
+  737 output 220 io_ll_fresp_bits_fflags_bits_uop_taken
+  738 output 221 io_ll_fresp_bits_fflags_bits_uop_imm_packed
+  739 output 222 io_ll_fresp_bits_fflags_bits_uop_csr_addr
+  740 output 223 io_ll_fresp_bits_fflags_bits_uop_rob_idx
+  741 output 224 io_ll_fresp_bits_fflags_bits_uop_ldq_idx
+  742 output 225 io_ll_fresp_bits_fflags_bits_uop_stq_idx
+  743 output 226 io_ll_fresp_bits_fflags_bits_uop_rxq_idx
+  744 output 227 io_ll_fresp_bits_fflags_bits_uop_pdst
+  745 output 228 io_ll_fresp_bits_fflags_bits_uop_prs1
+  746 output 229 io_ll_fresp_bits_fflags_bits_uop_prs2
+  747 output 230 io_ll_fresp_bits_fflags_bits_uop_prs3
+  748 output 231 io_ll_fresp_bits_fflags_bits_uop_ppred
+  749 output 232 io_ll_fresp_bits_fflags_bits_uop_prs1_busy
+  750 output 233 io_ll_fresp_bits_fflags_bits_uop_prs2_busy
+  751 output 234 io_ll_fresp_bits_fflags_bits_uop_prs3_busy
+  752 output 235 io_ll_fresp_bits_fflags_bits_uop_ppred_busy
+  753 output 236 io_ll_fresp_bits_fflags_bits_uop_stale_pdst
+  754 output 237 io_ll_fresp_bits_fflags_bits_uop_exception
+  755 output 238 io_ll_fresp_bits_fflags_bits_uop_exc_cause
+  756 output 239 io_ll_fresp_bits_fflags_bits_uop_bypassable
+  757 output 240 io_ll_fresp_bits_fflags_bits_uop_mem_cmd
+  758 output 241 io_ll_fresp_bits_fflags_bits_uop_mem_size
+  759 output 242 io_ll_fresp_bits_fflags_bits_uop_mem_signed
+  760 output 243 io_ll_fresp_bits_fflags_bits_uop_is_fence
+  761 output 244 io_ll_fresp_bits_fflags_bits_uop_is_fencei
+  762 output 245 io_ll_fresp_bits_fflags_bits_uop_is_amo
+  763 output 246 io_ll_fresp_bits_fflags_bits_uop_uses_ldq
+  764 output 247 io_ll_fresp_bits_fflags_bits_uop_uses_stq
+  765 output 248 io_ll_fresp_bits_fflags_bits_uop_is_sys_pc2epc
+  766 output 249 io_ll_fresp_bits_fflags_bits_uop_is_unique
+  767 output 250 io_ll_fresp_bits_fflags_bits_uop_flush_on_commit
+  768 output 251 io_ll_fresp_bits_fflags_bits_uop_ldst_is_rs1
+  769 output 252 io_ll_fresp_bits_fflags_bits_uop_ldst
+  770 output 253 io_ll_fresp_bits_fflags_bits_uop_lrs1
+  771 output 254 io_ll_fresp_bits_fflags_bits_uop_lrs2
+  772 output 255 io_ll_fresp_bits_fflags_bits_uop_lrs3
+  773 output 256 io_ll_fresp_bits_fflags_bits_uop_ldst_val
+  774 output 257 io_ll_fresp_bits_fflags_bits_uop_dst_rtype
+  775 output 258 io_ll_fresp_bits_fflags_bits_uop_lrs1_rtype
+  776 output 259 io_ll_fresp_bits_fflags_bits_uop_lrs2_rtype
+  777 output 260 io_ll_fresp_bits_fflags_bits_uop_frs3_en
+  778 output 261 io_ll_fresp_bits_fflags_bits_uop_fp_val
+  779 output 262 io_ll_fresp_bits_fflags_bits_uop_fp_single
+  780 output 263 io_ll_fresp_bits_fflags_bits_uop_xcpt_pf_if
+  781 output 264 io_ll_fresp_bits_fflags_bits_uop_xcpt_ae_if
+  782 output 265 io_ll_fresp_bits_fflags_bits_uop_xcpt_ma_if
+  783 output 266 io_ll_fresp_bits_fflags_bits_uop_bp_debug_if
+  784 output 267 io_ll_fresp_bits_fflags_bits_uop_bp_xcpt_if
+  785 output 268 io_ll_fresp_bits_fflags_bits_uop_debug_fsrc
+  786 output 269 io_ll_fresp_bits_fflags_bits_uop_debug_tsrc
+  787 output 270 io_ll_fresp_bits_fflags_bits_flags
+  788 output 442 io_lsu_io_req_valid
+  789 output 443 io_lsu_io_req_bits_uop_uopc
+  790 output 444 io_lsu_io_req_bits_uop_inst
+  791 output 445 io_lsu_io_req_bits_uop_debug_inst
+  792 output 446 io_lsu_io_req_bits_uop_is_rvc
+  793 output 447 io_lsu_io_req_bits_uop_debug_pc
+  794 output 448 io_lsu_io_req_bits_uop_iq_type
+  795 output 449 io_lsu_io_req_bits_uop_fu_code
+  796 output 450 io_lsu_io_req_bits_uop_ctrl_br_type
+  797 output 451 io_lsu_io_req_bits_uop_ctrl_op1_sel
+  798 output 452 io_lsu_io_req_bits_uop_ctrl_op2_sel
+  799 output 453 io_lsu_io_req_bits_uop_ctrl_imm_sel
+  800 output 454 io_lsu_io_req_bits_uop_ctrl_op_fcn
+  801 output 455 io_lsu_io_req_bits_uop_ctrl_fcn_dw
+  802 output 456 io_lsu_io_req_bits_uop_ctrl_csr_cmd
+  803 output 457 io_lsu_io_req_bits_uop_ctrl_is_load
+  804 output 458 io_lsu_io_req_bits_uop_ctrl_is_sta
+  805 output 459 io_lsu_io_req_bits_uop_ctrl_is_std
+  806 output 460 io_lsu_io_req_bits_uop_iw_state
+  807 output 461 io_lsu_io_req_bits_uop_is_br
+  808 output 462 io_lsu_io_req_bits_uop_is_jalr
+  809 output 463 io_lsu_io_req_bits_uop_is_jal
+  810 output 464 io_lsu_io_req_bits_uop_is_sfb
+  811 output 465 io_lsu_io_req_bits_uop_br_mask
+  812 output 466 io_lsu_io_req_bits_uop_br_tag
+  813 output 467 io_lsu_io_req_bits_uop_ftq_idx
+  814 output 468 io_lsu_io_req_bits_uop_edge_inst
+  815 output 469 io_lsu_io_req_bits_uop_pc_lob
+  816 output 470 io_lsu_io_req_bits_uop_taken
+  817 output 471 io_lsu_io_req_bits_uop_imm_packed
+  818 output 472 io_lsu_io_req_bits_uop_csr_addr
+  819 output 473 io_lsu_io_req_bits_uop_rob_idx
+  820 output 474 io_lsu_io_req_bits_uop_ldq_idx
+  821 output 475 io_lsu_io_req_bits_uop_stq_idx
+  822 output 476 io_lsu_io_req_bits_uop_rxq_idx
+  823 output 477 io_lsu_io_req_bits_uop_pdst
+  824 output 478 io_lsu_io_req_bits_uop_prs1
+  825 output 479 io_lsu_io_req_bits_uop_prs2
+  826 output 480 io_lsu_io_req_bits_uop_prs3
+  827 output 481 io_lsu_io_req_bits_uop_ppred
+  828 output 482 io_lsu_io_req_bits_uop_prs1_busy
+  829 output 483 io_lsu_io_req_bits_uop_prs2_busy
+  830 output 484 io_lsu_io_req_bits_uop_prs3_busy
+  831 output 485 io_lsu_io_req_bits_uop_ppred_busy
+  832 output 486 io_lsu_io_req_bits_uop_stale_pdst
+  833 output 487 io_lsu_io_req_bits_uop_exception
+  834 output 488 io_lsu_io_req_bits_uop_exc_cause
+  835 output 489 io_lsu_io_req_bits_uop_bypassable
+  836 output 490 io_lsu_io_req_bits_uop_mem_cmd
+  837 output 491 io_lsu_io_req_bits_uop_mem_size
+  838 output 492 io_lsu_io_req_bits_uop_mem_signed
+  839 output 493 io_lsu_io_req_bits_uop_is_fence
+  840 output 494 io_lsu_io_req_bits_uop_is_fencei
+  841 output 495 io_lsu_io_req_bits_uop_is_amo
+  842 output 496 io_lsu_io_req_bits_uop_uses_ldq
+  843 output 497 io_lsu_io_req_bits_uop_uses_stq
+  844 output 498 io_lsu_io_req_bits_uop_is_sys_pc2epc
+  845 output 499 io_lsu_io_req_bits_uop_is_unique
+  846 output 500 io_lsu_io_req_bits_uop_flush_on_commit
+  847 output 501 io_lsu_io_req_bits_uop_ldst_is_rs1
+  848 output 502 io_lsu_io_req_bits_uop_ldst
+  849 output 503 io_lsu_io_req_bits_uop_lrs1
+  850 output 504 io_lsu_io_req_bits_uop_lrs2
+  851 output 505 io_lsu_io_req_bits_uop_lrs3
+  852 output 506 io_lsu_io_req_bits_uop_ldst_val
+  853 output 507 io_lsu_io_req_bits_uop_dst_rtype
+  854 output 508 io_lsu_io_req_bits_uop_lrs1_rtype
+  855 output 509 io_lsu_io_req_bits_uop_lrs2_rtype
+  856 output 510 io_lsu_io_req_bits_uop_frs3_en
+  857 output 511 io_lsu_io_req_bits_uop_fp_val
+  858 output 512 io_lsu_io_req_bits_uop_fp_single
+  859 output 513 io_lsu_io_req_bits_uop_xcpt_pf_if
+  860 output 514 io_lsu_io_req_bits_uop_xcpt_ae_if
+  861 output 515 io_lsu_io_req_bits_uop_xcpt_ma_if
+  862 output 516 io_lsu_io_req_bits_uop_bp_debug_if
+  863 output 517 io_lsu_io_req_bits_uop_bp_xcpt_if
+  864 output 518 io_lsu_io_req_bits_uop_debug_fsrc
+  865 output 519 io_lsu_io_req_bits_uop_debug_tsrc
+  866 output 532 io_lsu_io_req_bits_data
+  867 output 521 io_lsu_io_req_bits_addr
+  868 output 522 io_lsu_io_req_bits_mxcpt_valid
+  869 output 523 io_lsu_io_req_bits_mxcpt_bits
+  870 output 524 io_lsu_io_req_bits_sfence_valid
+  871 output 525 io_lsu_io_req_bits_sfence_bits_rs1
+  872 output 526 io_lsu_io_req_bits_sfence_bits_rs2
+  873 output 527 io_lsu_io_req_bits_sfence_bits_addr
+  874 output 528 io_lsu_io_req_bits_sfence_bits_asid
+  875 output 97 io_lsu_io_fresp_ready
+}

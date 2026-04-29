@@ -38,6 +38,7 @@
 #include "mlir/IR/Value.h"
 #include "mlir/Pass/Pass.h"
 #include "llvm/ADT/MapVector.h"
+#include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/ADT/TypeSwitch.h"
 #include "llvm/Support/raw_ostream.h"
@@ -1329,7 +1330,10 @@ void ConvertHWToBTOR2PPPass::runOnOperation() {
       });
 
       DenseSet<StringRef> handledInstances;
-      DenseMap<ssize_t, size_t> portRefLIDs;
+      llvm::StringMap<size_t> portRefLIDs;
+      auto getPortRefKey = [](StringRef moduleName, ssize_t portID) {
+        return (Twine(moduleName) + ":" + Twine(portID)).str();
+      };
       for (auto instance : moduleDeps[module]) {
         // TODO: emit inst instruction
         size_t instanceLID = lid;
@@ -1354,7 +1358,7 @@ void ConvertHWToBTOR2PPPass::runOnOperation() {
             size_t portLID = modulePortLIDs[moduleOp][port.getId()];
             lid++;
             os << indent << refLID << " " << "ref " << moduleName << " " << portLID << " " << port.getName() << "\n";
-            portRefLIDs[port.getId()] = refLID;
+            portRefLIDs[getPortRefKey(moduleName, port.getId())] = refLID;
           }
 
           for (auto port : portInfo.getOutputs()) {
@@ -1365,7 +1369,7 @@ void ConvertHWToBTOR2PPPass::runOnOperation() {
             size_t portLID = modulePortLIDs[moduleOp][port.getId()];
             lid++;
             os << indent << refLID << " " << "ref " << moduleName << " " << portLID << " " << port.getName() << "\n";
-            portRefLIDs[port.getId()] = refLID;
+            portRefLIDs[getPortRefKey(moduleName, port.getId())] = refLID;
           }
 
           handledInstances.insert(moduleName);
@@ -1381,7 +1385,7 @@ void ConvertHWToBTOR2PPPass::runOnOperation() {
 
           Value result = instance.getResult(outputIdx);
 
-          size_t refLID = portRefLIDs[port.getId()];
+          size_t refLID = portRefLIDs[getPortRefKey(moduleName, port.getId())];
           size_t getLID = lid++;
 
           os << indent << getLID << " get " << instanceLID << " " << refLID << " " << port.getName() << "\n";
@@ -1483,7 +1487,7 @@ void ConvertHWToBTOR2PPPass::runOnOperation() {
 
           size_t localLID = getOpLID(operand);
 
-          size_t refLID = portRefLIDs[port.getId()];
+          size_t refLID = portRefLIDs[getPortRefKey(moduleName, port.getId())];
 
           size_t setLID = lid++;
           os << indent << setLID << " set " << instanceLID << " " << refLID << " " << localLID << " " << port.getName() << "\n";

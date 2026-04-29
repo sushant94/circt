@@ -1,0 +1,124 @@
+
+module RecFNToIN_e11_s53_i32 {
+  1 sort bitvec 65
+  2 input 1 io_in
+  3 sort bitvec 3
+  4 input 3 io_roundingMode
+  5 sort bitvec 1
+  6 input 5 io_signedOut
+  7 sort bitvec 6
+  8 consth 7 0
+  9 sort bitvec 11
+  10 consth 9 1E
+  11 consth 9 1F
+  12 sort bitvec 30
+  13 consth 12 3FFFFFFF
+  14 sort bitvec 2
+  15 consth 14 0
+  16 sort bitvec 51
+  17 consth 16 0
+  18 sort bitvec 79
+  19 consth 18 0
+  20 sort bitvec 31
+  21 consth 20 0
+  22 consth 9 7FF
+  23 consth 14 3
+  24 consth 5 1
+  25 consth 3 0
+  26 consth 3 2
+  27 consth 3 3
+  28 consth 3 4
+  29 consth 3 6
+  30 sort bitvec 5
+  31 consth 30 0
+  32 slice 3 2 63 61 _rawIn_isZero_T
+  33 neq 5 32 25 _rawIn_out_sig_T
+  34 slice 14 2 63 62 _rawIn_isSpecial_T
+  35 eq 5 34 23 rawIn_isSpecial
+  36 slice 5 2 61 61 _rawIn_out_isInf_T
+  37 and 5 35 36 rawIn_isNaN
+  38 xor 5 36 24 _rawIn_out_isInf_T_1
+  39 and 5 35 38 rawIn_isInf
+  40 slice 5 2 64 64 rawIn_sign
+  41 sort bitvec 52
+  42 slice 41 2 51 0 _rawIn_out_sig_T_2
+  43 slice 5 2 63 63 magGeOne
+  44 slice 9 2 62 52 posExp
+  45 xor 5 43 24 _magJustBelowOne_T
+  46 eq 5 44 22 _magJustBelowOne_T_1
+  47 and 5 45 46 magJustBelowOne
+  48 eq 5 4 25 roundingMode_near_even
+  49 eq 5 4 26 roundingMode_min
+  50 eq 5 4 27 roundingMode_max
+  51 eq 5 4 28 roundingMode_near_maxMag
+  52 eq 5 4 29 roundingMode_odd
+  53 slice 30 2 56 52 _shiftedSig_T_2
+  54 ite 30 43 53 31 _shiftedSig_T_3
+  55 sort bitvec 84
+  56 sort bitvec 32
+  57 concat 56 21 43
+  58 concat 55 57 42
+  59 concat 55 19 54
+  60 sll 55 58 59 shiftedSig
+  61 slice 16 60 50 0 _alignedSig_T_1
+  62 neq 5 61 17 _alignedSig_T_2
+  63 slice 5 60 51 51
+  64 concat 14 63 62 _roundIncr_near_even_T_6
+  65 neq 5 64 15 _common_inexact_T_1
+  66 ite 5 43 65 33 common_inexact
+  67 slice 14 60 52 51 _roundIncr_near_even_T
+  68 eq 5 67 23 _roundIncr_near_even_T_1
+  69 eq 5 64 23 _roundIncr_near_even_T_3
+  70 or 5 68 69 _roundIncr_near_even_T_4
+  71 and 5 43 70 _roundIncr_near_even_T_5
+  72 neq 5 64 15 _roundIncr_near_even_T_7
+  73 and 5 47 72 _roundIncr_near_even_T_8
+  74 or 5 71 73 roundIncr_near_even
+  75 slice 5 60 51 51 _roundIncr_near_maxMag_T
+  76 and 5 43 75 _roundIncr_near_maxMag_T_1
+  77 or 5 76 47 roundIncr_near_maxMag
+  78 and 5 48 74 _roundIncr_T
+  79 and 5 51 77 _roundIncr_T_1
+  80 or 5 49 52 _roundIncr_T_3
+  81 and 5 80 40 _roundIncr_T_5
+  82 and 5 81 66 _roundIncr_T_5
+  83 xor 5 40 24 _roundIncr_T_7
+  84 and 5 50 83 _roundIncr_T_9
+  85 and 5 84 66 _roundIncr_T_9
+  86 or 5 78 79 roundIncr
+  87 or 5 86 82 roundIncr
+  88 or 5 87 85 roundIncr
+  89 eq 5 44 11 magGeOne_atOverflowEdge
+  90 slice 12 60 81 52 _roundCarryBut2_T
+  91 eq 5 90 13 _roundCarryBut2_T_1
+  92 and 5 91 88 roundCarryBut2
+  93 slice 7 2 62 57
+  94 neq 5 93 8 _common_overflow_T
+  95 slice 20 60 82 52 _common_overflow_T_1
+  96 neq 5 95 21 _common_overflow_T_2
+  97 or 5 96 88 _common_overflow_T_3
+  98 and 5 89 97 _common_overflow_T_4
+  99 eq 5 44 10 _common_overflow_T_5
+  100 and 5 99 92 _common_overflow_T_6
+  101 or 5 89 100 _common_overflow_T_7
+  102 ite 5 40 98 101 _common_overflow_T_8
+  103 slice 5 60 82 82 _common_overflow_T_9
+  104 and 5 89 103 _common_overflow_T_11
+  105 and 5 104 92 _common_overflow_T_11
+  106 or 5 40 105 _common_overflow_T_12
+  107 ite 5 6 102 106 _common_overflow_T_13
+  108 or 5 94 107 _common_overflow_T_14
+  109 xor 5 6 24 _common_overflow_T_15
+  110 and 5 109 40 _common_overflow_T_17
+  111 and 5 110 88 _common_overflow_T_17
+  112 ite 5 43 108 111 common_overflow
+  113 or 5 37 39 invalidExc
+  114 xor 5 113 24 _inexact_T
+  115 and 5 114 112 overflow
+  116 xor 5 112 24 _inexact_T_1
+  117 and 5 114 116 inexact
+  118 and 5 117 66 inexact
+  119 concat 14 113 115
+  120 concat 3 119 118 io_intExceptionFlags
+  121 output 120 io_intExceptionFlags
+}

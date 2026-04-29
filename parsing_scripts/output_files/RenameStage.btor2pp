@@ -1,0 +1,695 @@
+include RenameMapTable.btor2pp
+include RenameFreeList.btor2pp
+include RenameBusyTable.btor2pp
+
+module RenameStage {
+  1 sort bitvec 1
+  2 input 1 reset
+  3 input 1 io_kill
+  4 input 1 io_dec_fire_0
+  5 sort bitvec 7
+  6 input 5 io_dec_uops_0_uopc
+  7 sort bitvec 32
+  8 input 7 io_dec_uops_0_inst
+  9 input 7 io_dec_uops_0_debug_inst
+  10 input 1 io_dec_uops_0_is_rvc
+  11 sort bitvec 40
+  12 input 11 io_dec_uops_0_debug_pc
+  13 sort bitvec 3
+  14 input 13 io_dec_uops_0_iq_type
+  15 sort bitvec 10
+  16 input 15 io_dec_uops_0_fu_code
+  17 sort bitvec 4
+  18 input 17 io_dec_uops_0_ctrl_br_type
+  19 sort bitvec 2
+  20 input 19 io_dec_uops_0_ctrl_op1_sel
+  21 input 13 io_dec_uops_0_ctrl_op2_sel
+  22 input 13 io_dec_uops_0_ctrl_imm_sel
+  23 sort bitvec 5
+  24 input 23 io_dec_uops_0_ctrl_op_fcn
+  25 input 1 io_dec_uops_0_ctrl_fcn_dw
+  26 input 13 io_dec_uops_0_ctrl_csr_cmd
+  27 input 1 io_dec_uops_0_ctrl_is_load
+  28 input 1 io_dec_uops_0_ctrl_is_sta
+  29 input 1 io_dec_uops_0_ctrl_is_std
+  30 input 19 io_dec_uops_0_iw_state
+  31 input 1 io_dec_uops_0_iw_p1_poisoned
+  32 input 1 io_dec_uops_0_iw_p2_poisoned
+  33 input 1 io_dec_uops_0_is_br
+  34 input 1 io_dec_uops_0_is_jalr
+  35 input 1 io_dec_uops_0_is_jal
+  36 input 1 io_dec_uops_0_is_sfb
+  37 sort bitvec 8
+  38 input 37 io_dec_uops_0_br_mask
+  39 input 13 io_dec_uops_0_br_tag
+  40 input 17 io_dec_uops_0_ftq_idx
+  41 input 1 io_dec_uops_0_edge_inst
+  42 sort bitvec 6
+  43 input 42 io_dec_uops_0_pc_lob
+  44 input 1 io_dec_uops_0_taken
+  45 sort bitvec 20
+  46 input 45 io_dec_uops_0_imm_packed
+  47 sort bitvec 12
+  48 input 47 io_dec_uops_0_csr_addr
+  49 input 19 io_dec_uops_0_rxq_idx
+  50 input 1 io_dec_uops_0_exception
+  51 sort bitvec 64
+  52 input 51 io_dec_uops_0_exc_cause
+  53 input 1 io_dec_uops_0_bypassable
+  54 input 23 io_dec_uops_0_mem_cmd
+  55 input 19 io_dec_uops_0_mem_size
+  56 input 1 io_dec_uops_0_mem_signed
+  57 input 1 io_dec_uops_0_is_fence
+  58 input 1 io_dec_uops_0_is_fencei
+  59 input 1 io_dec_uops_0_is_amo
+  60 input 1 io_dec_uops_0_uses_ldq
+  61 input 1 io_dec_uops_0_uses_stq
+  62 input 1 io_dec_uops_0_is_sys_pc2epc
+  63 input 1 io_dec_uops_0_is_unique
+  64 input 1 io_dec_uops_0_flush_on_commit
+  65 input 42 io_dec_uops_0_ldst
+  66 input 42 io_dec_uops_0_lrs1
+  67 input 42 io_dec_uops_0_lrs2
+  68 input 42 io_dec_uops_0_lrs3
+  69 input 1 io_dec_uops_0_ldst_val
+  70 input 19 io_dec_uops_0_dst_rtype
+  71 input 19 io_dec_uops_0_lrs1_rtype
+  72 input 19 io_dec_uops_0_lrs2_rtype
+  73 input 1 io_dec_uops_0_frs3_en
+  74 input 1 io_dec_uops_0_fp_val
+  75 input 1 io_dec_uops_0_fp_single
+  76 input 1 io_dec_uops_0_xcpt_pf_if
+  77 input 1 io_dec_uops_0_xcpt_ae_if
+  78 input 1 io_dec_uops_0_xcpt_ma_if
+  79 input 1 io_dec_uops_0_bp_debug_if
+  80 input 1 io_dec_uops_0_bp_xcpt_if
+  81 input 19 io_dec_uops_0_debug_fsrc
+  82 input 19 io_dec_uops_0_debug_tsrc
+  83 input 37 io_brupdate_b1_resolve_mask
+  84 input 13 io_brupdate_b2_uop_br_tag
+  85 input 1 io_brupdate_b2_mispredict
+  86 input 1 io_dis_fire_0
+  87 input 1 io_dis_ready
+  88 input 1 io_wakeups_0_valid
+  89 input 42 io_wakeups_0_bits_uop_pdst
+  90 input 19 io_wakeups_0_bits_uop_dst_rtype
+  91 input 1 io_wakeups_1_valid
+  92 input 42 io_wakeups_1_bits_uop_pdst
+  93 input 19 io_wakeups_1_bits_uop_dst_rtype
+  94 input 1 io_wakeups_2_valid
+  95 input 42 io_wakeups_2_bits_uop_pdst
+  96 input 19 io_wakeups_2_bits_uop_dst_rtype
+  97 input 1 io_com_valids_0
+  98 input 42 io_com_uops_0_pdst
+  99 input 42 io_com_uops_0_stale_pdst
+  100 input 42 io_com_uops_0_ldst
+  101 input 1 io_com_uops_0_ldst_val
+  102 input 19 io_com_uops_0_dst_rtype
+  103 input 1 io_rbk_valids_0
+  104 input 1 io_rollback
+  105 input 1 io_debug_rob_empty
+  106 state 1 r_valid
+  107 state 5 r_uop_uopc
+  108 state 7 r_uop_inst
+  109 state 7 r_uop_debug_inst
+  110 state 1 r_uop_is_rvc
+  111 state 11 r_uop_debug_pc
+  112 state 13 r_uop_iq_type
+  113 state 15 r_uop_fu_code
+  114 state 17 r_uop_ctrl_br_type
+  115 state 19 r_uop_ctrl_op1_sel
+  116 state 13 r_uop_ctrl_op2_sel
+  117 state 13 r_uop_ctrl_imm_sel
+  118 state 23 r_uop_ctrl_op_fcn
+  119 state 1 r_uop_ctrl_fcn_dw
+  120 state 13 r_uop_ctrl_csr_cmd
+  121 state 1 r_uop_ctrl_is_load
+  122 state 1 r_uop_ctrl_is_sta
+  123 state 1 r_uop_ctrl_is_std
+  124 state 19 r_uop_iw_state
+  125 state 1 r_uop_iw_p1_poisoned
+  126 state 1 r_uop_iw_p2_poisoned
+  127 state 1 r_uop_is_br
+  128 state 1 r_uop_is_jalr
+  129 state 1 r_uop_is_jal
+  130 state 1 r_uop_is_sfb
+  131 state 37 r_uop_br_mask
+  132 state 13 r_uop_br_tag
+  133 state 17 r_uop_ftq_idx
+  134 state 1 r_uop_edge_inst
+  135 state 42 r_uop_pc_lob
+  136 state 1 r_uop_taken
+  137 state 45 r_uop_imm_packed
+  138 state 47 r_uop_csr_addr
+  139 state 19 r_uop_rxq_idx
+  140 state 42 r_uop_prs1
+  141 state 42 r_uop_prs2
+  142 state 42 r_uop_stale_pdst
+  143 state 1 r_uop_exception
+  144 state 51 r_uop_exc_cause
+  145 state 1 r_uop_bypassable
+  146 state 23 r_uop_mem_cmd
+  147 state 19 r_uop_mem_size
+  148 state 1 r_uop_mem_signed
+  149 state 1 r_uop_is_fence
+  150 state 1 r_uop_is_fencei
+  151 state 1 r_uop_is_amo
+  152 state 1 r_uop_uses_ldq
+  153 state 1 r_uop_uses_stq
+  154 state 1 r_uop_is_sys_pc2epc
+  155 state 1 r_uop_is_unique
+  156 state 1 r_uop_flush_on_commit
+  157 state 1 r_uop_ldst_is_rs1
+  158 state 42 r_uop_ldst
+  159 state 42 r_uop_lrs1
+  160 state 42 r_uop_lrs2
+  161 state 42 r_uop_lrs3
+  162 state 1 r_uop_ldst_val
+  163 state 19 r_uop_dst_rtype
+  164 state 19 r_uop_lrs1_rtype
+  165 state 19 r_uop_lrs2_rtype
+  166 state 1 r_uop_frs3_en
+  167 state 1 r_uop_fp_val
+  168 state 1 r_uop_fp_single
+  169 state 1 r_uop_xcpt_pf_if
+  170 state 1 r_uop_xcpt_ae_if
+  171 state 1 r_uop_xcpt_ma_if
+  172 state 1 r_uop_bp_debug_if
+  173 state 1 r_uop_bp_xcpt_if
+  174 state 19 r_uop_debug_fsrc
+  175 state 19 r_uop_debug_tsrc
+  176 inst RenameMapTable maptable
+  177 ref RenameMapTable 2 reset
+  178 ref RenameMapTable 4 io_map_reqs_0_lrs1
+  179 ref RenameMapTable 5 io_map_reqs_0_lrs2
+  180 ref RenameMapTable 6 io_map_reqs_0_ldst
+  181 ref RenameMapTable 7 io_remap_reqs_0_ldst
+  182 ref RenameMapTable 8 io_remap_reqs_0_pdst
+  183 ref RenameMapTable 9 io_remap_reqs_0_valid
+  184 ref RenameMapTable 10 io_ren_br_tags_0_valid
+  185 ref RenameMapTable 12 io_ren_br_tags_0_bits
+  186 ref RenameMapTable 13 io_brupdate_b2_uop_br_tag
+  187 ref RenameMapTable 14 io_brupdate_b2_mispredict
+  188 ref RenameMapTable 15 io_rollback
+  189 ref RenameMapTable 1789 io_map_resps_0_prs1
+  190 ref RenameMapTable 1790 io_map_resps_0_prs2
+  191 ref RenameMapTable 1791 io_map_resps_0_stale_pdst
+  192 get 176 189 io_map_resps_0_prs1
+  193 get 176 190 io_map_resps_0_prs2
+  194 get 176 191 io_map_resps_0_stale_pdst
+  195 inst RenameFreeList freelist
+  196 ref RenameFreeList 2 reset
+  197 ref RenameFreeList 3 io_reqs_0
+  198 ref RenameFreeList 4 io_dealloc_pregs_0_valid
+  199 ref RenameFreeList 6 io_dealloc_pregs_0_bits
+  200 ref RenameFreeList 7 io_ren_br_tags_0_valid
+  201 ref RenameFreeList 9 io_ren_br_tags_0_bits
+  202 ref RenameFreeList 10 io_brupdate_b2_uop_br_tag
+  203 ref RenameFreeList 11 io_brupdate_b2_mispredict
+  204 ref RenameFreeList 12 io_debug_pipeline_empty
+  205 ref RenameFreeList 551 io_alloc_pregs_0_valid
+  206 ref RenameFreeList 552 io_alloc_pregs_0_bits
+  207 get 195 205 io_alloc_pregs_0_valid
+  208 get 195 206 io_alloc_pregs_0_bits
+  209 inst RenameBusyTable busytable
+  210 ref RenameBusyTable 2 reset
+  211 ref RenameBusyTable 4 io_ren_uops_0_pdst
+  212 ref RenameBusyTable 5 io_ren_uops_0_prs1
+  213 ref RenameBusyTable 6 io_ren_uops_0_prs2
+  214 ref RenameBusyTable 7 io_rebusy_reqs_0
+  215 ref RenameBusyTable 8 io_wb_pdsts_0
+  216 ref RenameBusyTable 9 io_wb_pdsts_1
+  217 ref RenameBusyTable 10 io_wb_pdsts_2
+  218 ref RenameBusyTable 11 io_wb_valids_0
+  219 ref RenameBusyTable 12 io_wb_valids_1
+  220 ref RenameBusyTable 13 io_wb_valids_2
+  221 ref RenameBusyTable 55 io_busy_resps_0_prs1_busy
+  222 ref RenameBusyTable 56 io_busy_resps_0_prs2_busy
+  223 get 209 221 io_busy_resps_0_prs1_busy
+  224 get 209 222 io_busy_resps_0_prs2_busy
+  225 consth 1 0
+  226 consth 42 0
+  227 consth 1 1
+  228 consth 37 FF
+  229 consth 19 0
+  230 consth 5 0
+  231 xor 1 86 227 _r_valid_T
+  232 and 1 106 231 _r_valid_T_1
+  233 ite 1 87 4 232
+  234 xor 1 3 227
+  235 and 1 234 233
+  236 xor 1 87 227
+  237 or 1 3 236
+  238 ite 5 237 107 6 next_uop_uopc
+  239 xor 1 87 227
+  240 or 1 3 239
+  241 ite 7 240 108 8 next_uop_inst
+  242 xor 1 87 227
+  243 or 1 3 242
+  244 ite 7 243 109 9 next_uop_debug_inst
+  245 xor 1 87 227
+  246 or 1 3 245
+  247 ite 1 246 110 10 next_uop_is_rvc
+  248 xor 1 87 227
+  249 or 1 3 248
+  250 ite 11 249 111 12 next_uop_debug_pc
+  251 xor 1 87 227
+  252 or 1 3 251
+  253 ite 13 252 112 14 next_uop_iq_type
+  254 xor 1 87 227
+  255 or 1 3 254
+  256 ite 15 255 113 16 next_uop_fu_code
+  257 xor 1 87 227
+  258 or 1 3 257
+  259 ite 17 258 114 18 next_uop_ctrl_br_type
+  260 xor 1 87 227
+  261 or 1 3 260
+  262 ite 19 261 115 20 next_uop_ctrl_op1_sel
+  263 xor 1 87 227
+  264 or 1 3 263
+  265 ite 13 264 116 21 next_uop_ctrl_op2_sel
+  266 xor 1 87 227
+  267 or 1 3 266
+  268 ite 13 267 117 22 next_uop_ctrl_imm_sel
+  269 xor 1 87 227
+  270 or 1 3 269
+  271 ite 23 270 118 24 next_uop_ctrl_op_fcn
+  272 xor 1 87 227
+  273 or 1 3 272
+  274 ite 1 273 119 25 next_uop_ctrl_fcn_dw
+  275 xor 1 87 227
+  276 or 1 3 275
+  277 ite 13 276 120 26 next_uop_ctrl_csr_cmd
+  278 xor 1 87 227
+  279 or 1 3 278
+  280 ite 1 279 121 27 next_uop_ctrl_is_load
+  281 xor 1 87 227
+  282 or 1 3 281
+  283 ite 1 282 122 28 next_uop_ctrl_is_sta
+  284 xor 1 87 227
+  285 or 1 3 284
+  286 ite 1 285 123 29 next_uop_ctrl_is_std
+  287 xor 1 87 227
+  288 or 1 3 287
+  289 ite 19 288 124 30 next_uop_iw_state
+  290 xor 1 87 227
+  291 or 1 3 290
+  292 ite 1 291 125 31 next_uop_iw_p1_poisoned
+  293 xor 1 87 227
+  294 or 1 3 293
+  295 ite 1 294 126 32 next_uop_iw_p2_poisoned
+  296 xor 1 87 227
+  297 or 1 3 296
+  298 ite 1 297 127 33 next_uop_is_br
+  299 xor 1 87 227
+  300 or 1 3 299
+  301 ite 1 300 128 34 next_uop_is_jalr
+  302 xor 1 87 227
+  303 or 1 3 302
+  304 ite 1 303 129 35 next_uop_is_jal
+  305 xor 1 87 227
+  306 or 1 3 305
+  307 ite 1 306 130 36 next_uop_is_sfb
+  308 xor 1 87 227
+  309 or 1 3 308
+  310 ite 37 309 131 38 next_uop_br_mask
+  311 xor 1 87 227
+  312 or 1 3 311
+  313 ite 13 312 132 39 next_uop_br_tag
+  314 xor 1 87 227
+  315 or 1 3 314
+  316 ite 17 315 133 40 next_uop_ftq_idx
+  317 xor 1 87 227
+  318 or 1 3 317
+  319 ite 1 318 134 41 next_uop_edge_inst
+  320 xor 1 87 227
+  321 or 1 3 320
+  322 ite 42 321 135 43 next_uop_pc_lob
+  323 xor 1 87 227
+  324 or 1 3 323
+  325 ite 1 324 136 44 next_uop_taken
+  326 xor 1 87 227
+  327 or 1 3 326
+  328 ite 45 327 137 46 next_uop_imm_packed
+  329 xor 1 87 227
+  330 or 1 3 329
+  331 ite 47 330 138 48 next_uop_csr_addr
+  332 xor 1 87 227
+  333 or 1 3 332
+  334 ite 19 333 139 49 next_uop_rxq_idx
+  335 xor 1 87 227
+  336 or 1 3 335
+  337 ite 42 336 140 192 next_uop_prs1
+  338 xor 1 87 227
+  339 or 1 3 338
+  340 ite 42 339 141 193 next_uop_prs2
+  341 xor 1 87 227
+  342 or 1 3 341
+  343 ite 42 342 142 194 next_uop_stale_pdst
+  344 xor 1 87 227
+  345 or 1 3 344
+  346 ite 1 345 143 50 next_uop_exception
+  347 xor 1 87 227
+  348 or 1 3 347
+  349 ite 51 348 144 52 next_uop_exc_cause
+  350 xor 1 87 227
+  351 or 1 3 350
+  352 ite 1 351 145 53 next_uop_bypassable
+  353 xor 1 87 227
+  354 or 1 3 353
+  355 ite 23 354 146 54 next_uop_mem_cmd
+  356 xor 1 87 227
+  357 or 1 3 356
+  358 ite 19 357 147 55 next_uop_mem_size
+  359 xor 1 87 227
+  360 or 1 3 359
+  361 ite 1 360 148 56 next_uop_mem_signed
+  362 xor 1 87 227
+  363 or 1 3 362
+  364 ite 1 363 149 57 next_uop_is_fence
+  365 xor 1 87 227
+  366 or 1 3 365
+  367 ite 1 366 150 58 next_uop_is_fencei
+  368 xor 1 87 227
+  369 or 1 3 368
+  370 ite 1 369 151 59 next_uop_is_amo
+  371 xor 1 87 227
+  372 or 1 3 371
+  373 ite 1 372 152 60 next_uop_uses_ldq
+  374 xor 1 87 227
+  375 or 1 3 374
+  376 ite 1 375 153 61 next_uop_uses_stq
+  377 xor 1 87 227
+  378 or 1 3 377
+  379 ite 1 378 154 62 next_uop_is_sys_pc2epc
+  380 xor 1 87 227
+  381 or 1 3 380
+  382 ite 1 381 155 63 next_uop_is_unique
+  383 xor 1 87 227
+  384 or 1 3 383
+  385 ite 1 384 156 64 next_uop_flush_on_commit
+  386 xor 1 87 227
+  387 or 1 3 386
+  388 and 1 387 157 next_uop_ldst_is_rs1
+  389 xor 1 87 227
+  390 or 1 3 389
+  391 ite 42 390 158 65 next_uop_ldst
+  392 xor 1 87 227
+  393 or 1 3 392
+  394 ite 42 393 159 66 next_uop_lrs1
+  395 xor 1 87 227
+  396 or 1 3 395
+  397 ite 42 396 160 67 next_uop_lrs2
+  398 xor 1 87 227
+  399 or 1 3 398
+  400 ite 42 399 161 68 next_uop_lrs3
+  401 xor 1 87 227
+  402 or 1 3 401
+  403 ite 1 402 162 69 next_uop_ldst_val
+  404 xor 1 87 227
+  405 or 1 3 404
+  406 ite 19 405 163 70 next_uop_dst_rtype
+  407 xor 1 87 227
+  408 or 1 3 407
+  409 ite 19 408 164 71 next_uop_lrs1_rtype
+  410 xor 1 87 227
+  411 or 1 3 410
+  412 ite 19 411 165 72 next_uop_lrs2_rtype
+  413 xor 1 87 227
+  414 or 1 3 413
+  415 ite 1 414 166 73 next_uop_frs3_en
+  416 xor 1 87 227
+  417 or 1 3 416
+  418 ite 1 417 167 74 next_uop_fp_val
+  419 xor 1 87 227
+  420 or 1 3 419
+  421 ite 1 420 168 75 next_uop_fp_single
+  422 xor 1 87 227
+  423 or 1 3 422
+  424 ite 1 423 169 76 next_uop_xcpt_pf_if
+  425 xor 1 87 227
+  426 or 1 3 425
+  427 ite 1 426 170 77 next_uop_xcpt_ae_if
+  428 xor 1 87 227
+  429 or 1 3 428
+  430 ite 1 429 171 78 next_uop_xcpt_ma_if
+  431 xor 1 87 227
+  432 or 1 3 431
+  433 ite 1 432 172 79 next_uop_bp_debug_if
+  434 xor 1 87 227
+  435 or 1 3 434
+  436 ite 1 435 173 80 next_uop_bp_xcpt_if
+  437 xor 1 87 227
+  438 or 1 3 437
+  439 ite 19 438 174 81 next_uop_debug_fsrc
+  440 xor 1 87 227
+  441 or 1 3 440
+  442 ite 19 441 175 82 next_uop_debug_tsrc
+  443 eq 1 158 394 _r_uop_bypass_hits_rs1_T
+  444 eq 1 163 229 _io_ren_stalls_0_T
+  445 and 1 162 444 freelist.io_reqs_0
+  446 and 1 445 86 freelist.io_reqs_0
+  447 and 1 446 443 r_uop_bypass_sel_rs1_0
+  448 eq 1 158 397 _r_uop_bypass_hits_rs2_T
+  449 and 1 446 448 r_uop_bypass_sel_rs2_0
+  450 eq 1 158 391 _r_uop_bypass_hits_dst_T
+  451 and 1 446 450 r_uop_bypass_sel_dst_0
+  452 neq 1 158 226 _ren2_uops_0_pdst_T_1
+  453 ite 42 452 208 226 bypassed_uop_pdst
+  454 ite 42 447 453 337 r_uop_newuop_prs1
+  455 ite 42 449 453 340 r_uop_newuop_prs2
+  456 ite 42 451 453 343 r_uop_newuop_stale_pdst
+  457 xor 37 83 228 _io_ren2_uops_0_newuop_br_mask_T
+  458 and 37 310 457 r_uop_newuop_br_mask
+  459 xor 1 130 227 _ren2_br_tags_0_valid_T
+  460 and 1 127 459 _ren2_br_tags_0_valid_T_1
+  461 or 1 460 128 _ren2_br_tags_0_valid_T_2
+  462 and 1 86 461 ren2_br_tags_0_valid
+  463 eq 1 102 229 _rbk_valids_0_T
+  464 and 1 101 463 com_valids_0
+  465 and 1 464 97 com_valids_0
+  466 and 1 101 463 rbk_valids_0
+  467 and 1 466 103 rbk_valids_0
+  468 ite 42 104 100 158 remap_reqs_0_ldst
+  469 ite 42 104 99 453 remap_reqs_0_pdst
+  470 or 1 446 467 remap_reqs_0_valid
+  471 or 1 465 467 freelist.io_dealloc_pregs_0_valid
+  472 ite 42 104 98 99 freelist.io_dealloc_pregs_0_bits
+  473 xor 1 446 227
+  474 concat 5 473 208
+  475 neq 1 474 230
+  476 xor 1 2 227
+  477 neq 1 90 229
+  478 and 1 88 477
+  479 neq 1 93 229
+  480 and 1 91 479
+  481 neq 1 96 229
+  482 and 1 94 481
+  483 or 1 478 480
+  484 or 1 483 482
+  485 xor 1 484 227
+  486 eq 1 164 229 _ren2_uops_0_prs1_busy_T
+  487 and 1 486 223 bypassed_uop_prs1_busy
+  488 eq 1 165 229 _ren2_uops_0_prs2_busy_T
+  489 and 1 488 224 bypassed_uop_prs2_busy
+  490 eq 1 159 226
+  491 and 1 106 223
+  492 and 1 491 490
+  493 xor 1 492 227
+  494 eq 1 160 226
+  495 and 1 106 224
+  496 and 1 495 494
+  497 xor 1 496 227
+  498 implies 1 476 475
+  499 not 1 498
+  500 bad 499
+  501 implies 1 476 485
+  502 not 1 501
+  503 bad 502
+  504 implies 1 476 493
+  505 not 1 504
+  506 bad 505
+  507 implies 1 476 497
+  508 not 1 507
+  509 bad 508
+  510 xor 1 207 227 _io_ren_stalls_0_T_1
+  511 and 1 444 510 io_ren_stalls_0
+  512 and 37 131 457 io_ren2_uops_0_newuop_br_mask
+  513 set 176 177 2 reset
+  514 set 176 178 66 io_map_reqs_0_lrs1
+  515 set 176 179 67 io_map_reqs_0_lrs2
+  516 set 176 180 65 io_map_reqs_0_ldst
+  517 set 176 181 468 io_remap_reqs_0_ldst
+  518 set 176 182 469 io_remap_reqs_0_pdst
+  519 set 176 183 470 io_remap_reqs_0_valid
+  520 set 176 184 462 io_ren_br_tags_0_valid
+  521 set 176 185 132 io_ren_br_tags_0_bits
+  522 set 176 186 84 io_brupdate_b2_uop_br_tag
+  523 set 176 187 85 io_brupdate_b2_mispredict
+  524 set 176 188 104 io_rollback
+  525 set 195 196 2 reset
+  526 set 195 197 446 io_reqs_0
+  527 set 195 198 471 io_dealloc_pregs_0_valid
+  528 set 195 199 472 io_dealloc_pregs_0_bits
+  529 set 195 200 462 io_ren_br_tags_0_valid
+  530 set 195 201 132 io_ren_br_tags_0_bits
+  531 set 195 202 84 io_brupdate_b2_uop_br_tag
+  532 set 195 203 85 io_brupdate_b2_mispredict
+  533 set 195 204 105 io_debug_pipeline_empty
+  534 set 209 210 2 reset
+  535 set 209 211 453 io_ren_uops_0_pdst
+  536 set 209 212 140 io_ren_uops_0_prs1
+  537 set 209 213 141 io_ren_uops_0_prs2
+  538 set 209 214 446 io_rebusy_reqs_0
+  539 set 209 215 89 io_wb_pdsts_0
+  540 set 209 216 92 io_wb_pdsts_1
+  541 set 209 217 95 io_wb_pdsts_2
+  542 set 209 218 88 io_wb_valids_0
+  543 set 209 219 91 io_wb_valids_1
+  544 set 209 220 94 io_wb_valids_2
+  545 output 511 io_ren_stalls_0
+  546 output 106 io_ren2_mask_0
+  547 output 107 io_ren2_uops_0_uopc
+  548 output 108 io_ren2_uops_0_inst
+  549 output 109 io_ren2_uops_0_debug_inst
+  550 output 110 io_ren2_uops_0_is_rvc
+  551 output 111 io_ren2_uops_0_debug_pc
+  552 output 112 io_ren2_uops_0_iq_type
+  553 output 113 io_ren2_uops_0_fu_code
+  554 output 114 io_ren2_uops_0_ctrl_br_type
+  555 output 115 io_ren2_uops_0_ctrl_op1_sel
+  556 output 116 io_ren2_uops_0_ctrl_op2_sel
+  557 output 117 io_ren2_uops_0_ctrl_imm_sel
+  558 output 118 io_ren2_uops_0_ctrl_op_fcn
+  559 output 119 io_ren2_uops_0_ctrl_fcn_dw
+  560 output 120 io_ren2_uops_0_ctrl_csr_cmd
+  561 output 121 io_ren2_uops_0_ctrl_is_load
+  562 output 122 io_ren2_uops_0_ctrl_is_sta
+  563 output 123 io_ren2_uops_0_ctrl_is_std
+  564 output 124 io_ren2_uops_0_iw_state
+  565 output 125 io_ren2_uops_0_iw_p1_poisoned
+  566 output 126 io_ren2_uops_0_iw_p2_poisoned
+  567 output 127 io_ren2_uops_0_is_br
+  568 output 128 io_ren2_uops_0_is_jalr
+  569 output 129 io_ren2_uops_0_is_jal
+  570 output 130 io_ren2_uops_0_is_sfb
+  571 output 512 io_ren2_uops_0_br_mask
+  572 output 132 io_ren2_uops_0_br_tag
+  573 output 133 io_ren2_uops_0_ftq_idx
+  574 output 134 io_ren2_uops_0_edge_inst
+  575 output 135 io_ren2_uops_0_pc_lob
+  576 output 136 io_ren2_uops_0_taken
+  577 output 137 io_ren2_uops_0_imm_packed
+  578 output 138 io_ren2_uops_0_csr_addr
+  579 output 139 io_ren2_uops_0_rxq_idx
+  580 output 453 io_ren2_uops_0_pdst
+  581 output 140 io_ren2_uops_0_prs1
+  582 output 141 io_ren2_uops_0_prs2
+  583 output 487 io_ren2_uops_0_prs1_busy
+  584 output 489 io_ren2_uops_0_prs2_busy
+  585 output 142 io_ren2_uops_0_stale_pdst
+  586 output 143 io_ren2_uops_0_exception
+  587 output 144 io_ren2_uops_0_exc_cause
+  588 output 145 io_ren2_uops_0_bypassable
+  589 output 146 io_ren2_uops_0_mem_cmd
+  590 output 147 io_ren2_uops_0_mem_size
+  591 output 148 io_ren2_uops_0_mem_signed
+  592 output 149 io_ren2_uops_0_is_fence
+  593 output 150 io_ren2_uops_0_is_fencei
+  594 output 151 io_ren2_uops_0_is_amo
+  595 output 152 io_ren2_uops_0_uses_ldq
+  596 output 153 io_ren2_uops_0_uses_stq
+  597 output 154 io_ren2_uops_0_is_sys_pc2epc
+  598 output 155 io_ren2_uops_0_is_unique
+  599 output 156 io_ren2_uops_0_flush_on_commit
+  600 output 157 io_ren2_uops_0_ldst_is_rs1
+  601 output 158 io_ren2_uops_0_ldst
+  602 output 159 io_ren2_uops_0_lrs1
+  603 output 160 io_ren2_uops_0_lrs2
+  604 output 161 io_ren2_uops_0_lrs3
+  605 output 162 io_ren2_uops_0_ldst_val
+  606 output 163 io_ren2_uops_0_dst_rtype
+  607 output 164 io_ren2_uops_0_lrs1_rtype
+  608 output 165 io_ren2_uops_0_lrs2_rtype
+  609 output 166 io_ren2_uops_0_frs3_en
+  610 output 167 io_ren2_uops_0_fp_val
+  611 output 168 io_ren2_uops_0_fp_single
+  612 output 169 io_ren2_uops_0_xcpt_pf_if
+  613 output 170 io_ren2_uops_0_xcpt_ae_if
+  614 output 171 io_ren2_uops_0_xcpt_ma_if
+  615 output 172 io_ren2_uops_0_bp_debug_if
+  616 output 173 io_ren2_uops_0_bp_xcpt_if
+  617 output 174 io_ren2_uops_0_debug_fsrc
+  618 output 175 io_ren2_uops_0_debug_tsrc
+  619 ite 1 2 225 235
+  620 next 1 106 619
+  621 next 5 107 238
+  622 next 7 108 241
+  623 next 7 109 244
+  624 next 1 110 247
+  625 next 11 111 250
+  626 next 13 112 253
+  627 next 15 113 256
+  628 next 17 114 259
+  629 next 19 115 262
+  630 next 13 116 265
+  631 next 13 117 268
+  632 next 23 118 271
+  633 next 1 119 274
+  634 next 13 120 277
+  635 next 1 121 280
+  636 next 1 122 283
+  637 next 1 123 286
+  638 next 19 124 289
+  639 next 1 125 292
+  640 next 1 126 295
+  641 next 1 127 298
+  642 next 1 128 301
+  643 next 1 129 304
+  644 next 1 130 307
+  645 next 37 131 458
+  646 next 13 132 313
+  647 next 17 133 316
+  648 next 1 134 319
+  649 next 42 135 322
+  650 next 1 136 325
+  651 next 45 137 328
+  652 next 47 138 331
+  653 next 19 139 334
+  654 next 42 140 454
+  655 next 42 141 455
+  656 next 42 142 456
+  657 next 1 143 346
+  658 next 51 144 349
+  659 next 1 145 352
+  660 next 23 146 355
+  661 next 19 147 358
+  662 next 1 148 361
+  663 next 1 149 364
+  664 next 1 150 367
+  665 next 1 151 370
+  666 next 1 152 373
+  667 next 1 153 376
+  668 next 1 154 379
+  669 next 1 155 382
+  670 next 1 156 385
+  671 next 1 157 388
+  672 next 42 158 391
+  673 next 42 159 394
+  674 next 42 160 397
+  675 next 42 161 400
+  676 next 1 162 403
+  677 next 19 163 406
+  678 next 19 164 409
+  679 next 19 165 412
+  680 next 1 166 415
+  681 next 1 167 418
+  682 next 1 168 421
+  683 next 1 169 424
+  684 next 1 170 427
+  685 next 1 171 430
+  686 next 1 172 433
+  687 next 1 173 436
+  688 next 19 174 439
+  689 next 19 175 442
+}

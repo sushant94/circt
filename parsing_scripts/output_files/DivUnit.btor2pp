@@ -1,0 +1,98 @@
+include MulDiv.btor2pp
+
+module DivUnit {
+  1 sort bitvec 1
+  2 input 1 reset
+  3 input 1 io_req_valid
+  4 sort bitvec 5
+  5 input 4 io_req_bits_uop_ctrl_op_fcn
+  6 input 1 io_req_bits_uop_ctrl_fcn_dw
+  7 sort bitvec 8
+  8 input 7 io_req_bits_uop_br_mask
+  9 input 4 io_req_bits_uop_rob_idx
+  10 sort bitvec 6
+  11 input 10 io_req_bits_uop_pdst
+  12 input 1 io_req_bits_uop_bypassable
+  13 input 1 io_req_bits_uop_is_amo
+  14 input 1 io_req_bits_uop_uses_stq
+  15 sort bitvec 2
+  16 input 15 io_req_bits_uop_dst_rtype
+  17 sort bitvec 64
+  18 input 17 io_req_bits_rs1_data
+  19 input 17 io_req_bits_rs2_data
+  20 input 1 io_req_bits_kill
+  21 input 1 io_resp_ready
+  22 input 7 io_brupdate_b1_resolve_mask
+  23 input 7 io_brupdate_b1_mispredict_mask
+  24 state 7 r_uop_br_mask
+  25 state 4 r_uop_rob_idx
+  26 state 10 r_uop_pdst
+  27 state 1 r_uop_bypassable
+  28 state 1 r_uop_is_amo
+  29 state 1 r_uop_uses_stq
+  30 state 15 r_uop_dst_rtype
+  31 inst MulDiv div
+  32 ref MulDiv 2 reset
+  33 ref MulDiv 3 io_req_valid
+  34 ref MulDiv 5 io_req_bits_fn
+  35 ref MulDiv 6 io_req_bits_dw
+  36 ref MulDiv 8 io_req_bits_in1
+  37 ref MulDiv 9 io_req_bits_in2
+  38 ref MulDiv 10 io_kill
+  39 ref MulDiv 11 io_resp_ready
+  40 ref MulDiv 542 io_req_ready
+  41 ref MulDiv 543 io_resp_valid
+  42 ref MulDiv 544 io_resp_bits_data
+  43 get 31 40 io_req_ready
+  44 get 31 41 io_resp_valid
+  45 get 31 42 io_resp_bits_data
+  46 consth 1 1
+  47 consth 7 FF
+  48 consth 7 0
+  49 and 1 43 3
+  50 and 7 23 8 _do_kill_T
+  51 neq 1 50 48 _do_kill_T_1
+  52 or 1 51 20 _do_kill_T_2
+  53 ite 4 49 9 25
+  54 ite 10 49 11 26
+  55 ite 1 49 12 27
+  56 ite 1 49 13 28
+  57 ite 1 49 14 29
+  58 ite 15 49 16 30
+  59 xor 7 22 47 _r_uop_br_mask_T
+  60 and 7 8 59 _r_uop_br_mask_T_1
+  61 and 7 23 24 _do_kill_T_3
+  62 neq 1 61 48 _do_kill_T_4
+  63 or 1 62 20 _do_kill_T_5
+  64 ite 1 49 52 63 do_kill
+  65 xor 7 22 47 _r_uop_br_mask_T_2
+  66 and 7 24 65 _r_uop_br_mask_T_3
+  67 ite 7 49 60 66
+  68 xor 1 64 46 _io_resp_valid_T
+  69 and 1 3 68 div.io_req_valid
+  70 and 1 44 68 io_resp_valid
+  71 set 31 32 2 reset
+  72 set 31 33 69 io_req_valid
+  73 set 31 34 5 io_req_bits_fn
+  74 set 31 35 6 io_req_bits_dw
+  75 set 31 36 18 io_req_bits_in1
+  76 set 31 37 19 io_req_bits_in2
+  77 set 31 38 64 io_kill
+  78 set 31 39 21 io_resp_ready
+  79 output 43 io_req_ready
+  80 output 70 io_resp_valid
+  81 output 25 io_resp_bits_uop_rob_idx
+  82 output 26 io_resp_bits_uop_pdst
+  83 output 27 io_resp_bits_uop_bypassable
+  84 output 28 io_resp_bits_uop_is_amo
+  85 output 29 io_resp_bits_uop_uses_stq
+  86 output 30 io_resp_bits_uop_dst_rtype
+  87 output 45 io_resp_bits_data
+  88 next 7 24 67
+  89 next 4 25 53
+  90 next 10 26 54
+  91 next 1 27 55
+  92 next 1 28 56
+  93 next 1 29 57
+  94 next 15 30 58
+}
